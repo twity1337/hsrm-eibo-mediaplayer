@@ -12,6 +12,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         System.out.println("Dies ist ein Test!");
+        Track Track_to_test_metadata_reading = new Track("C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media");
         System.exit(0);
     }
 }
