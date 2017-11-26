@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistManager {
-    private static PlaylistManager ourInstance = new PlaylistManager();
-    List<Playlist> playlistList;
+    private static PlaylistManager instance = new PlaylistManager();
+    private List<Playlist> playlistList;
 
     public static PlaylistManager getInstance() {
-        return ourInstance;
+        return instance;
     }
 
 

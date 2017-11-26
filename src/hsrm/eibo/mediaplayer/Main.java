@@ -1,6 +1,7 @@
 package hsrm.eibo.mediaplayer;
 
 import javafx.application.Application;
+import javafx.scene.media.Media;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -10,9 +11,10 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
-        System.out.println("Dies ist ein Test!");
-        Track Track_to_test_metadata_reading = new Track("C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media");
+    public void start(Stage primaryStage)
+    {
+        String testFilePath = ("file:///" + System.getProperty("user.dir").replace("\\", "/") + "/media/03. Prelude.mp3").replace(" ", "%20");
+        Media mediaToTestMetaData = new Media(testFilePath);
         System.exit(0);
     }
 }
