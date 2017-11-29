@@ -1,13 +1,11 @@
 package hsrm.eibo.mediaplayer;
 
 
-import jdk.internal.org.xml.sax.SAXException;
+import hsrm.eibo.mediaplayer.Core.Model.Metadata;
 import org.apache.tika.example.ParsingExample;
-import org.apache.tika.exception.TikaException;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.sax.BodyContentHandler;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,29 +20,29 @@ public class MetadataFactory {
         Metadata dataToAdd;
         AutoDetectParser parser = new AutoDetectParser();
         BodyContentHandler handler = new BodyContentHandler();
-        org.apache.tika.metadata.Metadata tikiMetadata;
+        org.apache.tika.metadata.Metadata tikaMetadata;
 
         for(String uri : uris)
         {
-            tikiMetadata = new org.apache.tika.metadata.Metadata();
+            tikaMetadata = new org.apache.tika.metadata.Metadata();
             try(InputStream stream = ParsingExample.class.getResourceAsStream(uri))
             {
-                parser.parse(stream, handler, tikiMetadata);
+                parser.parse(stream, handler, tikaMetadata);
             } catch (Exception e) {
-                //HANDLE THIS !!
+                //TODO: HANDLE THIS !!
             }
             dataToAdd = new Metadata(
-                tikiMetadata.get("title"),
-                tikiMetadata.get("album"),
-                tikiMetadata.get("interpret"),
-                Integer.parseInt(tikiMetadata.get("year")),
-                tikiMetadata.get("genre"),
-                tikiMetadata.get("filename"),
-                tikiMetadata.get("filepath"),
-                Float.parseFloat(tikiMetadata.get("length")),
-                Float.parseFloat(tikiMetadata.get("bitrate"))
+                tikaMetadata.get("title"),
+                tikaMetadata.get("album"),
+                tikaMetadata.get("interpret"),
+                Integer.parseInt(tikaMetadata.get("year")),
+                tikaMetadata.get("genre"),
+                tikaMetadata.get("filename"),
+                tikaMetadata.get("filepath"),
+                Float.parseFloat(tikaMetadata.get("length")),
+                Float.parseFloat(tikaMetadata.get("bitrate"))
             );
-            if(dataToAdd != null)
+            if(dataToAdd. != null)
             {
                 playlist.add(index, dataToAdd);
                 index++;

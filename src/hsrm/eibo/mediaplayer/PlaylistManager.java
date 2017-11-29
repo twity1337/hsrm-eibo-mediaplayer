@@ -1,5 +1,7 @@
 package hsrm.eibo.mediaplayer;
 
+import hsrm.eibo.mediaplayer.Core.Model.Playlist;
+
 import java.util.ArrayList;
 import java.util.List;
 

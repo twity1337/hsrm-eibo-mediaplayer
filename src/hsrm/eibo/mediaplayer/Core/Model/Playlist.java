@@ -1,4 +1,4 @@
-package hsrm.eibo.mediaplayer;
+package hsrm.eibo.mediaplayer.Core.Model;
 
 import javafx.scene.media.Media;
 

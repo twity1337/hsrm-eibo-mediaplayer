@@ -1,4 +1,4 @@
-package hsrm.eibo.mediaplayer;
+package hsrm.eibo.mediaplayer.Core.Model;
 
 
 public class Metadata {
@@ -66,4 +66,25 @@ public class Metadata {
         return bitrate;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null || !(obj instanceof Metadata ))
+            return false;
+
+        if(obj == this)
+            return true;
+
+        if(((Metadata) obj).getTitle().equals(this.title) &&
+            ((Metadata) obj).getAlbum().equals(this.album) &&
+            ((Metadata) obj).getInterpreteur().equals(this.interpreteur) &&
+            ((Metadata) obj).getGenre().equals(this.genre) &&
+            ((Metadata) obj).getYear() == this.year)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // TODO: Override HashCode method
 }
