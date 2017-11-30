@@ -19,8 +19,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage)
     {
-        Scene root = new Scene(ViewBuilder.getInstance().createMainView());
-        primaryStage.setScene(root);
+        ViewBuilder.getInstance().preparePrimaryStage(primaryStage);
         primaryStage.show();
 
 
@@ -28,6 +27,5 @@ public class Main extends Application {
         Media mediaToTestMetaData = new Media(testFilePath);
         Track test = new Track(testFilePath);
         System.out.println(test.getMetadata().getAlbum());
-        System.exit(0);
     }
 }
