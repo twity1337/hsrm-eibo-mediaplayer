@@ -26,12 +26,8 @@ public class Main extends Application {
 
         String testFilePath = ("file:///" + System.getProperty("user.dir").replace("\\", "/") + "/media/03. Prelude.mp3").replace(" ", "%20");
         Media mediaToTestMetaData = new Media(testFilePath);
-        try {
-            ArrayList<Metadata> list = MetadataFactory.createMetadataList(new URI(testFilePath));
-            System.out.println(list.get(0).toString());
-            System.exit(0);
-        }catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Track test = new Track(testFilePath);
+        System.out.println(test.getMetadata().getAlbum());
+        System.exit(0);
     }
 }
