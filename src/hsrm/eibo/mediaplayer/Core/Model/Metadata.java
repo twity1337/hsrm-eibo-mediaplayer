@@ -8,21 +8,16 @@ public class Metadata {
     private String interpreteur;
     private int year;
     private String genre;
-    private String fileName;
-    private String filePath;
     private float length;
     private float bitrate;
 
     public Metadata(String title, String album, String interpreteur,
-                    int year, String genre, String fileName,
-                    String filePath, float length, float bitrate) {
+                    int year, String genre, float length, float bitrate) {
         this.title = title;
         this.album = album;
         this.interpreteur = interpreteur;
         this.year = year;
         this.genre = genre;
-        this.fileName = fileName;
-        this.filePath = filePath;
         this.length = length;
         this.bitrate = bitrate;
     }
@@ -38,7 +33,7 @@ public class Metadata {
         return album;
     }
 
-    public String getInterpreteur() {
+    public String getArtist() {
         return interpreteur;
     }
 
@@ -48,14 +43,6 @@ public class Metadata {
 
     public String getGenre() {
         return genre;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getFilePath() {
-        return filePath;
     }
 
     public float getLength() {
@@ -76,9 +63,11 @@ public class Metadata {
 
         if(((Metadata) obj).getTitle().equals(this.title) &&
             ((Metadata) obj).getAlbum().equals(this.album) &&
-            ((Metadata) obj).getInterpreteur().equals(this.interpreteur) &&
+            ((Metadata) obj).getArtist().equals(this.interpreteur) &&
             ((Metadata) obj).getGenre().equals(this.genre) &&
-            ((Metadata) obj).getYear() == this.year)
+            ((Metadata) obj).getYear() == this.year &&
+            ((Metadata) obj).getLength() == this.length &&
+            ((Metadata) obj).getBitrate() == this.bitrate)
         {
             return true;
         }
