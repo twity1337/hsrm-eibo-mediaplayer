@@ -1,5 +1,8 @@
 package hsrm.eibo.mediaplayer.Core.View.Components;
 
+import hsrm.eibo.mediaplayer.Core.Controller.MediaController;
+import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -7,16 +10,17 @@ import javafx.scene.layout.VBox;
 
 public class MainBorderPane extends BorderPane {
 
-    MenuBar menuBar = new MenuBar();
+    private final MediaController controller = MediaController.getInstance();
 
-    public MainBorderPane()
-    {
+    private MenuBar menuBar = new MenuBar();
+    private Button playPauseButton = new Button();
+
+    public MainBorderPane() {
         this.setTop(getTopComponents());
-        this.setCenter(new Button("Test"));
+        this.setCenter(getCenterComponents());
     }
 
-    private Pane getTopComponents()
-    {
+    private Pane getTopComponents() {
         VBox topVBox = new VBox();
 
         Menu[] menus = {
@@ -36,10 +40,24 @@ public class MainBorderPane extends BorderPane {
 
         menus[0].getItems().addAll(fileSubMenu);
 
-        menuBar.getMenus().addAll(menus);
-        topVBox.getChildren().addAll(menuBar);
+        this.menuBar.getMenus().addAll(menus);
+        topVBox.getChildren().addAll(this.menuBar);
 
         return topVBox;
+    }
+
+    private Group getCenterComponents() {
+        Group buttonGroup = new Group();
+        this.playPauseButton.setText("Play / Pause");
+        this.playPauseButton.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                System.out.println(event.getClickCount());
+                controller.togglePlayPause();
+            }
+        });
+        buttonGroup.getChildren().add(this.playPauseButton);
+        return buttonGroup;
     }
 
 }

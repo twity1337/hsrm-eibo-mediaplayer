@@ -1,26 +1,16 @@
 package hsrm.eibo.mediaplayer.Core.Model;
 
-import javafx.scene.media.Media;
+import java.util.ArrayList;
 
-import java.util.List;
-
-public class Playlist {
-    private List<Media> medias;
+public class Playlist extends ArrayList<Track>{
     private String name;
-    private String locationUri;
+    private String location;
 
-    public Playlist(List<Media> medias, String name, String locationUri) {
-        this.medias = medias;
-        this.name = name;
-        this.locationUri = locationUri;
-    }
 
-    public List<Media> getMedias() {
-        return medias;
-    }
-
-    public void setMedias(List<Media> medias) {
-        this.medias = medias;
+    public Playlist(String location, String[] stringList) {
+        this.location = location;
+        for(String trackPath : stringList)
+            super.add(new Track(trackPath));
     }
 
     public String getName() {
@@ -31,7 +21,7 @@ public class Playlist {
         this.name = name;
     }
 
-    public String getLocationUri() {
-        return locationUri;
+    public String getLocation() {
+        return location;
     }
 }
