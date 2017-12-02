@@ -21,11 +21,13 @@ public class Main extends Application {
 
         //for testing reasons
         String[] list={};
+/*
         String testpath = "C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media\\playlist.m3u";
         try {
             list = MediaUtil.parseM3u(testpath);
         } catch (Exception e){}
         Playlist playlist = new Playlist(list);
+*/
 
         String testFilePath = ("file:///" + System.getProperty("user.dir").replace("\\", "/") + "/media/03. Prelude.mp3").replace(" ", "%20");
 
