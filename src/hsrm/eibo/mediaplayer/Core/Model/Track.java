@@ -7,8 +7,6 @@ import javafx.scene.media.MediaPlayer;
 public class Track {
 
     private Metadata metadata;
-
-    //path String for tika metadata
     private String path;
 
     /**
@@ -18,7 +16,6 @@ public class Track {
     public Track(String path)
     {
         this.path = path;
-        //try {this.path = (new URI(path)).getPath();}catch (Exception e){}
         if(path != null)
             this.metadata = MediaUtil.createMetadata(this.path);
     }

@@ -17,6 +17,7 @@ public class Main extends Application {
     public void start(Stage primaryStage)
     {
 
+        int[] testIntarray = MediaUtil.generateShuffelList(20);
 
         //for testing reasons
         String[] list={};

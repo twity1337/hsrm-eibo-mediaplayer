@@ -5,17 +5,17 @@ public class Metadata {
 
     private String title;
     private String album;
-    private String interpreteur;
+    private String artist;
     private int year;
     private String genre;
     private float length;
     private float bitrate;
 
-    public Metadata(String title, String album, String interpreteur,
+    public Metadata(String title, String album, String artist,
                     int year, String genre, float length, float bitrate) {
         this.title = title;
         this.album = album;
-        this.interpreteur = interpreteur;
+        this.artist = artist;
         this.year = year;
         this.genre = genre;
         this.length = length;
@@ -34,7 +34,7 @@ public class Metadata {
     }
 
     public String getArtist() {
-        return interpreteur;
+        return artist;
     }
 
     public int getYear() {
@@ -63,7 +63,7 @@ public class Metadata {
 
         if(((Metadata) obj).getTitle().equals(this.title) &&
             ((Metadata) obj).getAlbum().equals(this.album) &&
-            ((Metadata) obj).getArtist().equals(this.interpreteur) &&
+            ((Metadata) obj).getArtist().equals(this.artist) &&
             ((Metadata) obj).getGenre().equals(this.genre) &&
             ((Metadata) obj).getYear() == this.year &&
             ((Metadata) obj).getLength() == this.length &&

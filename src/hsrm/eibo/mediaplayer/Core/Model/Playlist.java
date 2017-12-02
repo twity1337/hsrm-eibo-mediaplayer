@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Playlist extends ArrayList<Track>{
     private String name;
+
     private String location;
 
 
@@ -13,6 +14,8 @@ public class Playlist extends ArrayList<Track>{
             super.add(new Track(trackPath));
     }
 
+    public Playlist(String[] stringList){this(null, stringList);}
+
     public String getName() {
         return name;
     }
@@ -21,6 +24,10 @@ public class Playlist extends ArrayList<Track>{
         this.name = name;
     }
 
+    /**
+     *
+     * @return location of playlist file in filesystem
+     */
     public String getLocation() {
         return location;
     }
