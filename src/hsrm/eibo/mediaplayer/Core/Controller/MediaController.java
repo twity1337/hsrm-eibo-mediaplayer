@@ -7,7 +7,7 @@ import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import javafx.scene.media.MediaPlayer;
 
 import java.util.ArrayList;
-
+//TODO: repeat mode (not just whole list but single track), volume state handling, progression handling (notify when track ended)
 public class MediaController {
     private ArrayList<MediaPlayer> mediaplayerList;
     private int[] shuffleList;
@@ -31,9 +31,14 @@ public class MediaController {
     }
 
     public void togglePlayPause()
-    {   //TODO: test if mediaplayer set and throw excption
+    {
+        if (currentTrackIndex < 0)
+            currentTrackIndex=0;
+        //TODO: add user promt to select playlist if no selected so far
+        if (playlist == null)
+            return;
 
-        if(this.currentMediaplayer == null && this.playlist != null)
+        if(this.currentMediaplayer == null)
             this.currentMediaplayer = this.playlist.get(currentTrackIndex).getTrackMediaPlayer();
 
         Status status = this.currentMediaplayer.getStatus();
@@ -58,6 +63,14 @@ public class MediaController {
     public void skipToNext(){
         this.currentMediaplayer.stop();
         this.currentMediaplayer = this.mediaplayerList.get(nextPlayerIndex());
+        this.currentMediaplayer.play();
+    }
+
+    public void skipToPrevious()
+    {
+        this.currentMediaplayer.stop();
+        this.currentMediaplayer = this.mediaplayerList.get(previousPlayerIndex());
+        this.currentMediaplayer.play();
     }
 
     public void setPlaylist(Playlist playlist)
