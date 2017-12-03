@@ -5,12 +5,14 @@ import hsrm.eibo.mediaplayer.Core.Model.Metadata;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import hsrm.eibo.mediaplayer.PlaylistManager;
 import javafx.scene.media.MediaPlayer;
+import org.apache.tika.exception.TikaException;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.audio.AudioParser;
 import org.apache.tika.parser.audio.MidiParser;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.SAXException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class MediaUtil {
     };
     //need method for list creation out of one URI/list of URIs with no prior list/add to existing list
     public static Metadata createMetadata(String path)
-        //TODO: throws IOException, SAXException, TikaException
+        throws IOException, SAXException, TikaException
     {
         Metadata dataToAdd;
         AutoDetectParser parser = new AutoDetectParser(AUTO_DETECT_EXCEPTED_PARSERS);
@@ -33,18 +35,16 @@ public class MediaUtil {
 
         tikaMetadata = new org.apache.tika.metadata.Metadata();
         File file = new File(path);
-        try(InputStream stream = new FileInputStream(file))
-        {
-            parser.parse(stream, handler, tikaMetadata);
-        } catch (Exception e) {
-            // TODO: Richtig machen!
-            throw new RuntimeException(e);
-        }
+
+        InputStream stream = new FileInputStream(file);
+        parser.parse(stream, handler, tikaMetadata);
+        stream.close();
+
         dataToAdd = new Metadata(
             tikaMetadata.get("title"),
             tikaMetadata.get("xmpDM:album"),
-            tikaMetadata.get("interpret"),
-            Integer.parseInt(tikaMetadata.get("xmpDM:releaseDate")),
+            getArtist(tikaMetadata),
+            tikaMetadata.get("xmpDM:releaseDate"),
             tikaMetadata.get("xmpDM:genre"),
             Float.parseFloat(tikaMetadata.get("xmpDM:duration")),
             Float.parseFloat(tikaMetadata.get("xmpDM:audioSampleRate"))
@@ -71,7 +71,8 @@ public class MediaUtil {
         return list;
     }
 
-    public static void loadPlaylistFromFile(String path) throws IOException
+    public static void loadPlaylistFromFile(String path)
+            throws IOException, SAXException, TikaException
     {
         PlaylistManager.getInstance().add(new Playlist(parseM3u(path)));
     }
@@ -102,5 +103,15 @@ public class MediaUtil {
             randomizedList[index] = i;
         }
         return randomizedList;
+    }
+
+    private static String getArtist(org.apache.tika.metadata.Metadata m)
+    {
+        String a;
+        if ((a=m.get("creator"))!=null
+                || (a=m.get("meta:author"))!=null
+                || (a=m.get("xmpDM:artist"))!=null)
+            ;
+        return a;
     }
 }

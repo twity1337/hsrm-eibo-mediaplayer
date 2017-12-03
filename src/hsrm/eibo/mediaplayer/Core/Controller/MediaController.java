@@ -1,4 +1,5 @@
 package hsrm.eibo.mediaplayer.Core.Controller;
+import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import javafx.scene.media.MediaPlayer.Status;
 
@@ -33,7 +34,7 @@ public class MediaController {
     {   //TODO: test if mediaplayer set and throw excption
 
         if(this.currentMediaplayer == null && this.playlist != null)
-            this.currentMediaplayer = this.playlist.get(0).getTrackMediaPlayer();
+            this.currentMediaplayer = this.playlist.get(currentTrackIndex).getTrackMediaPlayer();
 
         Status status = this.currentMediaplayer.getStatus();
 
@@ -54,7 +55,6 @@ public class MediaController {
 
     }
 
-    //TODO: stop/aktuellen player stoppen /neuen einfügen skip next prev
     public void skipToNext(){
         this.currentMediaplayer.stop();
         this.currentMediaplayer = this.mediaplayerList.get(nextPlayerIndex());
@@ -75,7 +75,8 @@ public class MediaController {
     private int nextPlayerIndex()
     {
         //end of playlist = -1
-        currentTrackIndex = ++currentTrackIndex >= playlist.size() ? -1 : currentTrackIndex;
+        currentTrackIndex = ++currentTrackIndex >= playlist.size() ?
+                (repeating ? currentTrackIndex: -1) : currentTrackIndex;
         if (currentTrackIndex<0 || !shuffled)
             return currentTrackIndex;
         return shuffleList[currentTrackIndex];
@@ -106,5 +107,21 @@ public class MediaController {
         //playlist wont remember tracks already played
         shuffled = !shuffled;
         shuffleList = MediaUtil.generateShuffelList(this.playlist.size());
+    }
+
+    /**
+     * method to add one or more Track objects to current playlist
+     * TODO: currently only adding at end of list
+     * @param tracksToAdd Track[]
+     */
+    public void addTrackToPlaylist(Track...tracksToAdd)
+    {
+        Playlist newTracks = new Playlist();
+        for (Track trackToAdd : tracksToAdd)
+            newTracks.add(trackToAdd);
+        this.mediaplayerList.addAll(MediaUtil.generateMediaplayerList(newTracks));
+        this.playlist.addAll(newTracks);
+        if (shuffled)
+            shuffleList = MediaUtil.generateShuffelList(playlist.size());
     }
 }

@@ -6,17 +6,17 @@ public class Metadata {
     private String title;
     private String album;
     private String artist;
-    private int year;
+    private String date;
     private String genre;
     private float length;
     private float bitrate;
 
     public Metadata(String title, String album, String artist,
-                    int year, String genre, float length, float bitrate) {
+                    String year, String genre, float length, float bitrate) {
         this.title = title;
         this.album = album;
         this.artist = artist;
-        this.year = year;
+        this.date = year;
         this.genre = genre;
         this.length = length;
         this.bitrate = bitrate;
@@ -37,8 +37,8 @@ public class Metadata {
         return artist;
     }
 
-    public int getYear() {
-        return year;
+    public String getDate() {
+        return date;
     }
 
     public String getGenre() {
@@ -62,12 +62,12 @@ public class Metadata {
             return true;
 
         if(((Metadata) obj).getTitle().equals(this.title) &&
-            ((Metadata) obj).getAlbum().equals(this.album) &&
-            ((Metadata) obj).getArtist().equals(this.artist) &&
-            ((Metadata) obj).getGenre().equals(this.genre) &&
-            ((Metadata) obj).getYear() == this.year &&
-            ((Metadata) obj).getLength() == this.length &&
-            ((Metadata) obj).getBitrate() == this.bitrate)
+                ((Metadata) obj).getAlbum().equals(this.album) &&
+                ((Metadata) obj).getArtist().equals(this.artist) &&
+                ((Metadata) obj).getGenre().equals(this.genre) &&
+                (((Metadata) obj).getDate() == this.date) &&
+                (((Metadata) obj).getLength() == this.length) &&
+                (((Metadata) obj).getBitrate() == this.bitrate))
         {
             return true;
         }

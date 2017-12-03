@@ -3,6 +3,10 @@ package hsrm.eibo.mediaplayer.Core.Model;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import org.apache.tika.exception.TikaException;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 
 public class Track {
 
@@ -13,9 +17,10 @@ public class Track {
      *
      * @param path
      */
-    public Track(String path)
+    public Track(String path) throws IOException, SAXException, TikaException
     {
         this.path = path;
+        //TODO: überprüfung heir überflüssig?
         if(path != null)
             this.metadata = MediaUtil.createMetadata(this.path);
     }
