@@ -17,7 +17,7 @@ public class Track {
      *
      * @param path
      */
-    public Track(String path) throws IOException, SAXException, TikaException
+    public Track(String path) throws IOException
     {/*
         this.path = path;
         //TODO: überprüfung heir überflüssig?
