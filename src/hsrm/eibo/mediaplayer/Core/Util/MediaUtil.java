@@ -40,6 +40,8 @@ public class MediaUtil {
             // TODO: Richtig machen!
             throw new RuntimeException(e);
         }
+
+        // TODO: Handle empty (not existing) metadata.
         dataToAdd = new Metadata(
             tikaMetadata.get("title"),
             tikaMetadata.get("xmpDM:album"),
@@ -52,28 +54,10 @@ public class MediaUtil {
         //TODO: equal empty
         return dataToAdd;
     }
-    //TODO: make extended m3u compatible
-    public static String[] parseM3u(String location) throws IOException
-    {
-        String[] list;
-        String line;
-        BufferedReader reader = new BufferedReader(new FileReader(location));
-        ArrayList<String> buffer = new ArrayList<>();
 
-        try
-        {
-            while((line = reader.readLine())!= null)
-                buffer.add(line);
-        } finally {
-            reader.close();
-        }
-        list = buffer.toArray(new String[0]);
-        return list;
-    }
-
-    public static void loadPlaylistFromFile(String path) throws IOException
+    public static void loadPlaylistFromFile(File file) throws IOException
     {
-        PlaylistManager.getInstance().add(new Playlist(parseM3u(path)));
+        PlaylistManager.getInstance().add(new Playlist(parseM3u(file)));
     }
 
     public static ArrayList<MediaPlayer> generateMediaplayerList(Playlist playlist) {
@@ -102,5 +86,25 @@ public class MediaUtil {
             randomizedList[index] = i;
         }
         return randomizedList;
+    }
+
+    //TODO: make extended m3u compatible
+    // TODO: Make "private"
+    public static String[] parseM3u(File file) throws IOException
+    {
+        String[] list;
+        String line;
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        ArrayList<String> buffer = new ArrayList<>();
+
+        try
+        {
+            while((line = reader.readLine())!= null)
+                buffer.add(line);
+        } finally {
+            reader.close();
+        }
+        list = buffer.toArray(new String[0]);
+        return list;
     }
 }

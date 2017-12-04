@@ -8,13 +8,13 @@ public class Playlist extends ArrayList<Track>{
     private String location;
 
 
-    public Playlist(String location, String[] stringList) {
+    public Playlist(String location, String[] trackPaths) {
         this.location = location;
-        for(String trackPath : stringList)
+        for(String trackPath : trackPaths)
             super.add(new Track(trackPath));
     }
 
-    public Playlist(String[] stringList){this(null, stringList);}
+    public Playlist(String[] trackPaths){this(null, trackPaths);}
 
     public String getName() {
         return name;
