@@ -19,14 +19,14 @@ import java.util.ArrayList;
 
 public class MediaUtil {
     //or MediaUtil wathever
-/*    private static final Parser[] AUTO_DETECT_EXCEPTED_PARSERS = {
+    private static final Parser[] AUTO_DETECT_EXCEPTED_PARSERS = {
             new AudioParser(),
             new MidiParser(),
             new Mp3Parser()
     };
     //need method for list creation out of one URI/list of URIs with no prior list/add to existing list
     public static Metadata createMetadata(String path)
-        throws IOException, SAXException, TikaException
+        //TODO: throws IOException, SAXException, TikaException
     {
         Metadata dataToAdd;
         AutoDetectParser parser = new AutoDetectParser(AUTO_DETECT_EXCEPTED_PARSERS);
@@ -35,45 +35,31 @@ public class MediaUtil {
 
         tikaMetadata = new org.apache.tika.metadata.Metadata();
         File file = new File(path);
+        try(InputStream stream = new FileInputStream(file))
+        {
+            parser.parse(stream, handler, tikaMetadata);
+        } catch (Exception e) {
+            // TODO: Richtig machen!
+            throw new RuntimeException(e);
+        }
 
-        InputStream stream = new FileInputStream(file);
-        parser.parse(stream, handler, tikaMetadata);
-        stream.close();
-
+        // TODO: Handle empty (not existing) metadata.
         dataToAdd = new Metadata(
             tikaMetadata.get("title"),
             tikaMetadata.get("xmpDM:album"),
-            getArtist(tikaMetadata),
-            tikaMetadata.get("xmpDM:releaseDate"),
+            tikaMetadata.get("interpret"),
+            Integer.parseInt(tikaMetadata.get("xmpDM:releaseDate")),
             tikaMetadata.get("xmpDM:genre"),
             Float.parseFloat(tikaMetadata.get("xmpDM:duration")),
             Float.parseFloat(tikaMetadata.get("xmpDM:audioSampleRate"))
         );
+        //TODO: equal empty
         return dataToAdd;
-    }*/
-    //TODO: make extended m3u compatible
-    public static String[] parseM3u(String location) throws IOException
-    {
-        String[] list;
-        String line;
-        BufferedReader reader = new BufferedReader(new FileReader(location));
-        ArrayList<String> buffer = new ArrayList<>();
-
-        try
-        {
-            while((line = reader.readLine())!= null)
-                buffer.add(line);
-        } finally {
-            reader.close();
-        }
-        list = buffer.toArray(new String[0]);
-        return list;
     }
 
-    public static void loadPlaylistFromFile(String path)
-            throws IOException, SAXException, TikaException
+    public static void loadPlaylistFromFile(File file) throws IOException
     {
-        PlaylistManager.getInstance().add(new Playlist(parseM3u(path)));
+        PlaylistManager.getInstance().add(new Playlist(parseM3u(file)));
     }
 
     public static ArrayList<MediaPlayer> generateMediaplayerList(Playlist playlist) {
@@ -104,13 +90,23 @@ public class MediaUtil {
         return randomizedList;
     }
 
-    private static String getArtist(org.apache.tika.metadata.Metadata m)
+    //TODO: make extended m3u compatible
+    // TODO: Make "private"
+    public static String[] parseM3u(File file) throws IOException
     {
-        String a;
-        if ((a=m.get("creator"))!=null
-                || (a=m.get("meta:author"))!=null
-                || (a=m.get("xmpDM:artist"))!=null)
-            ;
-        return a;
+        String[] list;
+        String line;
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        ArrayList<String> buffer = new ArrayList<>();
+
+        try
+        {
+            while((line = reader.readLine())!= null)
+                buffer.add(line);
+        } finally {
+            reader.close();
+        }
+        list = buffer.toArray(new String[0]);
+        return list;
     }
 }

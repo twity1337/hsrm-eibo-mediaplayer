@@ -8,17 +8,17 @@ import java.util.ArrayList;
 
 public class Playlist extends ArrayList<Track>{
     private String name;
+
     private String location;
 
 
-    public Playlist(String location, String[] stringList)
-            throws IOException, SAXException, TikaException
-    {
+    public Playlist(String location, String[] trackPaths) {
         this.location = location;
-        for(String trackPath : stringList)
+        for(String trackPath : trackPaths)
             super.add(new Track(trackPath));
     }
 
+    public Playlist(String[] trackPaths){this(null, trackPaths);}
     public Playlist(String[] stringList)
             throws IOException, SAXException, TikaException
     {this(null, stringList);}

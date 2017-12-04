@@ -30,6 +30,15 @@ public class MediaController {
         this.currentTrackIndex = 0;
     }
 
+    public MediaPlayer getCurrentMediaplayer() {
+        return currentMediaplayer;
+    }
+
+    public boolean isPlaying()
+    {
+        return this.currentMediaplayer.getStatus() == Status.PLAYING;
+    }
+
     public void togglePlayPause()
     {
         if (currentTrackIndex < 0)
@@ -75,14 +84,19 @@ public class MediaController {
 
     public void setPlaylist(Playlist playlist)
     {
-        this.currentMediaplayer.stop();
-        this.currentMediaplayer.dispose();
+        if(this.currentMediaplayer != null ) {
+            this.currentMediaplayer.stop();
+            this.currentMediaplayer.dispose();
+        }
         this.playlist = playlist;
         this.currentTrackIndex=0;
         if (shuffled)
             this.shuffleList = MediaUtil.generateShuffelList(this.playlist.size());
         this.mediaplayerList = MediaUtil.generateMediaplayerList(this.playlist);
-        this.currentMediaplayer = this.mediaplayerList.get(nextPlayerIndex());
+
+        // TODO: Why setting current mediaplayer to nextPlayerIndex on changing the playlist?
+        // this.currentMediaplayer = this.mediaplayerList.get(nextPlayerIndex());
+        this.currentMediaplayer = this.mediaplayerList.get(0);
     }
 
     private int nextPlayerIndex()
