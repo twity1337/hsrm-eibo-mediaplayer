@@ -10,12 +10,12 @@ import java.util.ArrayList;
 
 public class Playlist extends ArrayList<Track> {
     private String name;
-
     private String location;
 
 
     public Playlist(String location, String[] trackPaths)
-            throws PlaylistIOException{
+            throws PlaylistIOException
+    {
         this.location = location;
         PlaylistIOException exception = null;
         for(String trackPath : trackPaths)
@@ -28,10 +28,10 @@ public class Playlist extends ArrayList<Track> {
                 exception.addFailedFilePath(trackPath);
             }
         }
+        //TODO: do something with error
     }
 
-    public Playlist(String... trackPaths)
-            throws PlaylistIOException
+    public Playlist(String... trackPaths) throws PlaylistIOException
     {
         this(null, trackPaths);
     }

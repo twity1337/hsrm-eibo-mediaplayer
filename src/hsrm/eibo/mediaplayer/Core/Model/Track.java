@@ -1,28 +1,29 @@
 package hsrm.eibo.mediaplayer.Core.Model;
 
-import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
+import hsrm.eibo.mediaplayer.Core.Util.MetadataService;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import org.apache.tika.exception.TikaException;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
 public class Track {
 
     private Metadata metadata;
-    private String path;
+    private String trackPath;
 
     /**
      *
-     * @param path
+     * @param trackPath
      */
-    public Track(String path) throws IOException
-    {/*
-        this.path = path;
-        //TODO: überprüfung heir überflüssig?
-        if(path != null)
-            this.metadata = MediaUtil.createMetadata(this.path);*/
+    public Track(String trackPath) throws IOException
+    {
+        this.trackPath = trackPath;
+        MetadataService service = new MetadataService();
+        service.setPath(trackPath);
+        service.setOnSucceeded(event ->
+                metadata = (Metadata)event.getSource().getValue());
     }
 
     public Metadata getMetadata()
@@ -35,12 +36,12 @@ public class Track {
         return new MediaPlayer(new Media(this.getUri()));
     }
 
-    public String getPath() {
-        return path;
+    public String getTrackPath() {
+        return trackPath;
     }
 
     private String getUri()
     {
-        return ("file:///" + path.replace("\\", "/")).replace(" ", "%20");
+        return ("file:///" + trackPath.replace("\\", "/")).replace(" ", "%20");
     }
 }

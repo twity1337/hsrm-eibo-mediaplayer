@@ -20,6 +20,8 @@ import java.io.InputStream;
 /**
  * service to provide threaded metadata parsing
  */
+
+//TODO: rework to TrackService, on failure return file path
 public class MetadataService extends Service<Metadata>{
 
     private static final Parser[] AUTO_DETECT_EXCEPTED_PARSERS = {

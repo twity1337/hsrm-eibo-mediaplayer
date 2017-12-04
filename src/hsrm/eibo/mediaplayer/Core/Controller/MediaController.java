@@ -1,4 +1,5 @@
 package hsrm.eibo.mediaplayer.Core.Controller;
+import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import javafx.scene.media.MediaPlayer.Status;
@@ -19,6 +20,8 @@ public class MediaController {
     private boolean endOfMedia;
     private static MediaController ourInstance = new MediaController();
 
+
+
     public static MediaController getInstance() {
         return ourInstance;
     }
@@ -28,10 +31,25 @@ public class MediaController {
         this.repeating =false;
         this.shuffled =false;
         this.currentTrackIndex = 0;
+
     }
 
     public MediaPlayer getCurrentMediaplayer() {
+        MediaController ths = this;
+        currentMediaplayer.setOnEndOfMedia(new Runnable() {
+            @Override
+            public void run() {
+                ths.endOfMedia = true;
+            }
+        });
         return currentMediaplayer;
+    }
+
+    public void setCurrentMediaplayer()
+    {
+        if (playlist == null || playlist.size()<1)
+            return;
+
     }
 
     public boolean isPlaying()
@@ -48,18 +66,24 @@ public class MediaController {
             return;
 
         if(this.currentMediaplayer == null)
-            this.currentMediaplayer = this.playlist.get(currentTrackIndex).getTrackMediaPlayer();
+        {
+            this.currentMediaplayer =
+                    this.playlist.get(currentTrackIndex).getTrackMediaPlayer();
+        }
 
         Status status = this.currentMediaplayer.getStatus();
 
         if(status == Status.HALTED || status == Status.UNKNOWN)
             return;
 
-        if(status == Status.PAUSED || status == Status.READY || status == Status.STOPPED)
+        if(status == Status.PAUSED ||
+            status == Status.READY ||
+            status == Status.STOPPED)
         {
             if(this.endOfMedia)
             {
-                this.currentMediaplayer.seek(this.currentMediaplayer.getStartTime());
+                this.currentMediaplayer.seek(
+                        this.currentMediaplayer.getStartTime());
                 this.endOfMedia = false;
             }
             this.currentMediaplayer.play();
@@ -78,7 +102,8 @@ public class MediaController {
     public void skipToPrevious()
     {
         this.currentMediaplayer.stop();
-        this.currentMediaplayer = this.mediaplayerList.get(previousPlayerIndex());
+        this.currentMediaplayer =
+                this.mediaplayerList.get(previousPlayerIndex());
         this.currentMediaplayer.play();
     }
 
@@ -91,11 +116,10 @@ public class MediaController {
         this.playlist = playlist;
         this.currentTrackIndex=0;
         if (shuffled)
-            this.shuffleList = MediaUtil.generateShuffelList(this.playlist.size());
+            this.shuffleList = MediaUtil.generateShuffelList(
+                    this.playlist.size());
         this.mediaplayerList = MediaUtil.generateMediaplayerList(this.playlist);
 
-        // TODO: Why setting current mediaplayer to nextPlayerIndex on changing the playlist?
-        // this.currentMediaplayer = this.mediaplayerList.get(nextPlayerIndex());
         this.currentMediaplayer = this.mediaplayerList.get(0);
     }
 
@@ -142,11 +166,13 @@ public class MediaController {
      * @param tracksToAdd Track[]
      */
     public void addTrackToPlaylist(Track...tracksToAdd)
+            throws PlaylistIOException
     {
         Playlist newTracks = new Playlist();
         for (Track trackToAdd : tracksToAdd)
             newTracks.add(trackToAdd);
-        this.mediaplayerList.addAll(MediaUtil.generateMediaplayerList(newTracks));
+        this.mediaplayerList.addAll(
+                MediaUtil.generateMediaplayerList(newTracks));
         this.playlist.addAll(newTracks);
         if (shuffled)
             shuffleList = MediaUtil.generateShuffelList(playlist.size());

@@ -1,8 +1,10 @@
 package hsrm.eibo.mediaplayer.Core.View.Components;
 
 import hsrm.eibo.mediaplayer.Core.Controller.MediaController;
+import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
+import hsrm.eibo.mediaplayer.PlaylistManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -65,13 +67,15 @@ public class MainBorderPane extends BorderPane {
                 );
                 fileChooser.setTitle("Medium öffnen ...");
                 fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
-                List<File> choosedFiles = fileChooser.showOpenMultipleDialog(null);
-                if(choosedFiles != null)
+                List<File> chosenFiles = fileChooser.showOpenMultipleDialog(null);
+                if(chosenFiles != null)
                 {
-                    controller.setPlaylist(new Playlist(new String[]{choosedFiles.get(0).getPath()}));
+                    //add loaded List to Manager rather MediaController
+                    PlaylistManager.getInstance().loadPlaylistFromFile(chosenFiles);
+                    controller.setPlaylist(new Playlist(chosenFiles.get(0).getPath())); //removed unnecessary array creation
                     resetMediaControls();
-                    ths.test_playlistPath.setText("Track: " + choosedFiles.toString());
-                    System.out.println(choosedFiles.toString());
+                    ths.test_playlistPath.setText("Track: " + chosenFiles.toString());
+                    System.out.println(chosenFiles.toString());
                 }
 
             }
@@ -88,20 +92,21 @@ public class MainBorderPane extends BorderPane {
                 );
                 fileChooser.setTitle("Playlist öffnen ...");
                 fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
-                File choosedFile = fileChooser.showOpenDialog(null);
-                if(choosedFile != null)
+                File chosenFile = fileChooser.showOpenDialog(null);
+                if(chosenFile != null)
                 {
 
                     try {
-                        controller.setPlaylist(new Playlist(choosedFile.getPath(), MediaUtil.parseM3u(choosedFile)));
-                    }catch (IOException e)
+                        //add loaded List to Manager rather MediaController
+                        PlaylistManager.getInstance().loadPlaylistFromFile(chosenFile);
+                    }catch (PlaylistIOException e)
                     {
                         // TODO: Handle error
-                        System.out.println("ERROR: '" + choosedFile + "': " + e.getLocalizedMessage());
+                        System.out.println("ERROR: '" + chosenFile + "': " + e.getLocalizedMessage());
                         return;
                     }
-                    ths.test_playlistPath.setText("Playlist: " + choosedFile.toString());
-                    System.out.println(choosedFile.toString());
+                    ths.test_playlistPath.setText("Playlist: " + chosenFile.toString());
+                    System.out.println(chosenFile.toString());
                 }
             }
         });
