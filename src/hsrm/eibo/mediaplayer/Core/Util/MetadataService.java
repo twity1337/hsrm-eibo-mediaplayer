@@ -72,7 +72,7 @@ public class MetadataService extends Service<Metadata>{
                         Float.parseFloat(tikaMetadata.get("xmpDM:audioSampleRate"))
                 );
 
-                return null;
+                return dataToAdd;
             }
         };
     }

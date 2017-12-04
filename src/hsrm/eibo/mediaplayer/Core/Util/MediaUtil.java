@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class MediaUtil {
     //or MediaUtil wathever
-    private static final Parser[] AUTO_DETECT_EXCEPTED_PARSERS = {
+/*    private static final Parser[] AUTO_DETECT_EXCEPTED_PARSERS = {
             new AudioParser(),
             new MidiParser(),
             new Mp3Parser()
@@ -49,9 +49,8 @@ public class MediaUtil {
             Float.parseFloat(tikaMetadata.get("xmpDM:duration")),
             Float.parseFloat(tikaMetadata.get("xmpDM:audioSampleRate"))
         );
-        //TODO: equal empty
         return dataToAdd;
-    }
+    }*/
     //TODO: make extended m3u compatible
     public static String[] parseM3u(String location) throws IOException
     {

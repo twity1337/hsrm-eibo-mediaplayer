@@ -18,11 +18,11 @@ public class Track {
      * @param path
      */
     public Track(String path) throws IOException, SAXException, TikaException
-    {
+    {/*
         this.path = path;
         //TODO: überprüfung heir überflüssig?
         if(path != null)
-            this.metadata = MediaUtil.createMetadata(this.path);
+            this.metadata = MediaUtil.createMetadata(this.path);*/
     }
 
     public Metadata getMetadata()

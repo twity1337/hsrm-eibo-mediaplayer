@@ -75,5 +75,11 @@ public class Metadata {
         return false;
     }
 
+    public String toString()
+    {
+        String t = ", ";
+        return (title+t+album+t+artist+t+date+t+genre);
+    }
+
     // TODO: Override HashCode method
 }
