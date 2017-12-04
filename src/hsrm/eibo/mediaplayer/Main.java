@@ -24,10 +24,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        String testpath = "G:\\HS-RM Downloads\\HS WI\\3. Semester\\Eibo\\hsrm-eibo-mediaplayer\\media\\03. Prelude.mp3";
+        String testpath = "C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media\\03. Prelude.mp3";
         final Metadata[] md = new Metadata[1];
         MetadataService service;
-        try {
+
 
             service = new MetadataService();
             service.setPath(testpath);
@@ -40,16 +40,6 @@ public class Main extends Application {
             });
             service.start();
 
-
-        } /*catch (IOException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (TikaException e) {
-            e.printStackTrace();
-        }*/finally {
-
-        }
         String testFilePath = ("file:///" + System.getProperty("user.dir").replace("\\", "/") + "/media/03. Prelude.mp3").replace(" ", "%20");
 
         ViewBuilder.getInstance().preparePrimaryStage(primaryStage);
