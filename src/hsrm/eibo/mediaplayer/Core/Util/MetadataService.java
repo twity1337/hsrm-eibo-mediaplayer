@@ -34,8 +34,6 @@ public class MetadataService extends Service<Metadata>{
 
     public final void setPath(String path) {this.path=path;}
 
-    public final String getPath(){return this.path;}
-
     private final String getArtist(org.apache.tika.metadata.Metadata m)
     {
         String a;
@@ -48,7 +46,7 @@ public class MetadataService extends Service<Metadata>{
 
     @Override
     protected Task createTask() {
-        final String _path = getPath();
+        final String _path = this.path;
         if (_path == null)
             return null;
         return new Task() {

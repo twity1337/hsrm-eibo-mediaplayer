@@ -11,10 +11,7 @@ import javafx.application.Application;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
-import org.apache.tika.exception.TikaException;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
 
 public class Main extends Application {
 
@@ -40,7 +37,10 @@ public class Main extends Application {
             });
             service.start();
 
-        String testFilePath = ("file:///" + System.getProperty("user.dir").replace("\\", "/") + "/media/03. Prelude.mp3").replace(" ", "%20");
+        MediaController controller = MediaController.getInstance();
+
+        // TODO: DELETE THIS LINE!!
+        try{controller.setPlaylist(new Playlist(System.getProperty("user.dir") + "/media/test.mp3"));}catch (Exception e){throw new RuntimeException(e.getMessage());}
 
         ViewBuilder.getInstance().preparePrimaryStage(primaryStage);
         primaryStage.show();

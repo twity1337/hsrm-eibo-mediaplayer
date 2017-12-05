@@ -29,11 +29,16 @@ public class ViewBuilder {
         primaryStage.setTitle(WINDOW_TITLE);
         primaryStage.setMinHeight(WINDOW_MIN_HEIGHT);
         primaryStage.setMinWidth(WINDOW_MIN_WIDTH);
+        primaryStage.setOnCloseRequest(event -> handleShutdown());
     }
 
     public BorderPane createMainView()
     {
-        return new MainBorderPane();
+        return new MainBorderPane(this);
     }
 
+    public void handleShutdown() {
+        System.out.println("-- Exiting --");
+        System.exit(0);
+    }
 }

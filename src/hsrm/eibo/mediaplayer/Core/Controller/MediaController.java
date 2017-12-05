@@ -35,13 +35,6 @@ public class MediaController {
     }
 
     public MediaPlayer getCurrentMediaplayer() {
-        MediaController ths = this;
-        currentMediaplayer.setOnEndOfMedia(new Runnable() {
-            @Override
-            public void run() {
-                ths.endOfMedia = true;
-            }
-        });
         return currentMediaplayer;
     }
 
@@ -67,8 +60,7 @@ public class MediaController {
 
         if(this.currentMediaplayer == null)
         {
-            this.currentMediaplayer =
-                    this.playlist.get(currentTrackIndex).getTrackMediaPlayer();
+            this.currentMediaplayer = this.playlist.get(currentTrackIndex).getTrackMediaPlayer();
         }
 
         Status status = this.currentMediaplayer.getStatus();
@@ -102,8 +94,7 @@ public class MediaController {
     public void skipToPrevious()
     {
         this.currentMediaplayer.stop();
-        this.currentMediaplayer =
-                this.mediaplayerList.get(previousPlayerIndex());
+        this.currentMediaplayer = this.mediaplayerList.get(previousPlayerIndex());
         this.currentMediaplayer.play();
     }
 
