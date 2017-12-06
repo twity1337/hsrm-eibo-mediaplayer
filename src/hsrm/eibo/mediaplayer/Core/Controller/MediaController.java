@@ -17,10 +17,10 @@ public class MediaController {
     private int currentTrackInPlaybackIndex;
     private MediaPlayer currentMediaplayer;
     private Playlist playlist;
-    private static MediaController ourInstance = new MediaController();
+    private static MediaController instance = new MediaController();
 
     public static MediaController getInstance() {
-        return ourInstance;
+        return instance;
     }
 
     private MediaController() {
@@ -54,19 +54,25 @@ public class MediaController {
 
     public void skipToNext()
     {
-
+        this.currentMediaplayer.dispose();
+        if (!endOfPlaylist())
+        {
+            currentTrackInPlaybackIndex++;
+        }
+        else if (this.getInRepeatingMode().equals(RepeatMode.ALL) && this.endOfPlaylist())
+        {
+            this.currentTrackInPlaybackIndex = 0;
+        }
+        this.setCurrentMediaplayer();
+            return;
     }
 
     public void skipToPrevious()
     {
-
-    }
-
-    private int previousPlayerIndex()
-    {
-        if (--currentTrackInPlaybackIndex < 0 || !this.isInShuffleMode())
-            return currentTrackInPlaybackIndex;
-        return shuffleList[currentTrackInPlaybackIndex];
+        this.currentMediaplayer.dispose();
+        if (this.currentTrackInPlaybackIndex>0)
+            currentTrackInPlaybackIndex--;
+        this.setCurrentMediaplayer();
     }
 
     //user wont see order by which tracks will be played in shuffel mode;
@@ -79,14 +85,37 @@ public class MediaController {
         if(this.isInShuffleMode())
         {
             this.setInShuffleMode(false);
-            currentTrackInPlaybackIndex = shuffleList[currentTrackInPlaybackIndex];
+            this.currentTrackInPlaybackIndex = this.shuffleList[this.currentTrackInPlaybackIndex];
             return;
         }
         //OFF->ON
         //if replay of tracks gets shuffled
         //playlist wont remember tracks already played
         //shuffled = !shuffled;
-        shuffleList = MediaUtil.generateShuffelList(this.playlist.size());
+        createShuffleList();
+    }
+
+    /**
+     *
+     * @param time in seconds mediaplayer.currentTime should be set to
+     */
+    public void seek(double time)
+    {
+        this.currentMediaplayer.seek(new Duration(time*1000));
+    }
+
+    public void setPlaylist(Playlist playlist)
+    {
+        this.playlist=playlist;
+        this.currentTrackInPlaybackIndex=0;
+        this.setCurrentMediaplayer();
+    }
+
+    public void appendPlaylist(Playlist apendix)
+    {
+        this.playlist.addAll(apendix);
+        if (isInShuffleMode())
+            createShuffleList();
     }
 
     /**
@@ -100,8 +129,6 @@ public class MediaController {
         Playlist newTracks = new Playlist();
         for (Track trackToAdd : tracksToAdd)
             newTracks.add(trackToAdd);
-        this.mediaplayerList.addAll(
-                MediaUtil.generateMediaplayerList(newTracks));
         this.playlist.addAll(newTracks);
         if (isInShuffleMode())
             shuffleList = MediaUtil.generateShuffelList(playlist.size());
@@ -116,13 +143,15 @@ public class MediaController {
         //stopping old mediaplayer and cleanup
         if (this.isPlaying())
             currentMediaplayer.stop();
+        //TODO: test if dispose does stop
+        this.currentMediaplayer.dispose();
         // setting new mediaplayer and its eventhandler
         this.currentMediaplayer = track.getTrackMediaPlayer();
 
         this.currentMediaplayer.setOnPlaying(new Runnable() {
             @Override
             public void run() {
-                ourInstance.setPlaying(true);
+                instance.setPlaying(true);
             }
         });
 
@@ -130,15 +159,15 @@ public class MediaController {
             @Override
             public void run() {
                 System.out.println("Critical Error: player no longer useable");
-                ourInstance.currentMediaplayer.dispose();
-                ourInstance.currentMediaplayer=null;
+                instance.currentMediaplayer.dispose();
+                instance.currentMediaplayer=null;
             }
         });
 
         this.currentMediaplayer.setOnPaused(new Runnable() {
             @Override
             public void run() {
-                ourInstance.setPlaying(false);
+                instance.setPlaying(false);
             }
         });
 
@@ -146,23 +175,23 @@ public class MediaController {
             @Override
             public void run() {
                 System.out.println("Stream interrupted");
-                ourInstance.setPlaying(false);
+                instance.setPlaying(false);
             }
         });
 
         this.currentMediaplayer.setOnStopped(new Runnable() {
             @Override
             public void run() {
-                ourInstance.setPlaying(false);//stop resets playbacktime and mediaplayer wont respond to seek()
-                ourInstance.setStopped(true);
+                instance.setPlaying(false);//stop resets playbacktime and mediaplayer wont respond to seek()
+                instance.setStopped(true);
             }
         });
 
         this.currentMediaplayer.setOnEndOfMedia(new Runnable() {
             @Override
             public void run() {
-                ourInstance.setEndOfMedia(true);
-                ourInstance.commence();
+                instance.setEndOfMedia(true);
+                instance.playNext();
             }
         });
         //bind volume property bidirectional
@@ -183,41 +212,41 @@ public class MediaController {
         return currentMediaplayer;
     }
 
-    private void seekBeginning()
+    public void rewind()
     {
         this.currentMediaplayer.seek(this.currentMediaplayer.getStartTime());
     }
 
-    private void commence()
+    private void createShuffleList()
+    {//TODO: maybe put this in event Playlist.changed or something
+        this.shuffleList = MediaUtil.generateShuffelList(this.playlist.size());
+    }
+
+    /**
+     * method that handels automatic playback of playlist
+     */
+    private void playNext()
     {
         if (this.getInRepeatingMode().equals(RepeatMode.SINGLE))
         {
-            this.seekBeginning();
-            this.play();
-            return;
+            this.rewind();
+        } else {
+            this.skipToNext();
         }
-
-        if (this.currentTrackInPlaybackIndex >= this.playlist.size())
-        {
-            if (this.getInRepeatingMode().equals(RepeatMode.ALL))
-            {
-                this.currentTrackInPlaybackIndex = 0;
-                this.skipToNext();
-                this.play();
-                return;
-            }
-            //TODO: check if nedofmedia sets stop
-            seekBeginning();
-            return;
-        }
-        this.currentTrackInPlaybackIndex++;
-        this.skipToNext();
         this.play();
+    }
+
+    private boolean endOfPlaylist()
+    {
+        return (this.currentTrackInPlaybackIndex >= this.playlist.size()-1);
     }
 ////////////////////////////////////////////////////////////////////////////////
 //  Properties and classes                                                    //
 ////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * returns double (in seconds)
+     */
     private class DurationToDoubleBinding extends ObjectBinding<Double>{
         ReadOnlyObjectProperty<Duration> d;
         public DurationToDoubleBinding(ReadOnlyObjectProperty<Duration> durationObject)
@@ -232,7 +261,6 @@ public class MediaController {
     }
 
     private BooleanProperty inShuffleMode;
-
 
     public boolean isInShuffleMode() {
         return inShuffleMode.get();
@@ -275,7 +303,6 @@ public class MediaController {
     }
 
     private BooleanProperty stopped;
-
 
     public boolean isStopped() {
         return stopped.get();
@@ -332,6 +359,4 @@ public class MediaController {
     public void setInRepeatingMode(RepeatMode inRepeatingMode) {
         this.inRepeatingMode.set(inRepeatingMode);
     }
-
-
 }
