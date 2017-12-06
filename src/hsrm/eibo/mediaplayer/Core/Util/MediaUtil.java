@@ -19,6 +19,8 @@ import java.util.ArrayList;
 
 public class MediaUtil {
     //or MediaUtil wathever
+
+    //TODO: only needed for preloading, could be obsolete
     public static ArrayList<MediaPlayer> generateMediaplayerList(Playlist playlist) {
         ArrayList<MediaPlayer> playerList = new ArrayList<>();
 
