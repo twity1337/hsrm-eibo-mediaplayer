@@ -167,15 +167,20 @@ public class MainBorderPane extends BorderPane {
     {
         HBox mediaControls = new HBox();
         controller.endOfMediaProperty().addListener((observable, oldValue, newValue) -> {if(newValue) resetMediaControls();});
-        playPauseButton.setOnAction(event -> {
-            if(controller.isPlaying())
+        controller.playingProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue) // is playing
             {
-                playPauseButton.setText(">");
+                playPauseButton.setText("||");
             }else
             {
-                playPauseButton.setText("| |");
+                playPauseButton.setText(">");
             }
-            controller.play();
+        });
+        playPauseButton.setOnAction(event -> {
+            if(controller.isPlaying())
+                controller.pause();
+            else
+                controller.play();
         });
 
         // TODO: Find smart way to request the current media duration before MediaPlayer initialization.
@@ -249,6 +254,7 @@ public class MainBorderPane extends BorderPane {
                 Playlist playlist = (Playlist) ((ListView) event.getSource()).getSelectionModel().getSelectedItem();
                 controller.setCurrentMediaplayer(playlist.get(0));
                 ((ListView) event.getSource()).getItems().addAll(plManager.toArray(new Playlist[plManager.size()]));
+                controller.play();
             }
         });
 

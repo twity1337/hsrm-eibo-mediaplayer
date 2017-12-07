@@ -44,16 +44,18 @@ public class MediaController {
             return;
         }
         this.currentMediaplayer.play();
+        this.setPlaying(true);
     }
 
     public void pause()
     {
-
+        if (this.currentMediaplayer != null)
+            this.currentMediaplayer.pause();
+        this.setPlaying(false);
     }
 
     public void skipToNext()
     {
-        this.currentMediaplayer.dispose();
         if (!isEndOfPlaylist())
         {
             currentPlaybackIndex++;
@@ -67,7 +69,6 @@ public class MediaController {
 
     public void skipToPrevious()
     {
-        this.currentMediaplayer.dispose();
         if (this.currentPlaybackIndex >0)
             currentPlaybackIndex--;
         this.setCurrentMediaplayer();
@@ -140,12 +141,9 @@ public class MediaController {
     public void setCurrentMediaplayer(Track track)
     {
         //stopping old mediaplayer and cleanup
-        if(this.currentMediaplayer != null) {
-            if (this.isPlaying())
-                currentMediaplayer.stop();
-            //TODO: test if dispose does stop
+        if(this.currentMediaplayer != null)
             this.currentMediaplayer.dispose();
-        }
+        this.setPlaying(false);
 
         // setting new mediaplayer and its eventhandler
         this.currentMediaplayer = track.getTrackMediaPlayer();
@@ -159,11 +157,6 @@ public class MediaController {
     {
         this.setCurrentMediaplayer(
             this.playlist.get(currentPlaybackIndex));
-    }
-
-    public MediaPlayer getCurrentMediaplayer()
-    {
-        return currentMediaplayer;
     }
 
     public void rewind()
@@ -326,7 +319,8 @@ public class MediaController {
         this.currentMediaplayer.setOnHalted(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Critical Error: player no longer useable");
+                // TODO: job for exception handling
+                System.err.println("Critical Error: player no longer useable");
                 instance.currentMediaplayer.dispose();
                 instance.currentMediaplayer=null;
             }
@@ -359,7 +353,6 @@ public class MediaController {
             @Override
             public void run() {
                 instance.setEndOfMedia(true);
-                // TODO: this.setCurrentMediaplayer eher den View resetten bei onStopped()??
                 currentMediaplayer.stop();
                 instance.playNext();
             }
