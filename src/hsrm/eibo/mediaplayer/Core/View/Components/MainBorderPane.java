@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -165,7 +166,7 @@ public class MainBorderPane extends BorderPane {
     private Parent getBottomComponents()
     {
         HBox mediaControls = new HBox();
-        controller.getCurrentMediaplayer().setOnEndOfMedia(this::resetMediaControls);
+        controller.endOfMediaProperty().addListener((observable, oldValue, newValue) -> {if(newValue) resetMediaControls();});
         playPauseButton.setOnAction(event -> {
             if(controller.isPlaying())
             {
@@ -174,7 +175,7 @@ public class MainBorderPane extends BorderPane {
             {
                 playPauseButton.setText("| |");
             }
-            controller.togglePlayPause();
+            controller.play();
         });
 
         // TODO: Find smart way to request the current media duration before MediaPlayer initialization.
@@ -186,11 +187,12 @@ public class MainBorderPane extends BorderPane {
         // listeners won't be active anymore... (no display of current time, progress slider, ...)
         // -> register Listeners to MediaController and re-Set them on each MediaPlayer?
 
-        controller.getCurrentMediaplayer().currentTimeProperty().addListener((observable, oldValue, newValue) ->{
-            this.progressSlider.adjustValue(newValue.toSeconds());
+        controller.currentTimeProperty().addListener((observable, oldValue, newValue) ->{
+            double timeInSeconds = newValue.doubleValue();
+            this.progressSlider.adjustValue(timeInSeconds);
 
             currentTime.setText(
-                    parseToTimeString(newValue.toSeconds()) + " / " +
+                    parseToTimeString(timeInSeconds) + " / " +
                     parseToTimeString(mediaStopTime)
             );
         });
@@ -212,9 +214,6 @@ public class MainBorderPane extends BorderPane {
         this.playPauseButton.setText(">");
         this.currentTime.setText("--:--");
         this.progressSlider.setValue(0);
-
-        // TODO: REPLACE THIS
-        controller.getCurrentMediaplayer().stop();
     }
 
     private Parent getTabContent_CurrentPlayback()
@@ -244,6 +243,15 @@ public class MainBorderPane extends BorderPane {
 
         // TODO: Delete THIS!!
         try{list.getItems().add(new Playlist(System.getProperty("user.dir") + "/media/test.mp3"));}catch (Exception e){throw new RuntimeException(e.getMessage());}
+        list.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Playlist playlist = (Playlist) ((ListView) event.getSource()).getSelectionModel().getSelectedItem();
+                controller.setCurrentMediaplayer(playlist.get(0));
+                ((ListView) event.getSource()).getItems().addAll(plManager.toArray(new Playlist[plManager.size()]));
+            }
+        });
+
 
         VBox vbox = new VBox();
         vbox.getChildren().addAll(this.test_playlistPath, list);

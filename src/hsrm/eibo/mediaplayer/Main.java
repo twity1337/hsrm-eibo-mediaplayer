@@ -1,6 +1,7 @@
 package hsrm.eibo.mediaplayer;
 
 import hsrm.eibo.mediaplayer.Core.Controller.MediaController;
+import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
 import hsrm.eibo.mediaplayer.Core.Model.Metadata;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
@@ -12,6 +13,8 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 
 public class Main extends Application {
 
@@ -22,29 +25,18 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         String testpath = "C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media\\03. Prelude.mp3";
-        final Metadata[] md = new Metadata[1];
-        MetadataService service;
 
+        PlaylistManager manager = PlaylistManager.getInstance();
+        try {
+            manager.loadPlaylistFromFile(new File("C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media\\playlist.m3u"));
+            manager.loadPlaylistFromFile(new File("C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media\\playlist.m3u"));
 
-            service = new MetadataService();
-            service.setPath(testpath);
-            service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-                @Override
-                public void handle(WorkerStateEvent event) {
-                    md[0] = (Metadata) event.getSource().getValue();
-                    System.out.println(md[0].toString());
-                }
-            });
-            service.start();
-
-        MediaController controller = MediaController.getInstance();
-
-        // TODO: DELETE THIS LINE!!
-        try{controller.setPlaylist(new Playlist(System.getProperty("user.dir") + "/media/test.mp3"));}catch (Exception e){throw new RuntimeException(e.getMessage());}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         ViewBuilder.getInstance().preparePrimaryStage(primaryStage);
         primaryStage.show();
 
-        MediaController mediaControl = MediaController.getInstance();
     }
 }

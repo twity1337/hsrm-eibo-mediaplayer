@@ -32,7 +32,10 @@ public class MetadataService extends Service<Metadata>{
 
     private String path;
 
-    public final void setPath(String path) {this.path=path;}
+    public final void setPath(String path)
+    {
+        this.path=path;
+    }
 
     private final String getArtist(org.apache.tika.metadata.Metadata m)
     {

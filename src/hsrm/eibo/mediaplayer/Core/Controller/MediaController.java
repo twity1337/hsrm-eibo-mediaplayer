@@ -9,12 +9,11 @@ import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
-
-//TODO: repeat mode (not just whole list but single track), volume state handling, progression handling (notify when track ended)
 public class MediaController {
     //private ArrayList<MediaPlayer> mediaplayerList;//TODO: if loading on demand isnt fast enough, reconsider
     private int[] shuffleList;
-    private int currentTrackInPlaybackIndex;
+    private int currentPlaybackIndex;
+    private int currentPlaylistIndex; //TODO: todo
     private MediaPlayer currentMediaplayer;
     private Playlist playlist;
     private static MediaController instance = new MediaController();
@@ -25,9 +24,9 @@ public class MediaController {
 
     private MediaController() {
         //TODO: load config on startup(maybe)
-        this.currentTrackInPlaybackIndex = 0;
+        this.currentPlaybackIndex = 0;
         inShuffleMode = new SimpleBooleanProperty(false);
-        inRepeatingMode = new SimpleObjectProperty<RepeatMode>(RepeatMode.NONE);
+        repeatMode = new SimpleObjectProperty<RepeatMode>(RepeatMode.NONE);
         playing = new SimpleBooleanProperty(false);
         stopped = new SimpleBooleanProperty(false);
         endOfMedia = new SimpleBooleanProperty(true);
@@ -55,28 +54,28 @@ public class MediaController {
     public void skipToNext()
     {
         this.currentMediaplayer.dispose();
-        if (!endOfPlaylist())
+        if (!isEndOfPlaylist())
         {
-            currentTrackInPlaybackIndex++;
+            currentPlaybackIndex++;
         }
-        else if (this.getInRepeatingMode().equals(RepeatMode.ALL) && this.endOfPlaylist())
+        else if (this.getRepeatMode().equals(RepeatMode.ALL) && this.isEndOfPlaylist())
         {
-            this.currentTrackInPlaybackIndex = 0;
+            this.currentPlaybackIndex = 0;
         }
         this.setCurrentMediaplayer();
-            return;
     }
 
     public void skipToPrevious()
     {
         this.currentMediaplayer.dispose();
-        if (this.currentTrackInPlaybackIndex>0)
-            currentTrackInPlaybackIndex--;
+        if (this.currentPlaybackIndex >0)
+            currentPlaybackIndex--;
         this.setCurrentMediaplayer();
     }
 
     //user wont see order by which tracks will be played in shuffel mode;
     //playlist should retain order at all times(especially in view)
+    // TODO: Do as toggleProperty... !!!!111
     public void toggleShuffle()
     {
         //ON->OFF
@@ -85,7 +84,7 @@ public class MediaController {
         if(this.isInShuffleMode())
         {
             this.setInShuffleMode(false);
-            this.currentTrackInPlaybackIndex = this.shuffleList[this.currentTrackInPlaybackIndex];
+            this.currentPlaybackIndex = this.shuffleList[this.currentPlaybackIndex];
             return;
         }
         //OFF->ON
@@ -106,8 +105,8 @@ public class MediaController {
 
     public void setPlaylist(Playlist playlist)
     {
-        this.playlist=playlist;
-        this.currentTrackInPlaybackIndex=0;
+        this.playlist = playlist;
+        this.currentPlaybackIndex = 0;
         this.setCurrentMediaplayer();
     }
 
@@ -141,71 +140,26 @@ public class MediaController {
     public void setCurrentMediaplayer(Track track)
     {
         //stopping old mediaplayer and cleanup
-        if (this.isPlaying())
-            currentMediaplayer.stop();
-        //TODO: test if dispose does stop
-        this.currentMediaplayer.dispose();
+        if(this.currentMediaplayer != null) {
+            if (this.isPlaying())
+                currentMediaplayer.stop();
+            //TODO: test if dispose does stop
+            this.currentMediaplayer.dispose();
+        }
+
         // setting new mediaplayer and its eventhandler
         this.currentMediaplayer = track.getTrackMediaPlayer();
-
-        this.currentMediaplayer.setOnPlaying(new Runnable() {
-            @Override
-            public void run() {
-                instance.setPlaying(true);
-            }
-        });
-
-        this.currentMediaplayer.setOnHalted(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Critical Error: player no longer useable");
-                instance.currentMediaplayer.dispose();
-                instance.currentMediaplayer=null;
-            }
-        });
-
-        this.currentMediaplayer.setOnPaused(new Runnable() {
-            @Override
-            public void run() {
-                instance.setPlaying(false);
-            }
-        });
-
-        this.currentMediaplayer.setOnStalled(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Stream interrupted");
-                instance.setPlaying(false);
-            }
-        });
-
-        this.currentMediaplayer.setOnStopped(new Runnable() {
-            @Override
-            public void run() {
-                instance.setPlaying(false);//stop resets playbacktime and mediaplayer wont respond to seek()
-                instance.setStopped(true);
-            }
-        });
-
-        this.currentMediaplayer.setOnEndOfMedia(new Runnable() {
-            @Override
-            public void run() {
-                instance.setEndOfMedia(true);
-                instance.playNext();
-            }
-        });
-        //bind volume property bidirectional
-        this.currentMediaplayer.volumeProperty().
-                bindBidirectional(this.volumeProperty());
-        //bind currentTime(double) to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
-        this.currentTimeProperty().bind(new DurationToDoubleBinding(
-                this.currentMediaplayer.currentTimeProperty()));
+        bindListenersToCurrentMediaPlayer();
         //TODO: talk about duration slider handling
     }
 
-    public void setCurrentMediaplayer()
-    {this.setCurrentMediaplayer(
-            this.playlist.get(currentTrackInPlaybackIndex));}
+
+
+    private void setCurrentMediaplayer()
+    {
+        this.setCurrentMediaplayer(
+            this.playlist.get(currentPlaybackIndex));
+    }
 
     public MediaPlayer getCurrentMediaplayer()
     {
@@ -227,7 +181,7 @@ public class MediaController {
      */
     private void playNext()
     {
-        if (this.getInRepeatingMode().equals(RepeatMode.SINGLE))
+        if (this.getRepeatMode().equals(RepeatMode.SINGLE))
         {
             this.rewind();
         } else {
@@ -236,9 +190,9 @@ public class MediaController {
         this.play();
     }
 
-    private boolean endOfPlaylist()
+    private boolean isEndOfPlaylist()
     {
-        return (this.currentTrackInPlaybackIndex >= this.playlist.size()-1);
+        return (this.currentPlaybackIndex >= this.playlist.size()-1);
     }
 ////////////////////////////////////////////////////////////////////////////////
 //  Properties and classes                                                    //
@@ -346,17 +300,75 @@ public class MediaController {
 
     enum RepeatMode {NONE,SINGLE,ALL}
 
-    private SimpleObjectProperty<RepeatMode> inRepeatingMode;
+    private SimpleObjectProperty<RepeatMode> repeatMode;
 
-    public RepeatMode getInRepeatingMode() {
-        return inRepeatingMode.get();
+    public RepeatMode getRepeatMode() {
+        return repeatMode.get();
     }
 
     public SimpleObjectProperty<RepeatMode> inRepeatingModeProperty() {
-        return inRepeatingMode;
+        return repeatMode;
     }
 
     public void setInRepeatingMode(RepeatMode inRepeatingMode) {
-        this.inRepeatingMode.set(inRepeatingMode);
+        this.repeatMode.set(inRepeatingMode);
+    }
+
+
+    private void bindListenersToCurrentMediaPlayer() {
+        this.currentMediaplayer.setOnPlaying(new Runnable() {
+            @Override
+            public void run() {
+                instance.setPlaying(true);
+            }
+        });
+
+        this.currentMediaplayer.setOnHalted(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Critical Error: player no longer useable");
+                instance.currentMediaplayer.dispose();
+                instance.currentMediaplayer=null;
+            }
+        });
+
+        this.currentMediaplayer.setOnPaused(new Runnable() {
+            @Override
+            public void run() {
+                instance.setPlaying(false);
+            }
+        });
+
+        this.currentMediaplayer.setOnStalled(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Stream interrupted");
+                instance.setPlaying(false);
+            }
+        });
+
+        this.currentMediaplayer.setOnStopped(new Runnable() {
+            @Override
+            public void run() {
+                instance.setPlaying(false);//stop resets playbacktime and mediaplayer wont respond to seek()
+                instance.setStopped(true);
+            }
+        });
+
+        this.currentMediaplayer.setOnEndOfMedia(new Runnable() {
+            @Override
+            public void run() {
+                instance.setEndOfMedia(true);
+                // TODO: this.setCurrentMediaplayer eher den View resetten bei onStopped()??
+                currentMediaplayer.stop();
+                instance.playNext();
+            }
+        });
+        //bind volume property bidirectional
+        this.currentMediaplayer.volumeProperty().
+                bindBidirectional(this.volumeProperty());
+        //bind currentTime(double) to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
+        this.currentTimeProperty().bind(new DurationToDoubleBinding(
+                this.currentMediaplayer.currentTimeProperty()));
     }
 }
