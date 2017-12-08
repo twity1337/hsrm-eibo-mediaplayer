@@ -6,6 +6,10 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.*;
 
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.MapChangeListener;
+import javafx.scene.image.Image;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
@@ -32,6 +36,7 @@ public class MediaController {
         endOfMedia = new SimpleBooleanProperty(true);
         volume = new SimpleDoubleProperty(0.5);
         currentTime = new SimpleDoubleProperty(0);
+        coverProperty = new SimpleObjectProperty<>(null);
     }
 
 
@@ -207,6 +212,16 @@ public class MediaController {
         }
     }
 
+    private SimpleObjectProperty<Image> coverProperty;
+
+    public SimpleObjectProperty<Image> getCoverProperty(){return coverProperty;}
+
+    public void setCoverProperty(Image coverProperty) {
+        this.coverProperty.set(coverProperty);
+    }
+
+    private Image getCover(){return coverProperty.get();}
+
     private BooleanProperty inShuffleMode;
 
     public boolean isInShuffleMode() {
@@ -291,7 +306,7 @@ public class MediaController {
         this.currentTime.set(currentTime);
     }
 
-    enum RepeatMode {NONE,SINGLE,ALL}
+    private enum RepeatMode {NONE,SINGLE,ALL}
 
     private SimpleObjectProperty<RepeatMode> repeatMode;
 
@@ -349,14 +364,29 @@ public class MediaController {
             }
         });
 
-        this.currentMediaplayer.setOnEndOfMedia(new Runnable() {
-            @Override
-            public void run() {
-                instance.setEndOfMedia(true);
-                currentMediaplayer.stop();
-                instance.playNext();
-            }
+        this.currentMediaplayer.setOnEndOfMedia(() -> {
+            instance.setEndOfMedia(true);
+            currentMediaplayer.stop();
+            instance.playNext();
         });
+       /* this.currentMediaplayer.getMedia().getMetadata().addListener(new MapChangeListener<String, Object>() {
+
+            @Override
+            public void onChanged(Change<? extends String, ? extends Object> change) {
+                if(instance.coverProperty.get())
+
+                Image i=((Image) change.getMap().get("image"));
+                if (i != null)
+                    instance.coverProperty.set(i);
+            }
+        });*/
+       currentMediaplayer.setOnReady(new Runnable() {
+           @Override
+           public void run() {
+               Image i = (Image) instance.currentMediaplayer.getMedia().getMetadata().get("image");
+               instance.coverProperty.set(i);
+           }
+       });
         //bind volume property bidirectional
         this.currentMediaplayer.volumeProperty().
                 bindBidirectional(this.volumeProperty());

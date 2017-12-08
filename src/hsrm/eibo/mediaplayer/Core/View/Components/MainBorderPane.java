@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -111,6 +112,7 @@ public class MainBorderPane extends BorderPane {
                     try {
                         //add loaded List to Manager rather MediaController
                         PlaylistManager.getInstance().loadPlaylistFromFile(chosenFile);
+                        controller.setPlaylist(PlaylistManager.getInstance().getLastAddedPlaylist());
                     }catch (PlaylistIOException e)
                     {
                         // TODO: Handle error
@@ -224,16 +226,20 @@ public class MainBorderPane extends BorderPane {
     private Parent getTabContent_CurrentPlayback()
     {
         BorderPane coverBorderPane = new BorderPane();
-        Button prevButton = new Button("<");
+        Button prevButton = new Button("<<");
         prevButton.setMinHeight(100);
         prevButton.setOnAction(event -> controller.skipToPrevious());
         Rectangle placeh = new Rectangle(100, 100);
-        Button nextButton = new Button(">");
+        Button nextButton = new Button(">>");
         nextButton.setMinHeight(100);
         nextButton.setOnAction(event -> controller.skipToNext());
 
+        //
+        ImageView imageview = new ImageView();
+        imageview.imageProperty().bind(controller.getCoverProperty());
+
         coverBorderPane.setLeft(prevButton);
-        coverBorderPane.setCenter(placeh);
+        coverBorderPane.setCenter(imageview);
         coverBorderPane.setRight(nextButton);
         BorderPane.setAlignment(prevButton, Pos.CENTER);
         BorderPane.setAlignment(nextButton, Pos.CENTER);
@@ -247,7 +253,7 @@ public class MainBorderPane extends BorderPane {
         list.getItems().addAll(plManager.toArray(new Playlist[plManager.size()]));
 
         // TODO: Delete THIS!!
-        try{list.getItems().add(new Playlist(System.getProperty("user.dir") + "/media/test.mp3"));}catch (Exception e){throw new RuntimeException(e.getMessage());}
+        //try{list.getItems().add(new Playlist(System.getProperty("user.dir") + "/media/test.mp3"));}catch (Exception e){throw new RuntimeException(e.getMessage());}
         list.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {

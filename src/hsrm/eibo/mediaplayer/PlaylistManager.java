@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class PlaylistManager extends ArrayList<Playlist>{
     private static final String M3U_PARSER_THREAD_NAME = "M3U Parser Thread";
     private static PlaylistManager instance = new PlaylistManager();
+    private Playlist lastAddedPlaylist;
 
     public static PlaylistManager getInstance() {
         return instance;
@@ -27,7 +28,7 @@ public class PlaylistManager extends ArrayList<Playlist>{
             public void handle(WorkerStateEvent event) {
                 try {
                     instance.add(
-                            new Playlist((String[])event.getSource().getValue()));
+                    lastAddedPlaylist = new Playlist((String[])event.getSource().getValue()));
                 } catch (PlaylistIOException e) {
                     e.printStackTrace();
                 }
@@ -56,5 +57,9 @@ public class PlaylistManager extends ArrayList<Playlist>{
                 return playlist;
         }
         return null;
+    }
+
+    public Playlist getLastAddedPlaylist() {
+        return lastAddedPlaylist;
     }
 }

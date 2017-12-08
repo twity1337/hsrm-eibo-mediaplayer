@@ -1,6 +1,6 @@
 package hsrm.eibo.mediaplayer.Core.Model;
 
-import hsrm.eibo.mediaplayer.Core.Util.MetadataService;
+import hsrm.eibo.mediaplayer.Core.Util.MetadataParserTask;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.media.Media;
@@ -10,6 +10,7 @@ import java.io.IOException;
 
 public class Track {
 
+    private static final String METADATA_PARSER_THREAD_NAME = "Metadata Parser Thread";
     private Metadata metadata;
     private String trackPath;
 
@@ -20,10 +21,16 @@ public class Track {
     public Track(String trackPath) throws IOException
     {
         this.trackPath = trackPath;
-        MetadataService service = new MetadataService();
-        service.setPath(trackPath);
-        service.setOnSucceeded(event ->
-                metadata = (Metadata)event.getSource().getValue());
+        MetadataParserTask parserTask = new MetadataParserTask(this.trackPath);
+        parserTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                metadata = (Metadata) event.getSource().getValue();
+            }
+        });
+        Thread parserThread = new Thread(parserTask, METADATA_PARSER_THREAD_NAME);
+        parserThread.setDaemon(true);
+        parserThread.start();
     }
 
     public Metadata getMetadata()
