@@ -2,18 +2,15 @@ package hsrm.eibo.mediaplayer.Core.Util;
 
 import hsrm.eibo.mediaplayer.Core.Model.Metadata;
 import javafx.concurrent.Task;
-import org.apache.tika.exception.TikaException;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.audio.AudioParser;
 import org.apache.tika.parser.audio.MidiParser;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.apache.tika.sax.BodyContentHandler;
-import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**

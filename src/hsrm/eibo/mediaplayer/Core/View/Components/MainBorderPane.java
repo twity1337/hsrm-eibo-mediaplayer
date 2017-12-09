@@ -184,32 +184,22 @@ public class MainBorderPane extends BorderPane {
             else
                 controller.play();
         });
-
-        // TODO: Find smart way to request the current media duration before MediaPlayer initialization.
-        double mediaStopTime = 3; System.err.println("----  FIXME!! -- @ MainBorderPane.java:183 ----");
-        this.progressSlider.setMax(mediaStopTime);
-
-        // TODO: Fix known bug:
-        // Property listener are only created on the currentMediaplayer. If user changes the current Track or Playlist,
-        // listeners won't be active anymore... (no display of current time, progress slider, ...)
-        // -> register Listeners to MediaController and re-Set them on each MediaPlayer?
+        // set max Value of Slider
+        this.controller.trackDurationProperty().addListener((observable, oldValue, newValue) ->
+                progressSlider.setMax(newValue.doubleValue()));
+       // bind slider property to time property of Mediacontroller
+        this.progressSlider.valueProperty().bindBidirectional(this.controller.currentTimeProperty());
 
         controller.currentTimeProperty().addListener((observable, oldValue, newValue) ->{
             double timeInSeconds = newValue.doubleValue();
             this.progressSlider.adjustValue(timeInSeconds);
 
             currentTime.setText(
-                    parseToTimeString(timeInSeconds) + " / " +
-                    parseToTimeString(mediaStopTime)
+                    parseToTimeString(this.progressSlider.getValue()) + " / " +
+                    parseToTimeString(this.progressSlider.getMax())
             );
         });
 
-        this.progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                System.out.println(newValue.toString());
-            }
-        });
 
         HBox.setHgrow(progressSlider, Priority.ALWAYS);
         mediaControls.getChildren().addAll(playPauseButton, currentTime, progressSlider);
@@ -229,12 +219,10 @@ public class MainBorderPane extends BorderPane {
         Button prevButton = new Button("<<");
         prevButton.setMinHeight(100);
         prevButton.setOnAction(event -> controller.skipToPrevious());
-        Rectangle placeh = new Rectangle(100, 100);
         Button nextButton = new Button(">>");
         nextButton.setMinHeight(100);
         nextButton.setOnAction(event -> controller.skipToNext());
 
-        //
         ImageView imageview = new ImageView();
         imageview.imageProperty().bind(controller.getCoverProperty());
 

@@ -8,11 +8,11 @@ public class Metadata {
     private String artist;
     private String date;
     private String genre;
-    private float length;
-    private float bitrate;
+    private double length;
+    private double bitrate;
 
     public Metadata(String title, String album, String artist,
-                    String year, String genre, float length, float bitrate) {
+                    String year, String genre, double length, double bitrate) {
         this.title = title;
         this.album = album;
         this.artist = artist;
@@ -45,11 +45,11 @@ public class Metadata {
         return genre;
     }
 
-    public float getLength() {
+    public double getLength() {
         return length;
     }
 
-    public float getBitrate() {
+    public double getBitrate() {
         return bitrate;
     }
 

@@ -6,9 +6,6 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.*;
 
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.MapChangeListener;
 import javafx.scene.image.Image;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -29,6 +26,7 @@ public class MediaController {
     private MediaController() {
         //TODO: load config on startup(maybe)
         this.currentPlaybackIndex = 0;
+        trackDuration = new SimpleDoubleProperty(0);
         inShuffleMode = new SimpleBooleanProperty(false);
         repeatMode = new SimpleObjectProperty<RepeatMode>(RepeatMode.NONE);
         playing = new SimpleBooleanProperty(false);
@@ -153,15 +151,25 @@ public class MediaController {
         // setting new mediaplayer and its eventhandler
         this.currentMediaplayer = track.getTrackMediaPlayer();
         bindListenersToCurrentMediaPlayer();
+        this.setTrackDuration(track.getMetadata().getLength()/1000);//milli sec -> sec
         //TODO: talk about duration slider handling
     }
-
-
 
     private void setCurrentMediaplayer()
     {
         this.setCurrentMediaplayer(
-            this.playlist.get(currentPlaybackIndex));
+                this.playlist.get(currentPlaybackIndex));
+    }
+
+    /**
+     * method to determine current track played in playlist
+     * @return list position in playlist of track currently played/selected
+     */
+    public int getCurrentPlaylistIndex()
+    {
+        if (isInShuffleMode())
+            return shuffleList[currentPlaybackIndex];
+        return currentPlaybackIndex;
     }
 
     public void rewind()
@@ -192,6 +200,7 @@ public class MediaController {
     {
         return (this.currentPlaybackIndex >= this.playlist.size()-1);
     }
+
 ////////////////////////////////////////////////////////////////////////////////
 //  Properties and classes                                                    //
 ////////////////////////////////////////////////////////////////////////////////
@@ -322,6 +331,19 @@ public class MediaController {
         this.repeatMode.set(inRepeatingMode);
     }
 
+    private DoubleProperty trackDuration;
+
+    public double getTrackDuration() {
+        return trackDuration.get();
+    }
+
+    public DoubleProperty trackDurationProperty() {
+        return trackDuration;
+    }
+
+    public void setTrackDuration(double trackDuration) {
+        this.trackDuration.set(trackDuration);
+    }
 
     private void bindListenersToCurrentMediaPlayer() {
         this.currentMediaplayer.setOnPlaying(new Runnable() {
@@ -383,7 +405,7 @@ public class MediaController {
        currentMediaplayer.setOnReady(new Runnable() {
            @Override
            public void run() {
-               Image i = (Image) instance.currentMediaplayer.getMedia().getMetadata().get("image");
+               Image i = (Image) currentMediaplayer.getMedia().getMetadata().get("image");
                instance.coverProperty.set(i);
            }
        });
