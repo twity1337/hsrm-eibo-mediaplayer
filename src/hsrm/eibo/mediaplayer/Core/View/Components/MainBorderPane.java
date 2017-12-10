@@ -78,7 +78,6 @@ public class MainBorderPane extends BorderPane {
                 List<File> chosenFiles = fileChooser.showOpenMultipleDialog(null);
                 if(chosenFiles != null)
                 {
-                    //add loaded List to Manager rather MediaController
                     try {
                         controller.setPlaylist(new Playlist(FileIOUtil.extractFilePaths(chosenFiles.toArray(new File[chosenFiles.size()]))));
                     }catch (PlaylistIOException e)
@@ -110,9 +109,19 @@ public class MainBorderPane extends BorderPane {
                 {
 
                     try {
-                        //add loaded List to Manager rather MediaController
                         PlaylistManager.getInstance().loadPlaylistFromFile(chosenFile);
+                        PlaylistManager.getInstance().isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
+                            Playlist playlistToAdd;
+                            if (oldValue==true
+                                && newValue== false
+                                && (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
+                            {
+                                controller.setPlaylist(playlistToAdd);
+                            }
+                        });
+/*
                         controller.setPlaylist(PlaylistManager.getInstance().getLastAddedPlaylist());
+*/
                     }catch (PlaylistIOException e)
                     {
                         // TODO: Handle error
@@ -165,7 +174,7 @@ public class MainBorderPane extends BorderPane {
         return tabPane;
     }
 
-    private Parent getBottomComponents()
+    private Parent getBottomComponents() //TODO: volume controll
     {
         HBox mediaControls = new HBox();
         controller.endOfMediaProperty().addListener((observable, oldValue, newValue) -> {if(newValue) resetMediaControls();});
@@ -188,8 +197,19 @@ public class MainBorderPane extends BorderPane {
         this.controller.trackDurationProperty().addListener((observable, oldValue, newValue) ->
                 progressSlider.setMax(newValue.doubleValue()));
        // bind slider property to time property of Mediacontroller
-        this.progressSlider.valueProperty().bindBidirectional(this.controller.currentTimeProperty());
 
+        progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                //TODO: hacky method to determine if change occur "naturly" by passing of time or user interaction
+                int delta = (int)(newValue.doubleValue()-oldValue.doubleValue());
+                if (delta!=0)
+                {
+                    controller.seek(newValue.doubleValue());
+                }
+
+            }
+        });
         controller.currentTimeProperty().addListener((observable, oldValue, newValue) ->{
             double timeInSeconds = newValue.doubleValue();
             this.progressSlider.adjustValue(timeInSeconds);
@@ -199,7 +219,6 @@ public class MainBorderPane extends BorderPane {
                     parseToTimeString(this.progressSlider.getMax())
             );
         });
-
 
         HBox.setHgrow(progressSlider, Priority.ALWAYS);
         mediaControls.getChildren().addAll(playPauseButton, currentTime, progressSlider);

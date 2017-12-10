@@ -6,6 +6,8 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.*;
 
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.image.Image;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -59,6 +61,8 @@ public class MediaController {
 
     public void skipToNext()
     {
+        if (!mediaplayerSet())
+            return;
         if (!isEndOfPlaylist())
         {
             currentPlaybackIndex++;
@@ -72,6 +76,8 @@ public class MediaController {
 
     public void skipToPrevious()
     {
+        if (!mediaplayerSet())
+            return;
         if (this.currentPlaybackIndex >0)
             currentPlaybackIndex--;
         this.setCurrentMediaplayer();
@@ -154,6 +160,8 @@ public class MediaController {
         this.setTrackDuration(track.getMetadata().getLength()/1000);//milli sec -> sec
         //TODO: talk about duration slider handling
     }
+
+    private boolean mediaplayerSet(){return this.currentMediaplayer != null;}
 
     private void setCurrentMediaplayer()
     {
@@ -412,8 +420,12 @@ public class MediaController {
         //bind volume property bidirectional
         this.currentMediaplayer.volumeProperty().
                 bindBidirectional(this.volumeProperty());
-        //bind currentTime(double) to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
-        this.currentTimeProperty().bind(new DurationToDoubleBinding(
-                this.currentMediaplayer.currentTimeProperty()));
+        // currentTime(double) listens to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
+        this.currentMediaplayer.currentTimeProperty().addListener(new ChangeListener<Duration>() {
+            @Override
+            public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
+                currentTimeProperty().set(newValue.toSeconds());
+            }
+        });
     }
 }
