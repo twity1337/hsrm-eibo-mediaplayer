@@ -1,24 +1,39 @@
 package hsrm.eibo.mediaplayer.Core.Util;
 
 
-import hsrm.eibo.mediaplayer.Core.Model.Metadata;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
-import hsrm.eibo.mediaplayer.PlaylistManager;
 import javafx.scene.media.MediaPlayer;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.parser.audio.AudioParser;
-import org.apache.tika.parser.audio.MidiParser;
-import org.apache.tika.parser.mp3.Mp3Parser;
-import org.apache.tika.sax.BodyContentHandler;
-import org.xml.sax.SAXException;
 
-import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MediaUtil {
-    //or MediaUtil wathever
+
+    public static int FILETYPE_GID_AUDIO = 1;
+    public static int FILETYPE_GID_VIDEO = 1<<1;
+    public static int FILETYPE_GID_PLAYLIST = 1<<2;
+
+
+    private static String[][] supportedFiletype_managingArray = {
+        {}, // GID 0 : not used
+        {"*.mp3","*.mp4", "*.wav"}, // GID 1 : Audio
+        {"*.mp4","*.mkv"}, // GID 2 : Video
+        {}, // GID 3 : not used
+        {"*.m3u"}, // GID 4 : Playlist
+    };
+
+
+    public static String[] getSupportedFileTypes(int gid)
+    {
+        ArrayList<String> retVal = new ArrayList<>();
+        if((gid & FILETYPE_GID_AUDIO) != 0)
+            retVal.addAll(Arrays.asList(supportedFiletype_managingArray[FILETYPE_GID_AUDIO]));
+        if((gid & FILETYPE_GID_VIDEO) != 0)
+            retVal.addAll(Arrays.asList(supportedFiletype_managingArray[FILETYPE_GID_VIDEO]));
+        if((gid & FILETYPE_GID_PLAYLIST) != 0)
+            retVal.addAll(Arrays.asList(supportedFiletype_managingArray[FILETYPE_GID_PLAYLIST]));
+        return retVal.toArray(new String[] {});
+    }
 
     //TODO: only needed for preloading, could be obsolete
     public static ArrayList<MediaPlayer> generateMediaplayerList(Playlist playlist) {

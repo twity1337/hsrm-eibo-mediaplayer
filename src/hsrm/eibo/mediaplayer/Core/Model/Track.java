@@ -1,12 +1,17 @@
 package hsrm.eibo.mediaplayer.Core.Model;
 
+import hsrm.eibo.mediaplayer.Core.Exception.TrackUnsupportedFileTypeException;
+import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import hsrm.eibo.mediaplayer.Core.Util.MetadataParserTask;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class Track {
 
@@ -14,12 +19,21 @@ public class Track {
     private Metadata metadata;
     private String trackPath;
 
+
     /**
      *
      * @param trackPath
      */
-    public Track(String trackPath) throws IOException
+    public Track(String trackPath) throws IOException, TrackUnsupportedFileTypeException
     {
+        if(!ArrayUtils.contains(
+                MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_AUDIO | MediaUtil.FILETYPE_GID_VIDEO),
+                "*."+FilenameUtils.getExtension(trackPath))
+        ){
+            throw new TrackUnsupportedFileTypeException(FilenameUtils.getExtension(trackPath));
+        }
+
+
         this.trackPath = trackPath;
         MetadataParserTask parserTask = new MetadataParserTask(this.trackPath);
         parserTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {

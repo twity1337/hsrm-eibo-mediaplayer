@@ -13,17 +13,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        String testpath = "C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media\\03. Prelude.mp3";
-
-/*        PlaylistManager manager = PlaylistManager.getInstance();
-        try {
-            manager.loadPlaylistFromFile(new File("C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media\\playlist.m3u"));
-            manager.loadPlaylistFromFile(new File("C:\\Users\\lucas\\IdeaProjects\\eibo-project\\hsrm-eibo-mediaplayer\\media\\playlist.m3u"));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-
         ViewBuilder.getInstance().preparePrimaryStage(primaryStage);
         primaryStage.show();
 
