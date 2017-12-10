@@ -157,8 +157,6 @@ public class MediaController {
         // setting new mediaplayer and its eventhandler
         this.currentMediaplayer = track.getTrackMediaPlayer();
         bindListenersToCurrentMediaPlayer();
-        this.setTrackDuration(track.getMetadata().getLength()/1000);//milli sec -> sec
-        //TODO: talk about duration slider handling
     }
 
     private boolean mediaplayerSet(){return this.currentMediaplayer != null;}
@@ -209,6 +207,71 @@ public class MediaController {
         return (this.currentPlaybackIndex >= this.playlist.size()-1);
     }
 
+    private void bindListenersToCurrentMediaPlayer() {
+        this.currentMediaplayer.setOnPlaying(new Runnable() {
+            @Override
+            public void run() {
+                instance.setPlaying(true);
+            }
+        });
+
+        this.currentMediaplayer.setOnHalted(new Runnable() {
+            @Override
+            public void run() {
+                // TODO: job for exception handling
+                System.err.println("Critical Error: player no longer useable");
+                instance.currentMediaplayer.dispose();
+                instance.currentMediaplayer=null;
+            }
+        });
+
+        this.currentMediaplayer.setOnPaused(new Runnable() {
+            @Override
+            public void run() {
+                instance.setPlaying(false);
+            }
+        });
+
+        this.currentMediaplayer.setOnStalled(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Stream interrupted");
+                instance.setPlaying(false);
+            }
+        });
+
+        this.currentMediaplayer.setOnStopped(new Runnable() {
+            @Override
+            public void run() {
+                instance.setPlaying(false);//stop resets playbacktime and mediaplayer wont respond to seek()
+                instance.setStopped(true);
+            }
+        });
+
+        this.currentMediaplayer.setOnEndOfMedia(() -> {
+            instance.setEndOfMedia(true);
+            currentMediaplayer.stop();
+            instance.playNext();
+        });
+
+        currentMediaplayer.setOnReady(new Runnable() {
+            @Override
+            public void run() {
+                instance.coverProperty.set((Image)currentMediaplayer.getMedia().getMetadata().get("image"));
+                instance.trackDurationProperty().set(currentMediaplayer.getTotalDuration().toSeconds());
+            }
+        });
+        //bind volume property bidirectional
+        this.currentMediaplayer.volumeProperty().
+                bindBidirectional(this.volumeProperty());
+        // currentTime(double) listens to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
+        this.currentMediaplayer.currentTimeProperty().addListener(new ChangeListener<Duration>() {
+            @Override
+            public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
+                currentTimeProperty().set(newValue.toSeconds());
+            }
+        });
+    }
 ////////////////////////////////////////////////////////////////////////////////
 //  Properties and classes                                                    //
 ////////////////////////////////////////////////////////////////////////////////
@@ -351,81 +414,5 @@ public class MediaController {
 
     public void setTrackDuration(double trackDuration) {
         this.trackDuration.set(trackDuration);
-    }
-
-    private void bindListenersToCurrentMediaPlayer() {
-        this.currentMediaplayer.setOnPlaying(new Runnable() {
-            @Override
-            public void run() {
-                instance.setPlaying(true);
-            }
-        });
-
-        this.currentMediaplayer.setOnHalted(new Runnable() {
-            @Override
-            public void run() {
-                // TODO: job for exception handling
-                System.err.println("Critical Error: player no longer useable");
-                instance.currentMediaplayer.dispose();
-                instance.currentMediaplayer=null;
-            }
-        });
-
-        this.currentMediaplayer.setOnPaused(new Runnable() {
-            @Override
-            public void run() {
-                instance.setPlaying(false);
-            }
-        });
-
-        this.currentMediaplayer.setOnStalled(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Stream interrupted");
-                instance.setPlaying(false);
-            }
-        });
-
-        this.currentMediaplayer.setOnStopped(new Runnable() {
-            @Override
-            public void run() {
-                instance.setPlaying(false);//stop resets playbacktime and mediaplayer wont respond to seek()
-                instance.setStopped(true);
-            }
-        });
-
-        this.currentMediaplayer.setOnEndOfMedia(() -> {
-            instance.setEndOfMedia(true);
-            currentMediaplayer.stop();
-            instance.playNext();
-        });
-       /* this.currentMediaplayer.getMedia().getMetadata().addListener(new MapChangeListener<String, Object>() {
-
-            @Override
-            public void onChanged(Change<? extends String, ? extends Object> change) {
-                if(instance.coverProperty.get())
-
-                Image i=((Image) change.getMap().get("image"));
-                if (i != null)
-                    instance.coverProperty.set(i);
-            }
-        });*/
-       currentMediaplayer.setOnReady(new Runnable() {
-           @Override
-           public void run() {
-               Image i = (Image) currentMediaplayer.getMedia().getMetadata().get("image");
-               instance.coverProperty.set(i);
-           }
-       });
-        //bind volume property bidirectional
-        this.currentMediaplayer.volumeProperty().
-                bindBidirectional(this.volumeProperty());
-        // currentTime(double) listens to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
-        this.currentMediaplayer.currentTimeProperty().addListener(new ChangeListener<Duration>() {
-            @Override
-            public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
-                currentTimeProperty().set(newValue.toSeconds());
-            }
-        });
     }
 }
