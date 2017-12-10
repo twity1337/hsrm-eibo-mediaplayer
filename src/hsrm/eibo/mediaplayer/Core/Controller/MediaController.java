@@ -12,8 +12,9 @@ import javafx.scene.image.Image;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
+import java.util.Arrays;
+
 public class MediaController {
-    //private ArrayList<MediaPlayer> mediaplayerList;//TODO: if loading on demand isnt fast enough, reconsider
     private int[] shuffleList;
     private int currentPlaybackIndex;
     private int currentPlaylistIndex; //TODO: todo
@@ -30,13 +31,14 @@ public class MediaController {
         this.currentPlaybackIndex = 0;
         trackDuration = new SimpleDoubleProperty(0);
         inShuffleMode = new SimpleBooleanProperty(false);
-        repeatMode = new SimpleObjectProperty<RepeatMode>(RepeatMode.NONE);
+        repeatMode = new SimpleObjectProperty<>(RepeatMode.NONE);
         playing = new SimpleBooleanProperty(false);
         stopped = new SimpleBooleanProperty(false);
         endOfMedia = new SimpleBooleanProperty(true);
         volume = new SimpleDoubleProperty(0.5);
         currentTime = new SimpleDoubleProperty(0);
         coverProperty = new SimpleObjectProperty<>(null);
+        toggledShuffel = new SimpleBooleanProperty(false);
     }
 
 
@@ -83,27 +85,6 @@ public class MediaController {
         this.setCurrentMediaplayer();
     }
 
-    //user wont see order by which tracks will be played in shuffel mode;
-    //playlist should retain order at all times(especially in view)
-    // TODO: Do as toggleProperty... !!!!111
-    public void toggleShuffle()
-    {
-        //ON->OFF
-        //if replay gets unshuffeld playlist continues to play
-        // tracks in order(continuing track currently playing)
-        if(this.isInShuffleMode())
-        {
-            this.setInShuffleMode(false);
-            this.currentPlaybackIndex = this.shuffleList[this.currentPlaybackIndex];
-            return;
-        }
-        //OFF->ON
-        //if replay of tracks gets shuffled
-        //playlist wont remember tracks already played
-        //shuffled = !shuffled;
-        createShuffleList();
-    }
-
     /**
      *
      * @param time in seconds mediaplayer.currentTime should be set to
@@ -136,8 +117,7 @@ public class MediaController {
             throws PlaylistIOException
     {
         Playlist newTracks = new Playlist();
-        for (Track trackToAdd : tracksToAdd)
-            newTracks.add(trackToAdd);
+        newTracks.addAll(Arrays.asList(tracksToAdd));
         this.playlist.addAll(newTracks);
         if (isInShuffleMode())
             shuffleList = MediaUtil.generateShuffelList(playlist.size());
@@ -173,7 +153,7 @@ public class MediaController {
      */
     public int getCurrentPlaylistIndex()
     {
-        if (isInShuffleMode())
+        if (getToggledShuffel())
             return shuffleList[currentPlaybackIndex];
         return currentPlaybackIndex;
     }
@@ -314,6 +294,33 @@ public class MediaController {
 
     public void setInShuffleMode(boolean inShuffleMode) {
         this.inShuffleMode.set(inShuffleMode);
+    }
+
+    private SimpleBooleanProperty toggledShuffel;
+
+    public boolean getToggledShuffel() {
+        return toggledShuffel.get();
+    }
+
+    public SimpleBooleanProperty toggledShuffelProperty() {
+        return toggledShuffel;
+    }
+
+    public void setToggledShuffel(boolean toggledShuffel) {
+        this.toggledShuffel.set(toggledShuffel);
+        //ON->OFF
+        //if replay gets unshuffeld playlist continues to play
+        // tracks in order(continuing track currently playing)
+        if(this.getToggledShuffel())
+        {
+            this.currentPlaybackIndex = this.shuffleList[this.currentPlaybackIndex];
+            return;
+        }
+        //OFF->ON
+        //if replay of tracks gets shuffled
+        //playlist wont remember tracks already played
+        //shuffled = !shuffled;
+        createShuffleList();
     }
 
     private BooleanProperty endOfMedia;
