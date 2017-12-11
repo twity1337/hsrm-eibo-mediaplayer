@@ -9,6 +9,8 @@ import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManager;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManagerObserver;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -225,26 +227,24 @@ public class MainBorderPane extends BorderPane {
                 progressSlider.setMax(newValue.doubleValue()));
        // bind slider property to time property of Mediacontroller
 
-        progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                //TODO: hacky method to determine if change occur "naturly" by passing of time or user interaction
-                int delta = (int)(newValue.doubleValue()-oldValue.doubleValue());
-                if (delta!=0)
-                {
-                    controller.seek(newValue.doubleValue());
-                }
-
-            }
-        });
         controller.currentTimeProperty().addListener((observable, oldValue, newValue) ->{
-            double timeInSeconds = newValue.doubleValue();
-            this.progressSlider.adjustValue(timeInSeconds);
+            if (!progressSlider.isValueChanging())
+                this.progressSlider.setValue(newValue.doubleValue());
 
             currentTime.setText(
                     parseToTimeString(this.progressSlider.getValue()) + " / " +
-                    parseToTimeString(this.progressSlider.getMax())
+                            parseToTimeString(this.progressSlider.getMax())
             );
+        });
+
+        progressSlider.valueProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (progressSlider.isValueChanging())
+                {
+                    controller.seek(progressSlider.getValue());
+                }
+            }
         });
 
         HBox.setHgrow(progressSlider, Priority.ALWAYS);
