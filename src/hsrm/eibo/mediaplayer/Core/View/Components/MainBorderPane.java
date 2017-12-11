@@ -324,14 +324,11 @@ public class MainBorderPane extends BorderPane {
                 MediaListElementInterface selectedElement = ((TreeItem<MediaListElementInterface>)(((TreeView) event.getSource()).getSelectionModel().getSelectedItem())).getValue();
                 if(selectedElement == null) // no selected item
                     return;
-                if(selectedElement instanceof Playlist)
-                {
-                    controller.setCurrentMediaplayer(((Playlist) selectedElement).get(0));
-                }else if (selectedElement instanceof Track)
+                if (selectedElement instanceof Track)
                 {
                     controller.setCurrentMediaplayer((Track) selectedElement);
+                    controller.play();
                 }
-                controller.play();
             }
         });
 
