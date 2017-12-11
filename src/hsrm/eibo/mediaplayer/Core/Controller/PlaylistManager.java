@@ -1,10 +1,9 @@
-package hsrm.eibo.mediaplayer;
+package hsrm.eibo.mediaplayer.Core.Controller;
 
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.M3uParserTask;
-import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,8 +11,7 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 public class PlaylistManager extends ArrayList<Playlist>{
     private static final String M3U_PARSER_THREAD_NAME = "M3U Parser Thread";
@@ -21,23 +19,41 @@ public class PlaylistManager extends ArrayList<Playlist>{
     private static ObservableList<Playlist> observableInstance = FXCollections.observableArrayList(instance);
     private Playlist lastAddedPlaylist;
 
+    private static ArrayList<PlaylistManagerObserver> observers = new ArrayList<>();
+
+    public static void addOnChangeObserver(PlaylistManagerObserver obj)
+    {
+        observers.add(obj);
+    }
+    public static void removeOnChangeObserver(PlaylistManagerObserver obj)
+    {
+        observers.remove(obj);
+    }
+
+    private void notifyOnChangeObservers()
+    {
+        PlaylistManager ths = this;
+        observers.forEach(observer -> observer.update(ths));
+    }
+
     public static PlaylistManager getInstance() {
         return instance;
     }
 
     private PlaylistManager(){this.isLoadingList = new SimpleBooleanProperty(false);}
 
-    public void loadPlaylistFromFile(File playlistFile)
+    public void createPlaylistFromFile(File playlistFile)
     {
         this.setIsLoadingList(true);
         M3uParserTask parser = new M3uParserTask(playlistFile);
         parser.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
-            public void handle(WorkerStateEvent event) {
+            public synchronized void handle(WorkerStateEvent event) {
                 try {
                     instance.add(
-                    lastAddedPlaylist = new Playlist((String[])event.getSource().getValue()));
+                    lastAddedPlaylist = new Playlist(playlistFile.getPath(), (String[])event.getSource().getValue()));
                     setIsLoadingList(false);
+                    notifyOnChangeObservers();
                 } catch (PlaylistIOException e) {
                     e.printStackTrace();
                 }
@@ -53,6 +69,21 @@ public class PlaylistManager extends ArrayList<Playlist>{
         Thread parserThread = new Thread(parser, M3U_PARSER_THREAD_NAME);
         parserThread.setDaemon(true);
         parserThread.start();
+    }
+
+    public void createPlaylistFromFile(List<File> trackFiles) throws PlaylistIOException
+    {
+        int trackFileSize = trackFiles.size();
+        String[] trackPaths = new String[trackFileSize];
+        for(int i = 0; i < trackFileSize; i++)
+        {
+            trackPaths[i] = trackFiles.get(i).getPath();
+        }
+        lastAddedPlaylist = new Playlist(trackPaths);
+        lastAddedPlaylist.setName("Einzelne Dateien");
+
+        instance.add(lastAddedPlaylist);
+        notifyOnChangeObservers();
     }
 
     public void savePlaylistToFile(Playlist playlist){
@@ -96,5 +127,6 @@ public class PlaylistManager extends ArrayList<Playlist>{
             throws PlaylistIOException
     {
         playlist.addAll(Arrays.asList(tracksToAd));
+        notifyOnChangeObservers();
     }
 }

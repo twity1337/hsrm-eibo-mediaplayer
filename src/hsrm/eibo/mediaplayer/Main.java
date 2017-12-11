@@ -4,6 +4,8 @@ import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.util.Observable;
+
 
 public class Main extends Application {
 

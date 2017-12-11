@@ -2,11 +2,13 @@ package hsrm.eibo.mediaplayer.Core.View.Components;
 
 import hsrm.eibo.mediaplayer.Core.Controller.MediaController;
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
+import hsrm.eibo.mediaplayer.Core.Model.MediaListElementInterface;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
-import hsrm.eibo.mediaplayer.Core.Util.FileIOUtil;
+import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
-import hsrm.eibo.mediaplayer.PlaylistManager;
+import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManager;
+import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManagerObserver;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -27,9 +29,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
 
-import java.awt.*;
 import java.io.File;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class MainBorderPane extends BorderPane {
 
@@ -41,7 +43,6 @@ public class MainBorderPane extends BorderPane {
     private final ViewBuilder viewBuilder;
 
     private MenuBar menuBar = new MenuBar();
-    private Label test_playlistPath = new Label("Playlist");
     private Button playPauseButton = new Button(">");
     private Label currentTime = new Label("--:--");
     private Slider progressSlider = new Slider(0, 0, 0);
@@ -56,6 +57,7 @@ public class MainBorderPane extends BorderPane {
     private Parent getMenuItems() {
         VBox topVBox = new VBox();
         MainBorderPane ths = this;
+        PlaylistManager playlistManager = PlaylistManager.getInstance();
 
         Menu[] menus = {
                 new Menu("Datei"),
@@ -84,14 +86,13 @@ public class MainBorderPane extends BorderPane {
                 if(chosenFiles != null)
                 {
                     try {
-                        controller.setPlaylist(new Playlist(FileIOUtil.extractFilePaths(chosenFiles.toArray(new File[chosenFiles.size()]))));
+                        playlistManager.createPlaylistFromFile(chosenFiles);
                     }catch (PlaylistIOException e)
                     {
                         // TODO: Make that better... (error modal window..)
                         System.err.println("ERROR: Error loading files: " + e.getLocalizedMessage());
                     }
                     resetMediaControls();
-                    ths.test_playlistPath.setText("Track: " + chosenFiles.toString());
                     System.out.println(chosenFiles.toString());
                 }
 
@@ -112,9 +113,8 @@ public class MainBorderPane extends BorderPane {
                 File chosenFile = fileChooser.showOpenDialog(null);
                 if(chosenFile != null)
                 {
-
-                    PlaylistManager.getInstance().loadPlaylistFromFile(chosenFile);
-                    PlaylistManager.getInstance().isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
+                    playlistManager.createPlaylistFromFile(chosenFile);
+                    playlistManager.isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
                         Playlist playlistToAdd;
                         if (oldValue && !newValue &&
                             (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
@@ -122,9 +122,6 @@ public class MainBorderPane extends BorderPane {
                             controller.setPlaylist(playlistToAdd);
                         }
                     });
-
-                    ths.test_playlistPath.setText("Playlist: " + chosenFile.toString());
-                    System.out.println(chosenFile.toString());
                 }
             }
         });
@@ -173,7 +170,7 @@ public class MainBorderPane extends BorderPane {
                 return;
             }
 
-            PlaylistManager.getInstance().loadPlaylistFromFile(debugPlaylistFile);
+            PlaylistManager.getInstance().createPlaylistFromFile(debugPlaylistFile);
             PlaylistManager.getInstance().isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
                 Playlist playlistToAdd;
                 if (oldValue && !newValue &&
@@ -182,7 +179,6 @@ public class MainBorderPane extends BorderPane {
                     controller.setPlaylist(playlistToAdd);
                 }
             });
-            System.out.println("Playlist: " + debugPlaylistFile.toString());
 
         });
         root.getItems().addAll(items);
@@ -286,27 +282,62 @@ public class MainBorderPane extends BorderPane {
 
     private Parent getTabContent_Playlist()
     {
-        PlaylistManager plManager = PlaylistManager.getInstance();
-        ListView<Playlist> list = new ListView<>();
-        list.getItems().addAll(plManager.toArray(new Playlist[plManager.size()]));
+        PlaylistTreeView tree = new PlaylistTreeView();
 
-        // TODO: Delete THIS!!
-        //try{list.getItems().add(new Playlist(System.getProperty("user.dir") + "/media/test.mp3"));}catch (Exception e){throw new RuntimeException(e.getMessage());}
-        list.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        PlaylistManager.addOnChangeObserver(new PlaylistManagerObserver() {
+            @Override
+            public void update(PlaylistManager playlistManager) {
+                // onChange of Playlist
+
+                Playlist addedPlaylist = playlistManager.getLastAddedPlaylist();
+                final TreeItem<MediaListElementInterface> playlistTreeItem = new TreeItem<>(addedPlaylist);
+                playlistTreeItem.setExpanded(true);
+
+                addedPlaylist.forEach(new Consumer<Track>() {
+                    @Override
+                    public void accept(Track track) {
+                        // forEach Track in Listview
+                        track.metadataReadyProperty().addListener(new ChangeListener<Boolean>() {
+                            @Override
+                            public synchronized void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                                // Metadata ready on single track in TreeView.
+                                if(newValue)
+                                {
+                                    tree.redraw();
+                                }
+                            }
+                        });
+                        playlistTreeItem.getChildren().add(new TreeItem<>(track));
+                    }
+                });
+                // add playlist to TreeView
+                tree.getRoot().getChildren().add(playlistTreeItem);
+            }
+        });
+
+        tree.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                Playlist playlist = (Playlist) ((ListView) event.getSource()).getSelectionModel().getSelectedItem();
-                if(playlist == null) // no selected item
+                if(event.getClickCount() != 2)
                     return;
-                controller.setCurrentMediaplayer(playlist.get(0));
-                ((ListView) event.getSource()).getItems().addAll(plManager.toArray(new Playlist[plManager.size()]));
+
+                MediaListElementInterface selectedElement = ((TreeItem<MediaListElementInterface>)(((TreeView) event.getSource()).getSelectionModel().getSelectedItem())).getValue();
+                if(selectedElement == null) // no selected item
+                    return;
+                if(selectedElement instanceof Playlist)
+                {
+                    controller.setCurrentMediaplayer(((Playlist) selectedElement).get(0));
+                }else if (selectedElement instanceof Track)
+                {
+                    controller.setCurrentMediaplayer((Track) selectedElement);
+                }
                 controller.play();
             }
         });
 
 
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(this.test_playlistPath, list);
+        vbox.getChildren().addAll(tree);
         return vbox;
     }
 

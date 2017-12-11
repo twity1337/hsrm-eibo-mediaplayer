@@ -1,9 +1,7 @@
 package hsrm.eibo.mediaplayer.Core.Controller;
-import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
 import hsrm.eibo.mediaplayer.Core.Model.Metadata;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.*;
 
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
@@ -12,8 +10,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.image.Image;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-
-import java.util.Arrays;
 
 public class MediaController {
     private int[] shuffleList;
@@ -46,12 +42,24 @@ public class MediaController {
 
     public void play()
     {
-        if (this.currentMediaplayer == null
-            || this.currentMediaplayer.getStatus() == MediaPlayer.Status.UNKNOWN
-            || this.currentMediaplayer.getStatus() == MediaPlayer.Status.HALTED)
+        if (this.currentMediaplayer == null  || this.currentMediaplayer.getStatus() == MediaPlayer.Status.HALTED)
         {
+            // TODO Throw error
             return;
         }
+        if(this.currentMediaplayer.getStatus() == MediaPlayer.Status.UNKNOWN)
+        {
+            this.currentMediaplayer.statusProperty().addListener(new ChangeListener<MediaPlayer.Status>() {
+                @Override
+                public void changed(ObservableValue<? extends MediaPlayer.Status> observable, MediaPlayer.Status oldValue, MediaPlayer.Status newValue) {
+                    if (newValue != MediaPlayer.Status.READY)
+                        return;
+                    instance.play();
+                }
+            });
+
+        }
+
         this.currentMediaplayer.play();
         this.setPlaying(true);
     }
@@ -101,6 +109,7 @@ public class MediaController {
         this.playlist = playlist;
         this.currentPlaybackIndex = 0;
         this.setCurrentMediaplayer();
+        System.out.println("Playlist: " + playlist.getLocation());
     }
 
     /**
@@ -117,6 +126,7 @@ public class MediaController {
         // setting new mediaplayer and its eventhandler
         this.currentMediaplayer = track.getTrackMediaPlayer();
         bindListenersToCurrentMediaPlayer();
+        System.out.println("Track: " + track.getLocation());
     }
 
     private boolean mediaplayerSet(){return this.currentMediaplayer != null;}

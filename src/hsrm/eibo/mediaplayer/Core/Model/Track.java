@@ -14,7 +14,7 @@ import org.apache.commons.lang.ArrayUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-public class Track {
+public class Track implements MediaListElementInterface {
 
     private static final String METADATA_PARSER_THREAD_NAME = "Metadata Parser Thread";
     private Metadata metadata;
@@ -59,7 +59,7 @@ public class Track {
         return new MediaPlayer(new Media(this.getUri()));
     }
 
-    public String getTrackPath() {
+    public String getLocation() {
         return trackPath;
     }
 
@@ -80,5 +80,19 @@ public class Track {
 
     public void setMetadataReady(boolean metadataReady) {
         this.metadataReady.set(metadataReady);
+    }
+
+    @Override
+    public String toString() {
+        if(isMetadataReady())
+        {
+            Metadata metadata = this.getMetadata();
+            if(!metadata.getArtist().isEmpty() && !metadata.getTitle().isEmpty())
+                return metadata.getArtist() + " - " + metadata.getTitle();
+
+            if(!metadata.getTitle().isEmpty())
+                return metadata.getTitle();
+        }
+        return this.getLocation();
     }
 }

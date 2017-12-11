@@ -9,7 +9,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Playlist extends ArrayList<Track> {
+public class Playlist extends ArrayList<Track> implements MediaListElementInterface {
     private String name;
     private String location;
 
@@ -32,7 +32,8 @@ public class Playlist extends ArrayList<Track> {
                 System.err.println("ERROR: Error loading file: " + e.getMessage());
             }
         }
-        //TODO: do something with error
+        if(exception != null)
+            throw exception;
     }
 
     public Playlist(String... trackPaths) throws PlaylistIOException
@@ -54,5 +55,13 @@ public class Playlist extends ArrayList<Track> {
      */
     public String getLocation() {
         return location;
+    }
+
+
+    public String toString()
+    {
+        if(this.name == null || this.name.isEmpty())
+            return this.location;
+        return this.name;
     }
 }
