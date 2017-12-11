@@ -69,7 +69,7 @@ public class MediaController {
             return;
         if (!isEndOfPlaylist())
         {
-            currentPlaybackIndex++;
+            this.currentPlaybackIndex++;
         }
         else if (this.getRepeatMode().equals(RepeatMode.ALL) && this.isEndOfPlaylist())
         {
@@ -156,10 +156,13 @@ public class MediaController {
         if (this.getRepeatMode().equals(RepeatMode.SINGLE))
         {
             this.rewind();
+            this.play();
         } else {
             this.skipToNext();
+            this.currentMediaplayer.setOnReady(() -> {
+                play();
+            });
         }
-        this.play();
     }
 
     private boolean isEndOfPlaylist()
