@@ -231,20 +231,36 @@ public class MainBorderPane extends BorderPane {
             if (!progressSlider.isValueChanging())
                 this.progressSlider.setValue(newValue.doubleValue());
 
+            System.out.println("currentTime");
+
             currentTime.setText(
                     parseToTimeString(this.progressSlider.getValue()) + " / " +
                             parseToTimeString(this.progressSlider.getMax())
             );
         });
 
-        progressSlider.valueProperty().addListener(new InvalidationListener() {
+        progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
-            public void invalidated(Observable observable) {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 if (progressSlider.isValueChanging())
                 {
+                    System.out.println("valueChanging");
                     controller.seek(progressSlider.getValue());
                 }
             }
+        });
+        progressSlider.setOnMousePressed(event -> {
+            progressSlider.setValueChanging(true);
+            controller.seek(progressSlider.getValue());
+        });
+        progressSlider.setOnMouseReleased(event -> {
+            try {
+                Thread.sleep(500);
+            }catch (InterruptedException ignored)
+            {
+
+            }
+            progressSlider.setValueChanging(false);
         });
 
         HBox.setHgrow(progressSlider, Priority.ALWAYS);
