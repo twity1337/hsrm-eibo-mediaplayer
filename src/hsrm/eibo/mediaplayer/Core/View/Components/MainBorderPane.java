@@ -25,18 +25,20 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import sun.misc.resources.Messages_es;
+import javafx.stage.*;
 
-import javax.print.attribute.standard.Media;
+import java.awt.*;
 import java.io.File;
 import java.util.List;
 
 public class MainBorderPane extends BorderPane {
 
+    private static final boolean DEBUG_MODE_ENABLED = true;
+
+
+
     private final MediaController controller = MediaController.getInstance();
     private final ViewBuilder viewBuilder;
-
 
     private MenuBar menuBar = new MenuBar();
     private Label test_playlistPath = new Label("Playlist");
@@ -46,12 +48,12 @@ public class MainBorderPane extends BorderPane {
 
     public MainBorderPane(ViewBuilder vb) {
         this.viewBuilder = vb;
-        this.setTop(getTopComponents());
+        this.setTop(getMenuItems());
         this.setCenter(getCenterComponents());
         this.setBottom(getBottomComponents());
     }
 
-    private Parent getTopComponents() {
+    private Parent getMenuItems() {
         VBox topVBox = new VBox();
         MainBorderPane ths = this;
 
@@ -60,7 +62,8 @@ public class MainBorderPane extends BorderPane {
                 new Menu("Wiedergabe"),
                 new Menu("Playlist"),
                 new Menu("Ansicht"),
-                new Menu("?")
+                new Menu("?"),
+                null
         };
 
         MenuItem openMenuItem = new MenuItem("Öffnen...");
@@ -110,25 +113,16 @@ public class MainBorderPane extends BorderPane {
                 if(chosenFile != null)
                 {
 
-                    try {
-                        PlaylistManager.getInstance().loadPlaylistFromFile(chosenFile);
-                        PlaylistManager.getInstance().isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
-                            Playlist playlistToAdd;
-                            if (oldValue && !newValue &&
-                                (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
-                            {
-                                controller.setPlaylist(playlistToAdd);
-                            }
-                        });
-/*
-                        controller.setPlaylist(PlaylistManager.getInstance().getLastAddedPlaylist());
-*/
-                    }catch (PlaylistIOException e)
-                    {
-                        // TODO: Handle error
-                        System.out.println("ERROR: '" + chosenFile + "': " + e.getLocalizedMessage());
-                        return;
-                    }
+                    PlaylistManager.getInstance().loadPlaylistFromFile(chosenFile);
+                    PlaylistManager.getInstance().isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
+                        Playlist playlistToAdd;
+                        if (oldValue && !newValue &&
+                            (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
+                        {
+                            controller.setPlaylist(playlistToAdd);
+                        }
+                    });
+
                     ths.test_playlistPath.setText("Playlist: " + chosenFile.toString());
                     System.out.println(chosenFile.toString());
                 }
@@ -152,10 +146,46 @@ public class MainBorderPane extends BorderPane {
 
         menus[0].getItems().addAll(fileSubMenu);
 
+        if(DEBUG_MODE_ENABLED) {
+            menus[5] = new Menu("__DEBUG");
+            applyOptionalDebugItems(menus[5]);
+        }
+
         this.menuBar.getMenus().addAll(menus);
         topVBox.getChildren().addAll(this.menuBar);
 
         return topVBox;
+    }
+
+    private void applyOptionalDebugItems(Menu root) {
+        if(!DEBUG_MODE_ENABLED)
+            return;
+
+        MenuItem[] items = {
+                new MenuItem("Load Playlist from media/_DEBUG.m3u...")
+        };
+
+        items[0].setOnAction(event -> {
+            File debugPlaylistFile = new File(System.getProperty("user.dir")+"/media/_DEBUG.m3u");
+            if(!debugPlaylistFile.canRead())
+            {
+                System.err.println("ERROR: Error reading debug playlist file: \"" + debugPlaylistFile.getPath() + "\". Is this file present? ");
+                return;
+            }
+
+            PlaylistManager.getInstance().loadPlaylistFromFile(debugPlaylistFile);
+            PlaylistManager.getInstance().isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
+                Playlist playlistToAdd;
+                if (oldValue && !newValue &&
+                        (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
+                {
+                    controller.setPlaylist(playlistToAdd);
+                }
+            });
+            System.out.println("Playlist: " + debugPlaylistFile.toString());
+
+        });
+        root.getItems().addAll(items);
     }
 
     private Parent getCenterComponents() {

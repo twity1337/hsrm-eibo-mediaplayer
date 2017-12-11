@@ -27,7 +27,7 @@ public class PlaylistManager extends ArrayList<Playlist>{
 
     private PlaylistManager(){this.isLoadingList = new SimpleBooleanProperty(false);}
 
-    public void loadPlaylistFromFile(File playlistFile) throws PlaylistIOException
+    public void loadPlaylistFromFile(File playlistFile)
     {
         this.setIsLoadingList(true);
         M3uParserTask parser = new M3uParserTask(playlistFile);
@@ -43,7 +43,7 @@ public class PlaylistManager extends ArrayList<Playlist>{
                 }
             }
         });
-        //TODO: setOnfailed
+        //TODO: throw Exceptions to View
         parser.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {

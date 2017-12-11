@@ -13,7 +13,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        ViewBuilder.getInstance().preparePrimaryStage(primaryStage);
+        ViewBuilder.getInstance().initPrimaryStage(primaryStage);
         primaryStage.show();
 
     }

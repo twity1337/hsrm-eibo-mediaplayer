@@ -22,14 +22,23 @@ public class ViewBuilder {
         return instance;
     }
 
-    public void preparePrimaryStage(Stage primaryStage)
+    private Stage primaryStage = null;
+
+    public void initPrimaryStage(Stage primaryStage)
     {
+        if(this.primaryStage != null)
+            throw new RuntimeException("ViewBuilder.initPrimaryStage() can only be called once. It was already called before.");
         Scene root = new Scene(this.createMainView(), WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT);
         primaryStage.setScene(root);
         primaryStage.setTitle(WINDOW_TITLE);
         primaryStage.setMinHeight(WINDOW_MIN_HEIGHT);
         primaryStage.setMinWidth(WINDOW_MIN_WIDTH);
         primaryStage.setOnCloseRequest(event -> handleShutdown());
+        this.primaryStage = primaryStage;
+    }
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
     }
 
     public BorderPane createMainView()
