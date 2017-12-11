@@ -1,5 +1,6 @@
 package hsrm.eibo.mediaplayer.Core.Controller;
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
+import hsrm.eibo.mediaplayer.Core.Model.Metadata;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import javafx.beans.binding.ObjectBinding;
@@ -39,6 +40,7 @@ public class MediaController {
         currentTime = new SimpleDoubleProperty(0);
         coverProperty = new SimpleObjectProperty<>(null);
         toggledShuffel = new SimpleBooleanProperty(false);
+        currentTrackMetadata = new SimpleObjectProperty<>();
     }
 
 
@@ -99,28 +101,6 @@ public class MediaController {
         this.playlist = playlist;
         this.currentPlaybackIndex = 0;
         this.setCurrentMediaplayer();
-    }
-
-    public void appendPlaylist(Playlist apendix)
-    {
-        this.playlist.addAll(apendix);
-        if (isInShuffleMode())
-            createShuffleList();
-    }
-
-    /**
-     * method to add one or more Track objects to current playlist
-     * TODO: this should be part of playlistmanager
-     * @param tracksToAdd Track[]
-     */
-    public void addTrackToPlaylist(Track...tracksToAdd)
-            throws PlaylistIOException
-    {
-        Playlist newTracks = new Playlist();
-        newTracks.addAll(Arrays.asList(tracksToAdd));
-        this.playlist.addAll(newTracks);
-        if (isInShuffleMode())
-            shuffleList = MediaUtil.generateShuffelList(playlist.size());
     }
 
     /**
@@ -188,44 +168,25 @@ public class MediaController {
     }
 
     private void bindListenersToCurrentMediaPlayer() {
-        this.currentMediaplayer.setOnPlaying(new Runnable() {
-            @Override
-            public void run() {
-                instance.setPlaying(true);
-            }
+        this.currentMediaplayer.setOnPlaying(() -> instance.setPlaying(true));
+
+        this.currentMediaplayer.setOnHalted(() -> {
+            // TODO: job for exception handling
+            System.err.println("Critical Error: player no longer useable");
+            instance.currentMediaplayer.dispose();
+            instance.currentMediaplayer=null;
         });
 
-        this.currentMediaplayer.setOnHalted(new Runnable() {
-            @Override
-            public void run() {
-                // TODO: job for exception handling
-                System.err.println("Critical Error: player no longer useable");
-                instance.currentMediaplayer.dispose();
-                instance.currentMediaplayer=null;
-            }
+        this.currentMediaplayer.setOnPaused(() -> instance.setPlaying(false));
+
+        this.currentMediaplayer.setOnStalled(() -> {
+            System.out.println("Stream interrupted");
+            instance.setPlaying(false);
         });
 
-        this.currentMediaplayer.setOnPaused(new Runnable() {
-            @Override
-            public void run() {
-                instance.setPlaying(false);
-            }
-        });
-
-        this.currentMediaplayer.setOnStalled(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Stream interrupted");
-                instance.setPlaying(false);
-            }
-        });
-
-        this.currentMediaplayer.setOnStopped(new Runnable() {
-            @Override
-            public void run() {
-                instance.setPlaying(false);//stop resets playbacktime and mediaplayer wont respond to seek()
-                instance.setStopped(true);
-            }
+        this.currentMediaplayer.setOnStopped(() -> {
+            instance.setPlaying(false);//stop resets playbacktime and mediaplayer wont respond to seek()
+            instance.setStopped(true);
         });
 
         this.currentMediaplayer.setOnEndOfMedia(() -> {
@@ -234,31 +195,23 @@ public class MediaController {
             instance.playNext();
         });
 
-        currentMediaplayer.setOnReady(new Runnable() {
-            @Override
-            public void run() {
-                instance.coverProperty.set((Image)currentMediaplayer.getMedia().getMetadata().get("image"));
-                instance.trackDurationProperty().set(currentMediaplayer.getTotalDuration().toSeconds());
-            }
+        currentMediaplayer.setOnReady(() -> {
+            instance.coverProperty.set((Image)currentMediaplayer.getMedia().getMetadata().get("image"));
+            instance.trackDurationProperty().set(currentMediaplayer.getTotalDuration().toSeconds());
         });
         //bind volume property bidirectional
         this.currentMediaplayer.volumeProperty().
                 bindBidirectional(this.volumeProperty());
         // currentTime(double) listens to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
-        this.currentMediaplayer.currentTimeProperty().addListener(new ChangeListener<Duration>() {
-            @Override
-            public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
-                currentTimeProperty().set(newValue.toSeconds());
-            }
-        });
+        this.currentMediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> currentTimeProperty().set(newValue.toSeconds()));
     }
 ////////////////////////////////////////////////////////////////////////////////
 //  Properties and classes                                                    //
 ////////////////////////////////////////////////////////////////////////////////
 
-    /**
+ /* TODO:  *//**
      * returns double (in seconds)
-     */
+     *//*
     private class DurationToDoubleBinding extends ObjectBinding<Double>{
         ReadOnlyObjectProperty<Duration> d;
         public DurationToDoubleBinding(ReadOnlyObjectProperty<Duration> durationObject)
@@ -270,7 +223,7 @@ public class MediaController {
         protected Double computeValue() {
             return d.getValue().toSeconds();
         }
-    }
+    }*/
 
     private SimpleObjectProperty<Image> coverProperty;
 
@@ -421,5 +374,19 @@ public class MediaController {
 
     public void setTrackDuration(double trackDuration) {
         this.trackDuration.set(trackDuration);
+    }
+
+    private SimpleObjectProperty<Metadata> currentTrackMetadata;
+
+    public Metadata getCurrentTrackMetadata() {
+        return currentTrackMetadata.get();
+    }
+
+    public SimpleObjectProperty<Metadata> currentTrackMetadataProperty() {
+        return currentTrackMetadata;
+    }
+
+    public void setCurrentTrackMetadata(Metadata currentTrackMetadata) {
+        this.currentTrackMetadata.set(currentTrackMetadata);
     }
 }

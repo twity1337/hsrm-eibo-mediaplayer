@@ -2,7 +2,9 @@ package hsrm.eibo.mediaplayer;
 
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
+import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.M3uParserTask;
+import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +13,7 @@ import javafx.event.EventHandler;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class PlaylistManager extends ArrayList<Playlist>{
     private static final String M3U_PARSER_THREAD_NAME = "M3U Parser Thread";
@@ -81,5 +84,17 @@ public class PlaylistManager extends ArrayList<Playlist>{
 
     public void setIsLoadingList(boolean isLoadingList) {
         this.isLoadingList.set(isLoadingList);
+    }
+
+    /**
+     *
+     * @param playlist
+     * @param tracksToAd
+     * @throws PlaylistIOException
+     */
+    public void addTrackToPlaylist(Playlist playlist, Track...tracksToAd)
+            throws PlaylistIOException
+    {
+        playlist.addAll(Arrays.asList(tracksToAd));
     }
 }
