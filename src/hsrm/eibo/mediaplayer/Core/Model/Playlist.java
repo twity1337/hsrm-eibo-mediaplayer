@@ -2,6 +2,7 @@ package hsrm.eibo.mediaplayer.Core.Model;
 
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistException;
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
+import hsrm.eibo.mediaplayer.Core.Exception.TrackUnsupportedFileTypeException;
 import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
 
@@ -26,6 +27,9 @@ public class Playlist extends ArrayList<Track> {
                 if (exception == null)
                     exception = new PlaylistIOException();
                 exception.addFailedFilePath(trackPath);
+            } catch (TrackUnsupportedFileTypeException e)
+            {
+                System.err.println("ERROR: Error loading file: " + e.getMessage());
             }
         }
         //TODO: do something with error

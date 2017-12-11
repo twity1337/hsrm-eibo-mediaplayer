@@ -4,6 +4,7 @@ import hsrm.eibo.mediaplayer.Core.Controller.MediaController;
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import hsrm.eibo.mediaplayer.Core.Util.FileIOUtil;
+import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.PlaylistManager;
 import javafx.beans.value.ChangeListener;
@@ -24,12 +25,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
+import sun.misc.resources.Messages_es;
 
-import java.awt.*;
+import javax.print.attribute.standard.Media;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 public class MainBorderPane extends BorderPane {
@@ -69,9 +69,11 @@ public class MainBorderPane extends BorderPane {
             public void handle(ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Alle Mediendateien", "*.mp3","*.mp4", "*.wav", "*.mkv"),
-                        new FileChooser.ExtensionFilter("Audiodateien", "*.mp3", "*.wav"),
-                        new FileChooser.ExtensionFilter("Videodateien", "*.mp4","*.mkv")
+                        new FileChooser.ExtensionFilter("Alle Mediendateien",
+                                MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_AUDIO | MediaUtil.FILETYPE_GID_VIDEO)
+                        ),
+                        new FileChooser.ExtensionFilter("Audiodateien", MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_AUDIO)),
+                        new FileChooser.ExtensionFilter("Videodateien", MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_VIDEO))
                 );
                 fileChooser.setTitle("Medium öffnen ...");
                 fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
@@ -100,7 +102,7 @@ public class MainBorderPane extends BorderPane {
             public void handle(ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Unterstützte Playlisten", "*.m3u")
+                        new FileChooser.ExtensionFilter("Unterstützte Playlisten", MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_PLAYLIST))
                 );
                 fileChooser.setTitle("Playlist öffnen ...");
                 fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
@@ -112,9 +114,8 @@ public class MainBorderPane extends BorderPane {
                         PlaylistManager.getInstance().loadPlaylistFromFile(chosenFile);
                         PlaylistManager.getInstance().isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
                             Playlist playlistToAdd;
-                            if (oldValue==true
-                                && newValue== false
-                                && (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
+                            if (oldValue && !newValue &&
+                                (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
                             {
                                 controller.setPlaylist(playlistToAdd);
                             }
@@ -265,6 +266,8 @@ public class MainBorderPane extends BorderPane {
             @Override
             public void handle(MouseEvent event) {
                 Playlist playlist = (Playlist) ((ListView) event.getSource()).getSelectionModel().getSelectedItem();
+                if(playlist == null) // no selected item
+                    return;
                 controller.setCurrentMediaplayer(playlist.get(0));
                 ((ListView) event.getSource()).getItems().addAll(plManager.toArray(new Playlist[plManager.size()]));
                 controller.play();
