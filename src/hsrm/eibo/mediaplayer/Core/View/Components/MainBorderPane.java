@@ -43,9 +43,6 @@ public class MainBorderPane extends BorderPane {
     private final ViewBuilder viewBuilder;
 
     private MenuBar menuBar = new MenuBar();
-    private Button playPauseButton = new Button(">");
-    private Label currentTime = new Label("--:--");
-    private Slider progressSlider = new Slider(0, 0, 0);
 
     public MainBorderPane(ViewBuilder vb) {
         this.viewBuilder = vb;
@@ -93,7 +90,6 @@ public class MainBorderPane extends BorderPane {
                         // TODO: Make that better... (error modal window..)
                         System.err.println("ERROR: Error loading files: " + e.getLocalizedMessage());
                     }
-                    resetMediaControls();
                     System.out.println(chosenFiles.toString());
                 }
 
@@ -204,97 +200,155 @@ public class MainBorderPane extends BorderPane {
 
     private Parent getBottomComponents() //TODO: volume controll
     {
-        HBox mediaControls = new HBox();
-        controller.endOfMediaProperty().addListener((observable, oldValue, newValue) -> {if(newValue) resetMediaControls();});
+        VBox controllBox = new VBox();
+        HBox bottomBox = new HBox();
+        HBox topBox = new HBox();
+
+        Button rewindButton = this.createRewindButton();
+        Button playPauseButton = this.createPlayPauseButton();
+        Button nextButton = this.createForwardButton();
+        Button volumeButton = this.createVolumeButton();
+        Slider volumeSlider = this.createVolumeSlider();
+        Label currentTime = this.createTimeLabel();
+        Slider progressSlider = this.createProgressSlider();
+
+        bottomBox.setHgrow(progressSlider, Priority.ALWAYS);
+        topBox.getChildren().addAll(rewindButton, playPauseButton, nextButton, volumeButton, volumeSlider);
+        bottomBox.getChildren().addAll(currentTime, progressSlider);
+        controllBox.getChildren().addAll(topBox, bottomBox);
+
+        return controllBox;
+    }
+
+    private Button createPlayPauseButton()
+    {
+        Button b = new Button("play");
+        applyIconToLabeledElement(b, "play"); //initial setting
+        controller.endOfMediaProperty().addListener((observable, oldValue, newValue) -> {
+            //TODO: bleiben irgendwelche resets?
+        });
         controller.playingProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue) // is playing
             {
-                playPauseButton.setText("||");
-                applyIconToLabeledElement(this.playPauseButton, "pause");
+                b.setText("pause");
+                applyIconToLabeledElement(b, "pause");
             }else
             {
-                playPauseButton.setText(">");
-                applyIconToLabeledElement(this.playPauseButton, "play");
+                b.setText("" +
+                        "play");
+                applyIconToLabeledElement(b, "play");
             }
         });
-        playPauseButton.setOnAction(event -> {
+        b.setOnAction(event -> {
             if(controller.isPlaying())
                 controller.pause();
             else
                 controller.play();
         });
-        // set max Value of Slider
-        this.controller.trackDurationProperty().addListener((observable, oldValue, newValue) ->
-                progressSlider.setMax(newValue.doubleValue()));
-       // bind slider property to time property of Mediacontroller
-
-        controller.currentTimeProperty().addListener((observable, oldValue, newValue) ->{
-            if (!progressSlider.isValueChanging())
-            {
-                this.progressSlider.setValue(newValue.doubleValue());
-            } else {
-                controller.seek(progressSlider.getValue()); //TODO:
-            }
-
-            System.out.println("currentTime");
-
-            currentTime.setText(
-                    parseToTimeString(this.progressSlider.getValue()) + " / " +
-                            parseToTimeString(this.progressSlider.getMax())
-            );
-        });
-
-      /*  progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (progressSlider.isValueChanging())
-                {
-                    System.out.println("valueChanging");
-                    controller.seek(progressSlider.getValue());
-                }
-            }
-        });*/
-        progressSlider.setOnMousePressed(event -> {
-            progressSlider.setValueChanging(true);
-            controller.seek(progressSlider.getValue());
-        });
-        progressSlider.setOnMouseReleased(event -> {
-            progressSlider.setValueChanging(false);
-        });
-
-        HBox.setHgrow(progressSlider, Priority.ALWAYS);
-        mediaControls.getChildren().addAll(playPauseButton, currentTime, progressSlider);
-        return mediaControls;
+        return b;
     }
 
-    private void resetMediaControls()
+    private Button createRewindButton()
     {
-        this.playPauseButton.setText("Wiedergabe starten");
-        applyIconToLabeledElement(this.playPauseButton,"play");
-        this.currentTime.setText("--:--");
-        this.progressSlider.setValue(0);
+        Button b = new Button("rewind");
+        b.setOnAction(event -> controller.skipToPrevious());
+        applyIconToLabeledElement(b, "rewind");
+        return b;
+    }
+
+    private Button createForwardButton()
+    {
+        Button b = new Button("forward");
+        b.setOnAction(event -> controller.skipToNext());
+        applyIconToLabeledElement(b, "forward");
+        return b;
+    }
+
+    private Button createVolumeButton()
+    {
+        Button b = new Button("volume: ");
+        applyIconToLabeledElement(b, "speaker"); //initial setting
+        controller.mutedProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue && !newValue)
+            {
+                b.setText("volume: not muted");
+                applyIconToLabeledElement(b, "speaker");
+                if (controller.getVolume() < 0.2)
+                    controller.setVolume(0.2);
+            } else if (!oldValue && newValue)
+            {
+               b.setText("volume: muted");
+               applyIconToLabeledElement(b,"mute");
+            }
+        });
+        //when player is muted and volume is adjusted, unmute; mute if volume is zero
+        controller.volumeProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() != 0) {
+                controller.setMuted(false);
+            } else {
+                controller.setMuted(true);
+            }
+        });
+        // on mouseclick toggle mute on/off
+        b.setOnMouseClicked(event -> {
+            controller.setMuted(!controller.isMuted());
+        });
+        return b;
+    }
+
+    private Slider createVolumeSlider()
+    {
+        Slider s = new Slider(0, 1, 0.5);
+        s.valueProperty().bindBidirectional(controller.volumeProperty());
+        s.setMinWidth(40);
+        return s;
+    }
+
+    private Label createTimeLabel()
+    {
+        Label l = new Label("--:--");
+        controller.trackDurationProperty().addListener((observable, oldValue, newValue) -> {
+            l.setText("--:--"); //reset text on mediaplayer stop
+        });
+        controller.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+            l.setText(parseToTimeString(newValue.doubleValue())
+                    + " / "
+                    + parseToTimeString(controller.getTrackDuration()));
+        });
+        return l;
+    }
+
+    private Slider createProgressSlider()
+    {
+        Slider s = new Slider(0,0,0);
+        // set max Value of Slider
+        this.controller.trackDurationProperty().addListener((observable, oldValue, newValue) ->
+                s.setMax(newValue.doubleValue()));
+        // bind slider property to time property of Mediacontroller
+        controller.currentTimeProperty().addListener((observable, oldValue, newValue) ->{
+            if (!s.isValueChanging())
+            {
+                s.setValue(newValue.doubleValue());
+            } else {
+                controller.seek(s.getValue());
+            }
+        });
+        s.setOnMousePressed(event -> {
+            s.setValueChanging(true);
+            controller.seek(s.getValue());
+        });
+        s.setOnMouseReleased(event -> {
+            s.setValueChanging(false);
+        });
+        return s;
     }
 
     private Parent getTabContent_CurrentPlayback()
     {
         BorderPane coverBorderPane = new BorderPane();
-        Button prevButton = new Button("<<");
-        applyIconToLabeledElement(prevButton, "rewind");
-        prevButton.setMinHeight(100);
-        prevButton.setOnAction(event -> controller.skipToPrevious());
-        Button nextButton = new Button(">>");
-        applyIconToLabeledElement(nextButton, "forward");
-        nextButton.setMinHeight(100);
-        nextButton.setOnAction(event -> controller.skipToNext());
-
         ImageView imageview = new ImageView();
         imageview.imageProperty().bind(controller.getCoverProperty());
-
-        coverBorderPane.setLeft(prevButton);
         coverBorderPane.setCenter(imageview);
-        coverBorderPane.setRight(nextButton);
-        BorderPane.setAlignment(prevButton, Pos.CENTER);
-        BorderPane.setAlignment(nextButton, Pos.CENTER);
         return coverBorderPane;
     }
 
@@ -349,13 +403,10 @@ public class MainBorderPane extends BorderPane {
                 }
             }
         });
-
-
         VBox vbox = new VBox();
         vbox.getChildren().addAll(tree);
         return vbox;
     }
-
 
     private void applyIconToLabeledElement(Labeled element, String name) {
         ImageView image = new ImageView(this.getClass().getResource(ICON_RESOURCE_PATH + name + ".png").toString());

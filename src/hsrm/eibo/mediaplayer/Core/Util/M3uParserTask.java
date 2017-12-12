@@ -27,7 +27,8 @@ public class M3uParserTask extends Task<String[]>
             String line;
             reader = new BufferedReader(new FileReader(playlistFile));
             while((line = reader.readLine())!= null)
-                buffer.add(line);
+                if (line.charAt(0)!='#')
+                    buffer.add(line);
         } finally {
             reader.close();
         }

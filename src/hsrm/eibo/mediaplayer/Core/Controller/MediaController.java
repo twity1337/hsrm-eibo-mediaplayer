@@ -37,6 +37,7 @@ public class MediaController {
         coverProperty = new SimpleObjectProperty<>(null);
         toggledShuffel = new SimpleBooleanProperty(false);
         currentTrackMetadata = new SimpleObjectProperty<>();
+        muted = new SimpleBooleanProperty(false);
     }
 
 
@@ -208,7 +209,7 @@ public class MediaController {
             instance.playNext();
         });
 
-        currentMediaplayer.setOnReady(() -> {
+        this.currentMediaplayer.setOnReady(() -> {
             instance.coverProperty.set((Image)currentMediaplayer.getMedia().getMetadata().get("image"));
             instance.trackDurationProperty().set(currentMediaplayer.getTotalDuration().toSeconds());
         });
@@ -217,6 +218,8 @@ public class MediaController {
                 bindBidirectional(this.volumeProperty());
         // currentTime(double) listens to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
         this.currentMediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> currentTimeProperty().set(newValue.toSeconds()));
+
+        this.currentMediaplayer.muteProperty().bindBidirectional(this.muted);
     }
 ////////////////////////////////////////////////////////////////////////////////
 //  Properties and classes                                                    //
@@ -401,5 +404,19 @@ public class MediaController {
 
     public void setCurrentTrackMetadata(Metadata currentTrackMetadata) {
         this.currentTrackMetadata.set(currentTrackMetadata);
+    }
+
+    private SimpleBooleanProperty muted;
+
+    public boolean isMuted() {
+        return muted.get();
+    }
+
+    public SimpleBooleanProperty mutedProperty() {
+        return muted;
+    }
+
+    public void setMuted(boolean muted) {
+        this.muted.set(muted);
     }
 }
