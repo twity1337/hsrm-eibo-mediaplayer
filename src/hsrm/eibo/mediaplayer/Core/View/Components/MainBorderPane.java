@@ -9,6 +9,8 @@ import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManager;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManagerObserver;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -28,6 +30,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.util.List;
@@ -36,14 +39,14 @@ import java.util.function.Consumer;
 public class MainBorderPane extends BorderPane {
 
     private static final boolean DEBUG_MODE_ENABLED = true;
-    private static final String ICON_RESOURCE_PATH = "/hsrm/eibo/mediaplayer/Resources/icons/";
+    private static final String ICON_RESOURCE_PATH = "/hsrm/eibo/mediaplayer/Resources/Icons/";
 
 
     private final MediaController controller = MediaController.getInstance();
     private final ViewBuilder viewBuilder;
 
     private MenuBar menuBar = new MenuBar();
-    private Button playPauseButton = new Button(">");
+    private Button playPauseButton = new Button("Wiedergabe starten");
     private Label currentTime = new Label("--:--");
     private Slider progressSlider = new Slider(0, 0, 0);
 
@@ -52,6 +55,10 @@ public class MainBorderPane extends BorderPane {
         this.setTop(getMenuItems());
         this.setCenter(getCenterComponents());
         this.setBottom(getBottomComponents());
+
+        this.getStyleClass().add("main-border-pane");
+        this.currentTime.getStyleClass().add("currenttime");
+        resetMediaControls();
     }
 
 
@@ -160,7 +167,8 @@ public class MainBorderPane extends BorderPane {
             return;
 
         MenuItem[] items = {
-                new MenuItem("Load Playlist from media/_DEBUG.m3u...")
+                new MenuItem("Load Playlist from media/_DEBUG.m3u..."),
+                new MenuItem("Reload CSS...")
         };
 
         items[0].setOnAction(event -> {
@@ -182,12 +190,18 @@ public class MainBorderPane extends BorderPane {
             });
 
         });
+        items[1].setOnAction(event -> {
+            this.applyCss();
+            viewBuilder.getPrimaryStage().getScene().getStylesheets().clear();
+            viewBuilder.getPrimaryStage().getScene().getStylesheets().add(this.getClass().getResource(ViewBuilder.STYLESHEET_MAIN_PATH).toString());
+        });
         root.getItems().addAll(items);
     }
 
     private Parent getCenterComponents() {
 
         TabPane tabPane = new TabPane();
+        tabPane.getStyleClass().add("main-tabpane");
 
         Tab tab0 = new Tab();
         tab0.setText("Aktuelle Wiedergabe");
@@ -204,16 +218,28 @@ public class MainBorderPane extends BorderPane {
 
     private Parent getBottomComponents() //TODO: volume controll
     {
-        HBox mediaControls = new HBox();
+        final Label metadata_left = new Label("test");
+        final Label metadata_right = new Label("etst");
+        metadata_left.getStyleClass().add("metadata");
+        metadata_right.getStyleClass().add("metadata");
+        controller.currentTrackMetadataProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                System.out.println(observable);
+                throw new NotImplementedException();
+            }
+        });
+
+
         controller.endOfMediaProperty().addListener((observable, oldValue, newValue) -> {if(newValue) resetMediaControls();});
         controller.playingProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue) // is playing
             {
-                playPauseButton.setText("||");
+                playPauseButton.setText("Wiedergabe pausieren");
                 applyIconToLabeledElement(this.playPauseButton, "pause");
             }else
             {
-                playPauseButton.setText(">");
+                playPauseButton.setText("Wiedergabe starten");
                 applyIconToLabeledElement(this.playPauseButton, "play");
             }
         });
@@ -236,24 +262,12 @@ public class MainBorderPane extends BorderPane {
                 controller.seek(progressSlider.getValue()); //TODO:
             }
 
-            System.out.println("currentTime");
-
             currentTime.setText(
                     parseToTimeString(this.progressSlider.getValue()) + " / " +
                             parseToTimeString(this.progressSlider.getMax())
             );
         });
 
-      /*  progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (progressSlider.isValueChanging())
-                {
-                    System.out.println("valueChanging");
-                    controller.seek(progressSlider.getValue());
-                }
-            }
-        });*/
         progressSlider.setOnMousePressed(event -> {
             progressSlider.setValueChanging(true);
             controller.seek(progressSlider.getValue());
@@ -262,8 +276,14 @@ public class MainBorderPane extends BorderPane {
             progressSlider.setValueChanging(false);
         });
 
+        VBox mediaControls = new VBox();
+        mediaControls.getStyleClass().addAll("media-control-elements", "inner-spacing");
+        HBox topLine = new HBox(metadata_left, currentTime, metadata_right);
+        topLine.setAlignment(Pos.CENTER);
+        HBox bottomLine = new HBox(playPauseButton, progressSlider);
         HBox.setHgrow(progressSlider, Priority.ALWAYS);
-        mediaControls.getChildren().addAll(playPauseButton, currentTime, progressSlider);
+        bottomLine.getStyleClass().add("vbox-media-controls-bottom");
+        mediaControls.getChildren().addAll(topLine, bottomLine);
         return mediaControls;
     }
 
@@ -278,18 +298,19 @@ public class MainBorderPane extends BorderPane {
     private Parent getTabContent_CurrentPlayback()
     {
         BorderPane coverBorderPane = new BorderPane();
-        Button prevButton = new Button("<<");
+        Button prevButton = new Button("Vorheriger Titel");
         applyIconToLabeledElement(prevButton, "rewind");
         prevButton.setMinHeight(100);
         prevButton.setOnAction(event -> controller.skipToPrevious());
-        Button nextButton = new Button(">>");
+        Button nextButton = new Button("Nächster Titel");
         applyIconToLabeledElement(nextButton, "forward");
         nextButton.setMinHeight(100);
         nextButton.setOnAction(event -> controller.skipToNext());
 
         ImageView imageview = new ImageView();
-        imageview.imageProperty().bind(controller.getCoverProperty());
+        imageview.imageProperty().bind(controller.coverProperty());
 
+        coverBorderPane.getStyleClass().add("inner-spacing");
         coverBorderPane.setLeft(prevButton);
         coverBorderPane.setCenter(imageview);
         coverBorderPane.setRight(nextButton);
@@ -339,7 +360,7 @@ public class MainBorderPane extends BorderPane {
                 if(event.getClickCount() != 2)
                     return;
 
-                MediaListElementInterface selectedElement = ((TreeItem<MediaListElementInterface>)(((TreeView) event.getSource()).getSelectionModel().getSelectedItem())).getValue();
+                MediaListElementInterface selectedElement = tree.getSelectionModel().getSelectedItem().getValue();
                 if(selectedElement == null) // no selected item
                     return;
                 if (selectedElement instanceof Track)
@@ -352,6 +373,7 @@ public class MainBorderPane extends BorderPane {
 
 
         VBox vbox = new VBox();
+        vbox.getStyleClass().add("inner-spacing");
         vbox.getChildren().addAll(tree);
         return vbox;
     }
