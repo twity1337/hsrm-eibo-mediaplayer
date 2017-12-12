@@ -12,6 +12,7 @@ public class ViewBuilder {
     private static final int WINDOW_DEFAULT_WIDTH = 870;
     private static final int WINDOW_MIN_HEIGHT = 300;
     private static final int WINDOW_MIN_WIDTH = 400;
+    public static final String STYLESHEET_MAIN_PATH = "/hsrm/eibo/mediaplayer/Resources/Css/main.css";
 
     private static ViewBuilder instance;
     public static ViewBuilder getInstance()
@@ -29,6 +30,8 @@ public class ViewBuilder {
         if(this.primaryStage != null)
             throw new RuntimeException("ViewBuilder.initPrimaryStage() can only be called once. It was already called before.");
         Scene root = new Scene(this.createMainView(), WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT);
+        root.getStylesheets().add(this.getClass().getResource(STYLESHEET_MAIN_PATH).toString());
+
         primaryStage.setScene(root);
         primaryStage.setTitle(WINDOW_TITLE);
         primaryStage.setMinHeight(WINDOW_MIN_HEIGHT);

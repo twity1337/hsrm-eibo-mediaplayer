@@ -35,7 +35,7 @@ public class MediaController {
         volume = new SimpleDoubleProperty(0.5);
         currentTime = new SimpleDoubleProperty(0);
         coverProperty = new SimpleObjectProperty<>(null);
-        toggledShuffel = new SimpleBooleanProperty(false);
+        toggledShuffle = new SimpleBooleanProperty(false);
         currentTrackMetadata = new SimpleObjectProperty<>();
         muted = new SimpleBooleanProperty(false);
     }
@@ -144,7 +144,7 @@ public class MediaController {
      */
     public int getCurrentPlaylistIndex()
     {
-        if (getToggledShuffel())
+        if (getToggledShuffle())
             return shuffleList[currentPlaybackIndex];
         return currentPlaybackIndex;
     }
@@ -170,9 +170,7 @@ public class MediaController {
             this.play();
         } else {
             this.skipToNext();
-            this.currentMediaplayer.setOnReady(() -> {
-                play();
-            });
+            this.currentMediaplayer.setOnReady(this::play);
         }
     }
 
@@ -243,7 +241,7 @@ public class MediaController {
 
     private SimpleObjectProperty<Image> coverProperty;
 
-    public SimpleObjectProperty<Image> getCoverProperty(){return coverProperty;}
+    public SimpleObjectProperty<Image> coverProperty(){return coverProperty;}
 
     public void setCoverProperty(Image coverProperty) {
         this.coverProperty.set(coverProperty);
@@ -265,22 +263,22 @@ public class MediaController {
         this.inShuffleMode.set(inShuffleMode);
     }
 
-    private SimpleBooleanProperty toggledShuffel;
+    private SimpleBooleanProperty toggledShuffle;
 
-    public boolean getToggledShuffel() {
-        return toggledShuffel.get();
+    public boolean getToggledShuffle() {
+        return toggledShuffle.get();
     }
 
-    public SimpleBooleanProperty toggledShuffelProperty() {
-        return toggledShuffel;
+    public SimpleBooleanProperty toggledShuffleProperty() {
+        return toggledShuffle;
     }
 
-    public void setToggledShuffel(boolean toggledShuffel) {
-        this.toggledShuffel.set(toggledShuffel);
+    public void setToggledShuffle(boolean toggledShuffle) {
+        this.toggledShuffle.set(toggledShuffle);
         //ON->OFF
         //if replay gets unshuffeld playlist continues to play
         // tracks in order(continuing track currently playing)
-        if(this.getToggledShuffel())
+        if(this.getToggledShuffle())
         {
             this.currentPlaybackIndex = this.shuffleList[this.currentPlaybackIndex];
             return;

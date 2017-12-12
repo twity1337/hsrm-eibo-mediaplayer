@@ -1,0 +1,46 @@
+.inner-spacing
+{
+    -fx-padding: 10px;
+}
+
+
+.button
+{
+    -fx-border-radius: 7px;
+    -fx-border-color: rgba(155,155,155,0.4);
+    -fx-background-color: transparent;
+}
+.button:hover
+{
+    -fx-background-color: rgba(215, 215, 215, 0.4);
+    -fx-background-insets: 1px;
+}
+.button:pressed
+{
+    -fx-background-color: rgba(104, 104, 104, 0.4);
+}
+
+.media-control-elements
+{
+}
+
+.label.metadata
+{
+    -fx-background-color: red;
+    -fx-min-width: 20px;
+}
+
+.label.currenttime
+{
+    -fx-font-weight: bold;
+    -fx-font-size: 15pt;
+    -fx-min-width: 30px;
+    -fx-text-alignment: center;
+
+}
+
+.vbox-media-controls-bottom
+{
+    -fx-alignment: center;
+    -fx-start-margin: 20px;
+}
