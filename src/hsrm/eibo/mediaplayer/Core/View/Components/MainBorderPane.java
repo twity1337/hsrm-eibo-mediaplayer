@@ -9,8 +9,6 @@ import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManager;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManagerObserver;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -38,7 +36,7 @@ import java.util.function.Consumer;
 public class MainBorderPane extends BorderPane {
 
     private static final boolean DEBUG_MODE_ENABLED = true;
-
+    private static final String ICON_RESOURCE_PATH = "/hsrm/eibo/mediaplayer/Resources/icons/";
 
 
     private final MediaController controller = MediaController.getInstance();
@@ -55,6 +53,7 @@ public class MainBorderPane extends BorderPane {
         this.setCenter(getCenterComponents());
         this.setBottom(getBottomComponents());
     }
+
 
     private Parent getMenuItems() {
         VBox topVBox = new VBox();
@@ -211,9 +210,11 @@ public class MainBorderPane extends BorderPane {
             if(newValue) // is playing
             {
                 playPauseButton.setText("||");
+                applyIconToLabeledElement(this.playPauseButton, "pause");
             }else
             {
                 playPauseButton.setText(">");
+                applyIconToLabeledElement(this.playPauseButton, "play");
             }
         });
         playPauseButton.setOnAction(event -> {
@@ -229,7 +230,11 @@ public class MainBorderPane extends BorderPane {
 
         controller.currentTimeProperty().addListener((observable, oldValue, newValue) ->{
             if (!progressSlider.isValueChanging())
+            {
                 this.progressSlider.setValue(newValue.doubleValue());
+            } else {
+                controller.seek(progressSlider.getValue()); //TODO:
+            }
 
             System.out.println("currentTime");
 
@@ -239,7 +244,7 @@ public class MainBorderPane extends BorderPane {
             );
         });
 
-        progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
+      /*  progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 if (progressSlider.isValueChanging())
@@ -248,18 +253,12 @@ public class MainBorderPane extends BorderPane {
                     controller.seek(progressSlider.getValue());
                 }
             }
-        });
+        });*/
         progressSlider.setOnMousePressed(event -> {
             progressSlider.setValueChanging(true);
             controller.seek(progressSlider.getValue());
         });
         progressSlider.setOnMouseReleased(event -> {
-            try {
-                Thread.sleep(500);
-            }catch (InterruptedException ignored)
-            {
-
-            }
             progressSlider.setValueChanging(false);
         });
 
@@ -270,7 +269,8 @@ public class MainBorderPane extends BorderPane {
 
     private void resetMediaControls()
     {
-        this.playPauseButton.setText(">");
+        this.playPauseButton.setText("Wiedergabe starten");
+        applyIconToLabeledElement(this.playPauseButton,"play");
         this.currentTime.setText("--:--");
         this.progressSlider.setValue(0);
     }
@@ -279,9 +279,11 @@ public class MainBorderPane extends BorderPane {
     {
         BorderPane coverBorderPane = new BorderPane();
         Button prevButton = new Button("<<");
+        applyIconToLabeledElement(prevButton, "rewind");
         prevButton.setMinHeight(100);
         prevButton.setOnAction(event -> controller.skipToPrevious());
         Button nextButton = new Button(">>");
+        applyIconToLabeledElement(nextButton, "forward");
         nextButton.setMinHeight(100);
         nextButton.setOnAction(event -> controller.skipToNext());
 
@@ -352,6 +354,15 @@ public class MainBorderPane extends BorderPane {
         VBox vbox = new VBox();
         vbox.getChildren().addAll(tree);
         return vbox;
+    }
+
+
+    private void applyIconToLabeledElement(Labeled element, String name) {
+        ImageView image = new ImageView(this.getClass().getResource(ICON_RESOURCE_PATH + name + ".png").toString());
+        image.setFitHeight(32);
+        image.setFitWidth(32);
+        element.setGraphic(image);
+        element.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     }
 
     private String parseToTimeString(double timeInSeconds)
