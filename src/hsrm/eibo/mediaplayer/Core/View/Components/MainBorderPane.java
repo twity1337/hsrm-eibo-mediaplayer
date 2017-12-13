@@ -2,6 +2,7 @@ package hsrm.eibo.mediaplayer.Core.View.Components;
 
 import hsrm.eibo.mediaplayer.Core.Controller.MediaController;
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
+import hsrm.eibo.mediaplayer.Core.MediaControl;
 import hsrm.eibo.mediaplayer.Core.Model.MediaListElementInterface;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
@@ -30,6 +31,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
+import sun.awt.shell.ShellFolder;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
@@ -226,6 +228,8 @@ public class MainBorderPane extends BorderPane {
         Slider volumeSlider = this.createVolumeSlider();
         Label currentTime = this.createTimeLabel();
         Slider progressSlider = this.createProgressSlider();
+        Button shuffleButton = this.createShuffleButton();
+        Button repeatButton = this.createRepeatButton();
 
         final Label metadata_left = new Label("test");
         final Label metadata_right = new Label("etst");
@@ -245,7 +249,7 @@ public class MainBorderPane extends BorderPane {
         });
 
         bottomBox.setHgrow(progressSlider, Priority.ALWAYS);
-        topBox.getChildren().addAll(rewindButton, playPauseButton, nextButton, volumeButton, volumeSlider);
+        topBox.getChildren().addAll(rewindButton, playPauseButton, nextButton, shuffleButton, repeatButton, volumeButton, volumeSlider);
         bottomBox.getChildren().addAll(currentTime, progressSlider);
         controllBox.getChildren().addAll(metadataLine, topBox, bottomBox);
 
@@ -377,6 +381,61 @@ public class MainBorderPane extends BorderPane {
             s.setValueChanging(false);
         });
         return s;
+    }
+
+    private Button createShuffleButton()
+    {
+        Button b = new Button("zufällige Wiedergabe aus");
+        applyIconToLabeledElement(b, "unshuffle");
+        controller.inShuffleModeProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue && !newValue)
+            {
+                b.setText("zufällige Wiedergabe ein");
+                applyIconToLabeledElement(b, "unshuffle");
+            } else if (!oldValue && newValue)
+            {
+                b.setText("zufällige Wiedergabe aus");
+                applyIconToLabeledElement(b, "shuffle");
+            }
+        });
+        b.setOnMouseClicked(event -> {
+            controller.setInShuffleMode(!controller.isInShuffleMode());
+        });
+        return b;
+    }
+
+    private Button createRepeatButton()
+    {
+        Button b = new Button("Keine Wiederholung");
+        applyIconToLabeledElement(b, "repeat-none");
+        controller.repeatModeProperty().addListener((observable, oldValue,  newValue) -> {
+            if (newValue == MediaController.RepeatMode.NONE)
+            {
+                applyIconToLabeledElement(b, "repeat-none");
+                b.setText("keine Wiederholung");
+            } else if(newValue == MediaController.RepeatMode.ALL)
+            {
+                applyIconToLabeledElement(b, "repeat-all");
+                b.setText("playlist wiederholen");
+            } else if (newValue == MediaController.RepeatMode.SINGLE)
+            {
+                applyIconToLabeledElement(b, "repeat-single");
+                b.setText("track wiederholen");
+            }
+        });
+        b.setOnMouseClicked(event -> {
+            if (controller.getRepeatMode() == MediaController.RepeatMode.NONE)
+            {
+                controller.setRepeatMode(MediaController.RepeatMode.ALL);
+            } else if (controller.getRepeatMode() == MediaController.RepeatMode.ALL)
+            {
+                controller.setRepeatMode(MediaController.RepeatMode.SINGLE);
+            } else
+            {
+                controller.setRepeatMode(MediaController.RepeatMode.NONE);
+            }
+        });
+        return b;
     }
 
     private Parent getTabContent_CurrentPlayback()

@@ -360,7 +360,7 @@ public class MediaController {
         this.currentTime.set(currentTime);
     }
 
-    private enum RepeatMode {NONE,SINGLE,ALL}
+    public enum RepeatMode {NONE,SINGLE,ALL}
 
     private SimpleObjectProperty<RepeatMode> repeatMode;
 
@@ -368,12 +368,12 @@ public class MediaController {
         return repeatMode.get();
     }
 
-    public SimpleObjectProperty<RepeatMode> inRepeatingModeProperty() {
+    public SimpleObjectProperty<RepeatMode> repeatModeProperty() {
         return repeatMode;
     }
 
-    public void setInRepeatingMode(RepeatMode inRepeatingMode) {
-        this.repeatMode.set(inRepeatingMode);
+    public void setRepeatMode(RepeatMode repeatMode) {
+        this.repeatMode.set(repeatMode);
     }
 
     private DoubleProperty trackDuration;
