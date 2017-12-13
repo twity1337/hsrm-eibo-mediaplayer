@@ -2,7 +2,6 @@ package hsrm.eibo.mediaplayer.Core.View.Components;
 
 import hsrm.eibo.mediaplayer.Core.Controller.MediaController;
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
-import hsrm.eibo.mediaplayer.Core.MediaControl;
 import hsrm.eibo.mediaplayer.Core.Model.MediaListElementInterface;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
@@ -42,7 +41,6 @@ public class MainBorderPane extends BorderPane {
 
     private static final boolean DEBUG_MODE_ENABLED = true;
     private static final String ICON_RESOURCE_PATH = "/hsrm/eibo/mediaplayer/Resources/Icons/";
-
 
     private final MediaController controller = MediaController.getInstance();
     private final ViewBuilder viewBuilder;
@@ -261,7 +259,7 @@ public class MainBorderPane extends BorderPane {
         Button b = new Button("play");
         applyIconToLabeledElement(b, "play"); //initial setting
         controller.endOfMediaProperty().addListener((observable, oldValue, newValue) -> {
-            //TODO: bleiben irgendwelche resets?
+            controller.setCurrentTime(0);
         });
         controller.playingProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue) // is playing
@@ -288,7 +286,9 @@ public class MainBorderPane extends BorderPane {
         Button b = new Button("Vorheriger Titel");
         b.setId("previous-track-button");
         b.getStyleClass().add("previous-track");
-        b.setOnAction(event -> controller.skipToPrevious());
+        b.setOnAction(event -> {
+            controller.skipToPrevious();
+        });
         applyIconToLabeledElement(b, "rewind");
         return b;
     }
@@ -298,7 +298,9 @@ public class MainBorderPane extends BorderPane {
         Button b = new Button("Nächster Titel");
         b.setId("next-track-button");
         b.getStyleClass().add("next-track");
-        b.setOnAction(event -> controller.skipToNext());
+        b.setOnAction((ActionEvent event) -> {
+            controller.skipToNext();
+        });
         applyIconToLabeledElement(b, "forward");
         return b;
     }
@@ -488,7 +490,7 @@ public class MainBorderPane extends BorderPane {
         tree.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(event.getClickCount() != 2)
+                if(event.getClickCount() != 2 || tree.getSelectionModel().isEmpty())
                     return;
 
                 MediaListElementInterface selectedElement = tree.getSelectionModel().getSelectedItem().getValue();
@@ -496,7 +498,8 @@ public class MainBorderPane extends BorderPane {
                     return;
                 if (selectedElement instanceof Track)
                 {
-                    controller.setCurrentMediaplayer((Track) selectedElement);
+                    //controller.setCurrentMediaplayer((Track) selectedElement);
+                    controller.skipToIndex(tree.getSelectionModel().getSelectedIndex()-1);//apparently this index starts at '1'
                     controller.play();
                 }
             }

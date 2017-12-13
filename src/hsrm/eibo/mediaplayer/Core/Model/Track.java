@@ -87,10 +87,10 @@ public class Track implements MediaListElementInterface {
         if(isMetadataReady())
         {
             Metadata metadata = this.getMetadata();
-            if(!metadata.getArtist().isEmpty() && !metadata.getTitle().isEmpty())
+            if(metadata.getArtist() != null && metadata.getTitle() != null)
                 return metadata.getArtist() + " - " + metadata.getTitle();
 
-            if(!metadata.getTitle().isEmpty())
+            if(metadata.getTitle() != null)
                 return metadata.getTitle();
         }
         return this.getLocation();
