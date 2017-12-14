@@ -54,8 +54,8 @@ public class PlaylistManager extends ArrayList<Playlist>{
                     lastAddedPlaylist = new Playlist(playlistFile.getPath(), (String[])event.getSource().getValue()));
                     setIsLoadingList(false);
                     notifyOnChangeObservers();
-                } catch (PlaylistIOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    ErrorHandler.getInstance().addError(e);
                 }
             }
         });
@@ -79,7 +79,13 @@ public class PlaylistManager extends ArrayList<Playlist>{
         {
             trackPaths[i] = trackFiles.get(i).getPath();
         }
-        lastAddedPlaylist = new Playlist(trackPaths);
+
+        try {
+            lastAddedPlaylist = new Playlist(trackPaths);
+        } catch (Exception e)
+        {
+
+        }
         lastAddedPlaylist.setName("Einzelne Dateien");
 
         instance.add(lastAddedPlaylist);

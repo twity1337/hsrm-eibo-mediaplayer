@@ -118,6 +118,8 @@ public class MediaController {
     public void setPlaylist(Playlist playlist)
     {
         this.playlist = playlist;
+        if (isInShuffleMode())
+            createShuffleList();
         this.currentPlaybackIndex = 0;
         this.setCurrentMediaplayer();
         System.out.println("Playlist: " + playlist.getLocation());
@@ -177,13 +179,10 @@ public class MediaController {
     private void playNext()
     {
         if (this.getRepeatMode().equals(RepeatMode.SINGLE))
-        {
             this.rewind();
-            this.play();
-        } else {
+        else
             this.skipToNext();
-            this.currentMediaplayer.setOnReady(this::play);
-        }
+        this.play();
     }
 
     private boolean isEndOfPlaylist()
@@ -235,8 +234,16 @@ public class MediaController {
                 bindBidirectional(this.volumeProperty());
         // currentTime(double) listens to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
         this.currentMediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> currentTimeProperty().set(newValue.toSeconds()));
-
         this.currentMediaplayer.muteProperty().bindBidirectional(this.muted);
+
+        Track currentTrack = this.playlist.get(currentPlaybackIndex);
+        if (currentTrack.isMetadataReady())
+            this.setCurrentTrackMetadata(currentTrack.getMetadata());
+        else
+            currentTrack.metadataReadyProperty().addListener(((observable, oldValue, newValue) -> {
+                if (newValue)
+                    setCurrentTrackMetadata(currentTrack.getMetadata());
+            }));
     }
 ////////////////////////////////////////////////////////////////////////////////
 //  Properties and classes                                                    //

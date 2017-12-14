@@ -12,6 +12,7 @@ import org.apache.tika.sax.BodyContentHandler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 
 /**
  * service to provide threaded metadata parsing
@@ -52,6 +53,7 @@ public class MetadataParserTask extends Task<Metadata>{
         InputStream stream = new FileInputStream(file);
         parser.parse(stream, handler, tikaMetadata);
         stream.close();
+
         dataToAdd = new Metadata(
                 tikaMetadata.get("title"),
                 tikaMetadata.get("xmpDM:album"),
@@ -61,5 +63,6 @@ public class MetadataParserTask extends Task<Metadata>{
                 Float.parseFloat(tikaMetadata.get("xmpDM:duration")),
                 Float.parseFloat(tikaMetadata.get("xmpDM:audioSampleRate"))
         );
+
         return dataToAdd;    }
 }

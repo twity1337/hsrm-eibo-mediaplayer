@@ -31,7 +31,7 @@ public class Track implements MediaListElementInterface {
                 MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_AUDIO | MediaUtil.FILETYPE_GID_VIDEO),
                 "*."+FilenameUtils.getExtension(trackPath))
         ){
-            throw new TrackUnsupportedFileTypeException(FilenameUtils.getExtension(trackPath));
+            throw new TrackUnsupportedFileTypeException(trackPath);
         }
 
 
@@ -93,6 +93,6 @@ public class Track implements MediaListElementInterface {
             if(metadata.getTitle() != null)
                 return metadata.getTitle();
         }
-        return this.getLocation();
+        return FilenameUtils.getName(this.getLocation());
     }
 }

@@ -1,56 +1,59 @@
 package hsrm.eibo.mediaplayer.Core.Model;
 
 
+import org.apache.commons.collections4.map.UnmodifiableMap;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Metadata {
 
-    private String title;
-    private String album;
-    private String artist;
-    private String date;
-    private String genre;
-    private double length;
-    private double bitrate;
+    private Map<String, String> metadataMap = new HashMap<>();
 
     public Metadata(String title, String album, String artist,
                     String year, String genre, double length, double bitrate) {
-        this.title = title;
-        this.album = album;
-        this.artist = artist;
-        this.date = year;
-        this.genre = genre;
-        this.length = length;
-        this.bitrate = bitrate;
+        this.metadataMap.put("title", title);
+        this.metadataMap.put("album", album);
+        this.metadataMap.put("artist", artist);
+        this.metadataMap.put("year", year);
+        this.metadataMap.put("genre", genre);
+        this.metadataMap.put("length", String.valueOf(length));
+        this.metadataMap.put("bitrate", String.valueOf(bitrate));
+        this.metadataMap = Collections.unmodifiableMap(this.metadataMap);
     }
 
-    public Metadata() {
+    public Map<String, String> getMetadataMap()
+    {
+        return this.metadataMap;
     }
 
     public String getTitle() {
-        return title;
+        return this.metadataMap.get("title");
     }
 
     public String getAlbum() {
-        return album;
+        return this.metadataMap.get("title");
     }
 
     public String getArtist() {
-        return artist;
+        return this.metadataMap.get("artist");
     }
 
     public String getDate() {
-        return date;
+        return this.metadataMap.get("date");
     }
 
     public String getGenre() {
-        return genre;
+        return this.metadataMap.get("genre");
     }
 
     public double getLength() {
-        return length;
+        return Double.parseDouble(this.metadataMap.get("length"));
     }
 
     public double getBitrate() {
-        return bitrate;
+        return Double.parseDouble(this.metadataMap.get("bitrate"));
     }
 
     @Override
@@ -61,25 +64,17 @@ public class Metadata {
         if(obj == this)
             return true;
 
-        if(((Metadata) obj).getTitle().equals(this.title) &&
-                ((Metadata) obj).getAlbum().equals(this.album) &&
-                ((Metadata) obj).getArtist().equals(this.artist) &&
-                ((Metadata) obj).getGenre().equals(this.genre) &&
-                (((Metadata) obj).getDate() == this.date) &&
-                (((Metadata) obj).getLength() == this.length) &&
-                (((Metadata) obj).getBitrate() == this.bitrate))
-        {
-            return true;
-        }
-
-        return false;
+        return this.metadataMap.equals(obj);
     }
 
+    @Override
     public String toString()
     {
-        String t = ", ";
-        return (title+t+album+t+artist+t+date+t+genre);
+        return this.metadataMap.toString();
     }
 
-    // TODO: Override HashCode method
+    @Override
+    public int hashCode() {
+        return this.metadataMap.hashCode();
+    }
 }

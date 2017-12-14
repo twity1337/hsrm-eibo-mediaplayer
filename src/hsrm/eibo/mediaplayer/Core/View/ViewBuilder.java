@@ -1,20 +1,33 @@
 package hsrm.eibo.mediaplayer.Core.View;
 
+import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
+import hsrm.eibo.mediaplayer.Core.Exception.HasAdditionalInformation;
 import hsrm.eibo.mediaplayer.Core.View.Components.MainBorderPane;
+import hsrm.eibo.mediaplayer.Core.View.Components.NotificationScene;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class ViewBuilder {
+import java.util.*;
+
+public class ViewBuilder implements Observer{
 
     private static final String WINDOW_TITLE = "QuarkTime-Player";
     private static final int WINDOW_DEFAULT_HEIGHT = 600;
     private static final int WINDOW_DEFAULT_WIDTH = 870;
-    private static final int WINDOW_MIN_HEIGHT = 300;
-    private static final int WINDOW_MIN_WIDTH = 400;
+    private static final int WINDOW_MIN_HEIGHT = 560;
+    private static final int WINDOW_MIN_WIDTH = 500;
     public static final String STYLESHEET_MAIN_PATH = "/hsrm/eibo/mediaplayer/Resources/Css/main.css";
+    public static final int NOTIFICATION_DIALOG_HEIGHT = 300;
+    public static final int NOTIFICATION_DIALOG_WIDTH = 500;
 
     private static ViewBuilder instance;
+
+    private ViewBuilder() {
+        ErrorHandler.getInstance().addObserver(this);
+    }
+
     public static ViewBuilder getInstance()
     {
         if(instance == null) {
@@ -49,8 +62,48 @@ public class ViewBuilder {
         return new MainBorderPane(this);
     }
 
+    public void showErrorDialog(String message, String exceptionText)
+    {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initOwner(this.primaryStage);
+        dialog.setTitle("Fehler");
+        dialog.setAlwaysOnTop(true);
+        dialog.setResizable(false);
+        dialog.setHeight(NOTIFICATION_DIALOG_HEIGHT);
+        dialog.setWidth(NOTIFICATION_DIALOG_WIDTH);
+
+        NotificationScene scene = new NotificationScene(dialog, NOTIFICATION_DIALOG_WIDTH, NOTIFICATION_DIALOG_HEIGHT);
+        scene.setMessage(message);
+        if(exceptionText != null)
+            scene.setExceptionText(exceptionText);
+
+        dialog.setScene(scene.render());
+        dialog.showAndWait();
+    }
+
+    public void showErrorDialog(String message)
+    {
+        showErrorDialog(message, null);
+    }
+
     public void handleShutdown() {
         System.out.println("-- Exiting --");
         System.exit(0);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        ErrorHandler observable = (ErrorHandler) o;
+        List<Exception> collectedErrors = ((ErrorHandler) o).getCollectedErrors();
+
+        ViewBuilder ths = this;
+        collectedErrors.forEach(e -> {
+
+            String errorSummary = e.getMessage();
+            if(e instanceof HasAdditionalInformation)
+                errorSummary = ((HasAdditionalInformation) e).getAddionalInformationMessage();
+            ths.showErrorDialog(observable.getLastErrorSummary(), errorSummary);
+        });
     }
 }

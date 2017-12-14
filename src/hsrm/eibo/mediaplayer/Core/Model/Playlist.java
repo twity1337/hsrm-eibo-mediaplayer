@@ -15,7 +15,7 @@ public class Playlist extends ArrayList<Track> implements MediaListElementInterf
 
 
     public Playlist(String location, String[] trackPaths)
-            throws PlaylistIOException
+            throws PlaylistIOException, TrackUnsupportedFileTypeException
     {
         this.location = location;
         PlaylistIOException exception = null;
@@ -27,16 +27,14 @@ public class Playlist extends ArrayList<Track> implements MediaListElementInterf
                 if (exception == null)
                     exception = new PlaylistIOException();
                 exception.addFailedFilePath(trackPath);
-            } catch (TrackUnsupportedFileTypeException e)
-            {
-                System.err.println("ERROR: Error loading file: " + e.getMessage());
             }
         }
+
         if(exception != null)
             throw exception;
     }
 
-    public Playlist(String... trackPaths) throws PlaylistIOException
+    public Playlist(String... trackPaths) throws PlaylistIOException, TrackUnsupportedFileTypeException
     {
         this(null, trackPaths);
     }

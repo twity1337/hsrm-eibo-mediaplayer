@@ -9,12 +9,11 @@ import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManager;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManagerObserver;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -25,13 +24,9 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.*;
-import sun.awt.shell.ShellFolder;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.util.List;
@@ -162,7 +157,8 @@ public class MainBorderPane extends BorderPane {
 
         MenuItem[] items = {
                 new MenuItem("Load Playlist from media/_DEBUG.m3u..."),
-                new MenuItem("Reload CSS...")
+                new MenuItem("Reload CSS..."),
+                new MenuItem("Show Error-Dialog..."),
         };
 
         items[0].setOnAction(event -> {
@@ -188,6 +184,10 @@ public class MainBorderPane extends BorderPane {
             this.applyCss();
             viewBuilder.getPrimaryStage().getScene().getStylesheets().clear();
             viewBuilder.getPrimaryStage().getScene().getStylesheets().add(this.getClass().getResource(ViewBuilder.STYLESHEET_MAIN_PATH).toString());
+        });
+        items[2].setOnAction(event -> {
+            viewBuilder.showErrorDialog("Es ist ein Test-Fehler aufgetreten!");
+            viewBuilder.showErrorDialog("Es ist ein Test-Fehler aufgetreten!", "Ich bin ein Test...");
         });
         root.getItems().addAll(items);
     }
@@ -229,22 +229,7 @@ public class MainBorderPane extends BorderPane {
         Button shuffleButton = this.createShuffleButton();
         Button repeatButton = this.createRepeatButton();
 
-        final Label metadata_left = new Label("test");
-        final Label metadata_right = new Label("etst");
-        metadata_left.getStyleClass().add("metadata");
-        metadata_right.getStyleClass().add("metadata");
-
-
-
-        HBox metadataLine = new HBox(metadata_left, metadata_right);
-
-        controller.currentTrackMetadataProperty().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                System.out.println(observable);
-                throw new NotImplementedException();
-            }
-        });
+        final Pane metadataLine = this.createMetadataLabels();
 
         bottomBox.setHgrow(progressSlider, Priority.ALWAYS);
         topBox.getChildren().addAll(rewindButton, playPauseButton, nextButton, shuffleButton, repeatButton, volumeButton, volumeSlider);
@@ -252,6 +237,29 @@ public class MainBorderPane extends BorderPane {
         controllBox.getChildren().addAll(metadataLine, topBox, bottomBox);
 
         return controllBox;
+    }
+
+    private Pane createMetadataLabels() {
+        TilePane box = new TilePane();
+        Label[] l = new Label[4];
+
+        l[0] = new Label("Titel:");
+        l[1] = new Label();
+        l[2] = new Label("Interpret:");
+        l[3] = new Label();
+
+        l[0].getStyleClass().addAll("metadata", "metadata-label", "left");
+        l[1].getStyleClass().addAll("metadata", "metadata-value", "left");
+        l[2].getStyleClass().addAll("metadata", "metadata-label", "right");
+        l[3].getStyleClass().addAll("metadata", "metadata-value", "right");
+
+        controller.currentTrackMetadataProperty().addListener(((observable, oldValue, newValue) -> {
+            l[1].setText(newValue.getMetadataMap().get("title"));
+            l[3].setText(newValue.getMetadataMap().get("artist"));
+        }));
+        box.getStyleClass().add("metadata-row");
+        box.getChildren().addAll(l);
+        return box;
     }
 
     private Button createPlayPauseButton()
@@ -447,7 +455,6 @@ public class MainBorderPane extends BorderPane {
         imageview.imageProperty().bind(controller.coverProperty());
 
         coverBorderPane.getStyleClass().add("inner-spacing");
-        coverBorderPane.setLeft(this.lookup("#previous-track-button"));
         coverBorderPane.setCenter(imageview);
         return coverBorderPane;
     }
@@ -505,6 +512,7 @@ public class MainBorderPane extends BorderPane {
             }
         });
         VBox vbox = new VBox();
+        VBox.setVgrow(tree, Priority.ALWAYS);
         vbox.getStyleClass().add("inner-spacing");
         vbox.getChildren().addAll(tree);
         return vbox;

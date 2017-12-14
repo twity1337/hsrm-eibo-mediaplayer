@@ -2,7 +2,46 @@
 {
     -fx-padding: 10px;
 }
+.left
+{
+    -fx-text-alignment: left;
+}
+.right
+{
+    -fx-text-alignment: right;
+}
 
+.button
+{
+    -fx-border-radius: 7px;
+    -fx-border-color: rgba(155,155,155,0.4);
+    -fx-background-color: transparent;
+}
+.button:hover
+{
+    -fx-background-color: rgba(215, 215, 215, 0.4);
+    -fx-background-insets: 1px;
+}
+.button:pressed
+{
+    -fx-background-color: rgba(104, 104, 104, 0.4);
+}
+
+.media-control-elements
+{
+}
+.inner-spacing
+{
+    -fx-padding: 10px;
+}
+.left
+{
+    -fx-alignment: center-left;
+}
+.right
+{
+    -fx-alignment: center-right;
+}
 
 .button
 {
@@ -24,18 +63,64 @@
 {
 }
 
+.metadata-row
+{
+}
+
 .label.metadata
 {
-    -fx-background-color: red;
-    -fx-min-width: 20px;
+    -fx-alignment: center;
 }
+.label.metadata-label
+{
+    -fx-alignment: left;
+    -fx-padding: 0px 10px 0px 0px;
+    -fx-font-weight: bold;
+}
+.label.metadata-value
+{
+    -fx-alignment: center-left;
+}
+
 
 .label.currenttime
 {
     -fx-font-weight: bold;
-    -fx-font-size: 15pt;
-    -fx-min-width: 30px;
+    -fx-font-size: 13pt;
+    -fx-min-width: 120px;
     -fx-text-alignment: center;
+    -fx-alignment: center;
+
+}
+
+.vbox-media-controls-bottom
+{
+    -fx-alignment: center;
+    -fx-start-margin: 20px;
+}
+.label.metadata
+{
+    -fx-alignment: center;
+}
+.label.metadata-label
+{
+    -fx-end-margin: 10px;
+    -fx-font-weight: bold;
+    -fx-min-width: 60px;
+}
+.label.metadata-value
+{
+    -fx-alignment: center-left;
+}
+
+
+.label.currenttime
+{
+    -fx-font-weight: bold;
+    -fx-font-size: 13pt;
+    -fx-min-width: 120px;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
 
 }
 
