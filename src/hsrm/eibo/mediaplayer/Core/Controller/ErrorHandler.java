@@ -16,7 +16,8 @@ public class ErrorHandler extends Observable{
 
     public void addError(Exception exception)
     {
-            this.collectedErrors.add(exception);
+        this.setChanged();
+        this.collectedErrors.add(exception);
     }
 
     public void removeErrorMessage(Exception exception)

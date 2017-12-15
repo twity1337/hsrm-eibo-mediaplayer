@@ -112,6 +112,14 @@
 {
     -fx-alignment: center-left;
 }
+.label.metadata-label.left
+{
+    -fx-padding: 0 0 0 50px;
+}
+.label.metadata-label.right
+{
+    -fx-padding: 0 50px 0 0;
+}
 
 
 .label.currenttime

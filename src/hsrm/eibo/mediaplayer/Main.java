@@ -11,25 +11,18 @@ import java.util.Observable;
 public class Main extends Application {
 
     public static void main(String[] args) {
-        try {
             launch(args);
-        }catch (Exception e)
-        {
-            ErrorHandler err = ErrorHandler.getInstance();
-            err.addError(e);
-            err.notifyErrorObserver(e, "Es ist ein unerwarteter Fehler aufgetreten:");
-        }
     }
 
     @Override
     public void start(Stage primaryStage) {
-        try {
+//        try {
             ViewBuilder.getInstance().initPrimaryStage(primaryStage);
             primaryStage.show();
-        }catch (Exception e)
-        {
-
-
-        }
+//        } catch (Exception e) {
+//            ErrorHandler err = ErrorHandler.getInstance();
+//            err.addError(e);
+//            err.notifyErrorObserver(e, "Es ist ein unerwarteter Fehler aufgetreten:");
+//        }
     }
 }

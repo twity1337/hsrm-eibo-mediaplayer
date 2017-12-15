@@ -35,7 +35,7 @@ public class MediaController {
         coverProperty = new SimpleObjectProperty<>(null);
         currentTrackMetadata = new SimpleObjectProperty<>();
         muted = new SimpleBooleanProperty(false);
-    }
+}
 
 
     public void play()
@@ -58,6 +58,7 @@ public class MediaController {
 
         }
         this.currentMediaplayer.play();
+
         this.setPlaying(true);
         this.setStopped(false);
     }
@@ -230,8 +231,7 @@ public class MediaController {
             instance.trackDurationProperty().set(currentMediaplayer.getTotalDuration().toSeconds());
         });
         //bind volume property bidirectional
-        this.currentMediaplayer.volumeProperty().
-                bindBidirectional(this.volumeProperty());
+        this.currentMediaplayer.volumeProperty().bind(this.volumeProperty());
         // currentTime(double) listens to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
         this.currentMediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> currentTimeProperty().set(newValue.toSeconds()));
         this.currentMediaplayer.muteProperty().bindBidirectional(this.muted);

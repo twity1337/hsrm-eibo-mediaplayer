@@ -15,6 +15,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -29,6 +31,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.*;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -234,29 +237,36 @@ public class MainBorderPane extends BorderPane {
         bottomBox.setHgrow(progressSlider, Priority.ALWAYS);
         topBox.getChildren().addAll(rewindButton, playPauseButton, nextButton, shuffleButton, repeatButton, volumeButton, volumeSlider);
         bottomBox.getChildren().addAll(currentTime, progressSlider);
+
         controllBox.getChildren().addAll(metadataLine, topBox, bottomBox);
 
         return controllBox;
     }
 
     private Pane createMetadataLabels() {
-        TilePane box = new TilePane();
-        Label[] l = new Label[4];
+        HBox box = new HBox();
+        ArrayList<Node> l = new ArrayList<>();
+        HBox labelGroup0 = new HBox(), labelGroup1 = new HBox();
+        Label labelText0 = new Label(), labelText1 = new Label();
+        Region spacer = new Region();
+        Label labelTitle0 = new Label("Titel:"), labelTitle1 = new Label("Interpret:");
+        labelGroup0.getChildren().addAll(labelTitle0, labelText0);
+        labelGroup1.getChildren().addAll(labelTitle1, labelText1);
 
-        l[0] = new Label("Titel:");
-        l[1] = new Label();
-        l[2] = new Label("Interpret:");
-        l[3] = new Label();
+        l.add(labelGroup0);
+        l.add(spacer);
+        l.add(labelGroup1);
 
-        l[0].getStyleClass().addAll("metadata", "metadata-label", "left");
-        l[1].getStyleClass().addAll("metadata", "metadata-value", "left");
-        l[2].getStyleClass().addAll("metadata", "metadata-label", "right");
-        l[3].getStyleClass().addAll("metadata", "metadata-value", "right");
+        labelTitle0.getStyleClass().addAll("metadata", "metadata-label", "left");
+        labelTitle1.getStyleClass().addAll("metadata", "metadata-label", "right");
+        labelText0.getStyleClass().addAll("metadata", "metadata-value", "left");
+        labelText1.getStyleClass().addAll("metadata", "metadata-value", "right");
 
         controller.currentTrackMetadataProperty().addListener(((observable, oldValue, newValue) -> {
-            l[1].setText(newValue.getMetadataMap().get("title"));
-            l[3].setText(newValue.getMetadataMap().get("artist"));
+            labelText0.setText(newValue.getMetadataMap().get("title"));
+            labelText1.setText(newValue.getMetadataMap().get("artist"));
         }));
+        HBox.setHgrow(spacer, Priority.ALWAYS); // use Region in l[2]  as spacer.
         box.getStyleClass().add("metadata-row");
         box.getChildren().addAll(l);
         return box;
@@ -322,8 +332,8 @@ public class MainBorderPane extends BorderPane {
             {
                 b.setText("volume: not muted");
                 applyIconToLabeledElement(b, "speaker");
-                if (controller.getVolume() < 0.2)
-                    controller.setVolume(0.2);
+                if (controller.getVolume() < 0.1)
+                    controller.setVolume(0.1);
             } else if (!oldValue && newValue)
             {
                b.setText("volume: muted");
@@ -348,7 +358,7 @@ public class MainBorderPane extends BorderPane {
     private Slider createVolumeSlider()
     {
         Slider s = new Slider(0, 1, 0.5);
-        s.valueProperty().bindBidirectional(controller.volumeProperty());
+        controller.volumeProperty().bind(s.valueProperty());
         s.setMinWidth(40);
         return s;
     }

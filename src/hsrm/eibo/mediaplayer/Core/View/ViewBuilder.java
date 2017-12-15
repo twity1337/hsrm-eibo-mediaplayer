@@ -100,9 +100,9 @@ public class ViewBuilder implements Observer{
         ViewBuilder ths = this;
         collectedErrors.forEach(e -> {
 
-            String errorSummary = e.getMessage();
+            String errorSummary = e.getClass().toString() + ": " + e.getLocalizedMessage();
             if(e instanceof HasAdditionalInformation)
-                errorSummary = ((HasAdditionalInformation) e).getAddionalInformationMessage();
+                errorSummary =  e.getClass().toString() + ": " + ((HasAdditionalInformation) e).getAddionalInformationMessage();
             ths.showErrorDialog(observable.getLastErrorSummary(), errorSummary);
         });
     }
