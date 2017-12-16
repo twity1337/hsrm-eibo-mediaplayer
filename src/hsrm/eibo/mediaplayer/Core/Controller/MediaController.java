@@ -13,7 +13,6 @@ import javafx.util.Duration;
 
 public class MediaController {
     private int[] shuffleList;
-    private int currentPlaybackIndex;
     private MediaPlayer currentMediaplayer;
     private Playlist playlist;
     private static MediaController instance = new MediaController();
@@ -23,7 +22,7 @@ public class MediaController {
     }
 
     private MediaController() {
-        this.currentPlaybackIndex = 0;
+        currentPlaybackIndex = new SimpleIntegerProperty(0);
         trackDuration = new SimpleDoubleProperty(0);
         inShuffleMode = new SimpleBooleanProperty(false);
         repeatMode = new SimpleObjectProperty<>(RepeatMode.NONE);
@@ -35,7 +34,7 @@ public class MediaController {
         coverProperty = new SimpleObjectProperty<>(null);
         currentTrackMetadata = new SimpleObjectProperty<>();
         muted = new SimpleBooleanProperty(false);
-}
+    }
 
 
     public void play()
@@ -77,11 +76,11 @@ public class MediaController {
             return;
         if (!isEndOfPlaylist())
         {
-            this.currentPlaybackIndex++;
+            this.setCurrentPlaybackIndex(this.getCurrentPlaybackIndex()+1);
         }
         else if (this.getRepeatMode().equals(RepeatMode.ALL) && this.isEndOfPlaylist())
         {
-            this.currentPlaybackIndex = 0;
+            this.setCurrentPlaybackIndex(0);
         }
         this.setCurrentMediaplayer();
         if (!this.isStopped())
@@ -92,8 +91,8 @@ public class MediaController {
     {
         if (!mediaplayerSet())
             return;
-        if (this.currentPlaybackIndex >0)
-            currentPlaybackIndex--;
+        if (this.getCurrentPlaybackIndex() >0)
+            this.setCurrentPlaybackIndex(this.getCurrentPlaybackIndex()-1);
         this.setCurrentMediaplayer();
         if (!this.isStopped())
             play();
@@ -101,7 +100,7 @@ public class MediaController {
 
     public void skipToIndex(int index)
     {
-        this.currentPlaybackIndex = index;
+        this.setCurrentPlaybackIndex(index);
         this.setCurrentMediaplayer();
     }
 
@@ -121,7 +120,7 @@ public class MediaController {
         this.playlist = playlist;
         if (isInShuffleMode())
             createShuffleList();
-        this.currentPlaybackIndex = 0;
+        this.setCurrentPlaybackIndex(0);
         this.setCurrentMediaplayer();
         System.out.println("Playlist: " + playlist.getLocation());
     }
@@ -148,18 +147,7 @@ public class MediaController {
     private void setCurrentMediaplayer()
     {
         this.setCurrentMediaplayer(
-                this.playlist.get(getCurrentPlaylistIndex()));
-    }
-
-    /**
-     * method to determine current track played in playlist
-     * @return list position in playlist of track currently played/selected
-     */
-    public int getCurrentPlaylistIndex()
-    {
-        if (isInShuffleMode())
-            return shuffleList[currentPlaybackIndex];
-        return currentPlaybackIndex;
+                this.playlist.get(this.getCurrentPlaybackIndex()));
     }
 
     public void rewind()
@@ -188,7 +176,7 @@ public class MediaController {
 
     private boolean isEndOfPlaylist()
     {
-        return (this.currentPlaybackIndex >= this.playlist.size()-1);
+        return (this.getCurrentPlaybackIndex() >= this.playlist.size()-1);
     }
 
     private void bindListenersToCurrentMediaPlayer() {
@@ -217,7 +205,7 @@ public class MediaController {
             instance.setEndOfMedia(true);
             currentMediaplayer.stop();
             if (instance.isEndOfPlaylist() && instance.getRepeatMode() == RepeatMode.NONE){
-                this.currentPlaybackIndex = 0;
+                this.setCurrentPlaybackIndex(0);
                 this.setStopped(true);
                 this.setPlaying(false);
                 this.setCurrentMediaplayer();
@@ -236,7 +224,7 @@ public class MediaController {
         this.currentMediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> currentTimeProperty().set(newValue.toSeconds()));
         this.currentMediaplayer.muteProperty().bindBidirectional(this.muted);
 
-        Track currentTrack = this.playlist.get(currentPlaybackIndex);
+        Track currentTrack = this.playlist.get(this.getCurrentPlaybackIndex());
         if (currentTrack.isMetadataReady())
             this.setCurrentTrackMetadata(currentTrack.getMetadata());
         else
@@ -301,7 +289,7 @@ public class MediaController {
         // tracks in order(continuing track currently playing)
         if (playlist == null)
             return;
-        this.currentPlaybackIndex = this.shuffleList[this.currentPlaybackIndex];
+        this.setCurrentPlaybackIndex(this.shuffleList[this.getCurrentPlaybackIndex()]);
     }
 
     private BooleanProperty endOfMedia;
@@ -434,5 +422,21 @@ public class MediaController {
 
     public MediaPlayer getCurrentMediaplayer() {
         return currentMediaplayer;
+    }
+
+    private SimpleIntegerProperty currentPlaybackIndex;
+
+    public SimpleIntegerProperty currentPlaybackIndexProperty() {
+        return currentPlaybackIndex;
+    }
+
+    public int getCurrentPlaybackIndex() {
+        if (isInShuffleMode())
+            return shuffleList[this.currentPlaybackIndex.get()];
+        return this.currentPlaybackIndex.get();
+    }
+
+    public void setCurrentPlaybackIndex(int currentPlaybackIndex) {
+        this.currentPlaybackIndex.set(currentPlaybackIndex);
     }
 }

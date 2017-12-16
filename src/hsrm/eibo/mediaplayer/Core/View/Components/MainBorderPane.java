@@ -117,7 +117,7 @@ public class MainBorderPane extends BorderPane {
                     playlistManager.isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
                         Playlist playlistToAdd;
                         if (oldValue && !newValue &&
-                            (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
+                                (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
                         {
                             controller.setPlaylist(playlistToAdd);
                         }
@@ -336,8 +336,8 @@ public class MainBorderPane extends BorderPane {
                     controller.setVolume(0.1);
             } else if (!oldValue && newValue)
             {
-               b.setText("volume: muted");
-               applyIconToLabeledElement(b,"mute");
+                b.setText("volume: muted");
+                applyIconToLabeledElement(b,"mute");
             }
         });
         //when player is muted and volume is adjusted, unmute; mute if volume is zero
@@ -358,7 +358,7 @@ public class MainBorderPane extends BorderPane {
     private Slider createVolumeSlider()
     {
         Slider s = new Slider(0, 1, 0.5);
-        controller.volumeProperty().bind(s.valueProperty());
+        controller.volumeProperty().bindBidirectional(s.valueProperty());
         s.setMinWidth(40);
         return s;
     }
@@ -380,10 +380,14 @@ public class MainBorderPane extends BorderPane {
 
     private Slider createProgressSlider()
     {
-        Slider s = new Slider(0,0,0);
+        Slider s = new Slider(0,0.1,0);
+        s.setDisable(true);
         // set max Value of Slider
-        this.controller.trackDurationProperty().addListener((observable, oldValue, newValue) ->
-                s.setMax(newValue.doubleValue()));
+        this.controller.trackDurationProperty().addListener((observable, oldValue, newValue) -> {
+            s.setMax(newValue.doubleValue());
+            s.setDisable(Double.isNaN(newValue.doubleValue()));
+            s.setValue(0);
+        });
         // bind slider property to time property of Mediacontroller
         controller.currentTimeProperty().addListener((observable, oldValue, newValue) ->{
             if (!s.isValueChanging())
@@ -521,6 +525,10 @@ public class MainBorderPane extends BorderPane {
                 }
             }
         });
+
+        controller.currentPlaybackIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            tree.getSelectionModel().select(newValue.intValue()+1);
+        }));
         VBox vbox = new VBox();
         VBox.setVgrow(tree, Priority.ALWAYS);
         vbox.getStyleClass().add("inner-spacing");
