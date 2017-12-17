@@ -35,17 +35,6 @@ public class MediaUtil {
         return retVal.toArray(new String[] {});
     }
 
-    //TODO: only needed for preloading, could be obsolete
-    public static ArrayList<MediaPlayer> generateMediaplayerList(Playlist playlist) {
-        ArrayList<MediaPlayer> playerList = new ArrayList<>();
-
-        for (int i = 0; i < playlist.size(); i++) {
-            playerList.add(playlist.get(i).getTrackMediaPlayer());
-        }
-
-        return playerList;
-    }
-
     /**
      * method to generate list of length n with randomly order numbers 0,...,(n-1)
      *

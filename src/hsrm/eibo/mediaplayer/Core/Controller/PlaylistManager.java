@@ -54,8 +54,11 @@ public class PlaylistManager extends ArrayList<Playlist>{
                     lastAddedPlaylist = new Playlist(playlistFile.getPath(), (String[])event.getSource().getValue()));
                     setIsLoadingList(false);
                     notifyOnChangeObservers();
+                    event.getSource().cancel();
                 } catch (Exception e) {
-                    ErrorHandler.getInstance().addError(e);
+                    ErrorHandler err = ErrorHandler.getInstance();
+                    err.addError(e);
+                    err.notifyErrorObserver("Fehler beim Laden der Playlist");
                 }
             }
         });
@@ -64,6 +67,9 @@ public class PlaylistManager extends ArrayList<Playlist>{
             @Override
             public void handle(WorkerStateEvent event) {
                 setIsLoadingList(false);
+                ErrorHandler err = ErrorHandler.getInstance();
+                err.addError(event.getSource().getException());
+                err.notifyErrorObserver("Fehler beim Laden der Metadaten");
             }
         });
         Thread parserThread = new Thread(parser, M3U_PARSER_THREAD_NAME);

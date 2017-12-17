@@ -1,4 +1,5 @@
 package hsrm.eibo.mediaplayer.Core.Controller;
+import hsrm.eibo.mediaplayer.Core.Exception.MediaPlayerException;
 import hsrm.eibo.mediaplayer.Core.Model.Metadata;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
@@ -186,7 +187,14 @@ public class MediaController {
         this.setPlaying(false);
 
         // setting new mediaplayer and its eventhandler
-        this.currentMediaplayer = track.getTrackMediaPlayer();
+        try {
+            this.currentMediaplayer = track.getTrackMediaPlayer();
+        } catch (MediaPlayerException e)
+        {
+            ErrorHandler err = ErrorHandler.getInstance();
+            err.addError(e);
+            err.notifyErrorObserver("Fehler beim Auswählen des Tracks");
+        }
         bindListenersToCurrentMediaPlayer();
         System.out.println("Track: " + track.getLocation());
     }

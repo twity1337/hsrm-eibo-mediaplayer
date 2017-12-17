@@ -53,6 +53,7 @@ public class NotificationScene extends Scene {
         VBox.setVgrow(spacer, Priority.ALWAYS);
         VBox.setVgrow(exceptionText, Priority.ALWAYS);
         this.exceptionText.setEditable(false);
+        this.exceptionText.setWrapText(true);
 
         this.mainBox.getChildren().addAll(this.messageLabel, buttonLine);
     }
@@ -61,7 +62,7 @@ public class NotificationScene extends Scene {
     public void setMessage(String message)
     {
         if(message != null)
-            this.messageLabel.setText(message);
+            this.messageLabel.setText(message + ":");
     }
 
     public void setExceptionText(String exceptionText)

@@ -1,16 +1,21 @@
 package hsrm.eibo.mediaplayer.Core.Model;
 
+import hsrm.eibo.mediaplayer.Core.Exception.FileInaccessibleException;
 import hsrm.eibo.mediaplayer.Core.Exception.TrackUnsupportedFileTypeException;
+import hsrm.eibo.mediaplayer.Core.Util.FileIOUtil;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import hsrm.eibo.mediaplayer.Core.Util.MetadataParserTask;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
@@ -54,9 +59,23 @@ public class Track implements MediaListElementInterface {
         return this.metadata;
     }
 
-    public MediaPlayer getTrackMediaPlayer()
+    public MediaPlayer getTrackMediaPlayer() throws FileInaccessibleException, TrackUnsupportedFileTypeException
     {
-        return new MediaPlayer(new Media(this.getUri()));
+        Media media;
+        try {
+            media = new Media(this.getUri());
+
+        }catch (MediaException e)
+        {
+            if (e.getType() == MediaException.Type.MEDIA_INACCESSIBLE || e.getType() == MediaException.Type.MEDIA_UNAVAILABLE)
+                throw new FileInaccessibleException(this.getLocation());
+            else if(e.getType() == MediaException.Type.MEDIA_UNSUPPORTED)
+                throw new TrackUnsupportedFileTypeException(this.getLocation());
+            else
+                throw e;
+        }
+
+        return new MediaPlayer(media);
     }
 
     public String getLocation() {

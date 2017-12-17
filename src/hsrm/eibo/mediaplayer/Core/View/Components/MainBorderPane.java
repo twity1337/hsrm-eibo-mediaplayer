@@ -35,16 +35,17 @@ import java.util.function.Consumer;
 
 public class MainBorderPane extends BorderPane {
 
-    private static final boolean DEBUG_MODE_ENABLED = true;
     private static final String ICON_RESOURCE_PATH = "/hsrm/eibo/mediaplayer/Resources/Icons/";
+    private boolean debugModeEnabled = false;
 
     private final MediaController controller = MediaController.getInstance();
     private final ViewBuilder viewBuilder;
 
     private MenuBar menuBar = new MenuBar();
 
-    public MainBorderPane(ViewBuilder vb) {
+    public MainBorderPane(ViewBuilder vb, boolean debugModeEnabled) {
         this.viewBuilder = vb;
+        this.debugModeEnabled = debugModeEnabled;
         this.setTop(getMenuItems());
         this.setBottom(getBottomComponents());
         this.setCenter(getCenterComponents());
@@ -63,8 +64,7 @@ public class MainBorderPane extends BorderPane {
                 new Menu("Wiedergabe"),
                 new Menu("Playlist"),
                 new Menu("Ansicht"),
-                new Menu("?"),
-                null
+                new Menu("?")
         };
 
         MenuItem openMenuItem = new MenuItem("Öffnen...");
@@ -141,9 +141,8 @@ public class MainBorderPane extends BorderPane {
 
         menus[0].getItems().addAll(fileSubMenu);
 
-        if(DEBUG_MODE_ENABLED) {
-            menus[5] = new Menu("__DEBUG");
-            applyOptionalDebugItems(menus[5]);
+        if(debugModeEnabled) {
+            applyOptionalDebugItems(menus[0]);
         }
 
         this.menuBar.getMenus().addAll(menus);
@@ -153,16 +152,17 @@ public class MainBorderPane extends BorderPane {
     }
 
     private void applyOptionalDebugItems(Menu root) {
-        if(!DEBUG_MODE_ENABLED)
+        if(!debugModeEnabled)
             return;
 
         MenuItem[] items = {
+                new SeparatorMenuItem(),
                 new MenuItem("Load Playlist from media/_DEBUG.m3u..."),
                 new MenuItem("Reload CSS..."),
                 new MenuItem("Show Error-Dialog..."),
         };
 
-        items[0].setOnAction(event -> {
+        items[1].setOnAction(event -> {
             File debugPlaylistFile = new File(System.getProperty("user.dir")+"/media/_DEBUG.m3u");
             if(!debugPlaylistFile.canRead())
             {
@@ -181,12 +181,12 @@ public class MainBorderPane extends BorderPane {
             });
 
         });
-        items[1].setOnAction(event -> {
+        items[2].setOnAction(event -> {
             this.applyCss();
             viewBuilder.getPrimaryStage().getScene().getStylesheets().clear();
             viewBuilder.getPrimaryStage().getScene().getStylesheets().add(this.getClass().getResource(ViewBuilder.STYLESHEET_MAIN_PATH).toString());
         });
-        items[2].setOnAction(event -> {
+        items[3].setOnAction(event -> {
             viewBuilder.showErrorDialog("Es ist ein Test-Fehler aufgetreten!");
             viewBuilder.showErrorDialog("Es ist ein Test-Fehler aufgetreten!", "Ich bin ein Test...");
         });

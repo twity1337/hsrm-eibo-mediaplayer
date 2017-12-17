@@ -10,19 +10,27 @@ import java.util.Observable;
 
 public class Main extends Application {
 
+    private static final boolean DEBUG_MODE_ENABLED = true;
+
     public static void main(String[] args) {
             launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
-//        try {
-            ViewBuilder.getInstance().initPrimaryStage(primaryStage);
-            primaryStage.show();
-//        } catch (Exception e) {
-//            ErrorHandler err = ErrorHandler.getInstance();
-//            err.addError(e);
-//            err.notifyErrorObserver(e, "Es ist ein unerwarteter Fehler aufgetreten:");
-//        }
+        ViewBuilder.getInstance()
+                .setDebugModeEnabled(DEBUG_MODE_ENABLED)
+                .initPrimaryStage(primaryStage);
+        this.initExceptionHandling();
+        primaryStage.show();
+    }
+
+    private void initExceptionHandling()
+    {
+        Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
+            ErrorHandler err = ErrorHandler.getInstance();
+            err.addError(e);
+            err.notifyErrorObserver("Es ist ein unerwarteter Fehler aufgetreten");
+        });
     }
 }

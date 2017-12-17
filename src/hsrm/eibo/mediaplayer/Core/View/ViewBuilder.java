@@ -9,6 +9,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 
 public class ViewBuilder implements Observer{
@@ -23,6 +25,7 @@ public class ViewBuilder implements Observer{
     public static final int NOTIFICATION_DIALOG_WIDTH = 500;
 
     private static ViewBuilder instance;
+    private boolean debugModeEnabled;
 
     private ViewBuilder() {
         ErrorHandler.getInstance().addObserver(this);
@@ -53,13 +56,18 @@ public class ViewBuilder implements Observer{
         this.primaryStage = primaryStage;
     }
 
+    public ViewBuilder setDebugModeEnabled(boolean debugModeEnabled) {
+        this.debugModeEnabled = debugModeEnabled;
+        return this;
+    }
+
     public Stage getPrimaryStage() {
         return primaryStage;
     }
 
     public BorderPane createMainView()
     {
-        return new MainBorderPane(this);
+        return new MainBorderPane(this, debugModeEnabled);
     }
 
     public void showErrorDialog(String message, String exceptionText)
@@ -68,7 +76,6 @@ public class ViewBuilder implements Observer{
         dialog.initModality(Modality.WINDOW_MODAL);
         dialog.initOwner(this.primaryStage);
         dialog.setTitle("Fehler");
-        dialog.setAlwaysOnTop(true);
         dialog.setResizable(false);
         dialog.setHeight(NOTIFICATION_DIALOG_HEIGHT);
         dialog.setWidth(NOTIFICATION_DIALOG_WIDTH);
@@ -95,14 +102,20 @@ public class ViewBuilder implements Observer{
     @Override
     public void update(Observable o, Object arg) {
         ErrorHandler observable = (ErrorHandler) o;
-        List<Exception> collectedErrors = ((ErrorHandler) o).getCollectedErrors();
+        List<Throwable> collectedErrors = ((ErrorHandler) o).getCollectedErrors();
 
         ViewBuilder ths = this;
         collectedErrors.forEach(e -> {
 
-            String errorSummary = e.getClass().toString() + ": " + e.getLocalizedMessage();
+            String errorSummary = e.getClass().getSimpleName() + ": " + e.getLocalizedMessage();
             if(e instanceof HasAdditionalInformation)
-                errorSummary =  e.getClass().toString() + ": " + ((HasAdditionalInformation) e).getAddionalInformationMessage();
+                errorSummary =  e.getClass().getSimpleName() + ": " + ((HasAdditionalInformation) e).getAddionalInformationMessage();
+            if(debugModeEnabled)
+            {
+                StringWriter writer = new StringWriter();
+                e.printStackTrace(new PrintWriter(writer));
+                errorSummary += "\n" + writer.toString();
+            }
             ths.showErrorDialog(observable.getLastErrorSummary(), errorSummary);
         });
     }
