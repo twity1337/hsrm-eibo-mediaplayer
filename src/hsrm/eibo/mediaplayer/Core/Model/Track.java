@@ -15,15 +15,30 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.io.IOException;
 
+/**
+ * Track objects contain the Metadata of a media file and the system path to the media file.
+ * On creation metadata will be read in a different thread and published on completing the thread.
+ * MediaListElementInterface provides ClassCast safety.
+ */
 public class Track implements MediaListElementInterface {
 
+    /**
+     * name of the metadata parsing thread
+     */
     private static final String METADATA_PARSER_THREAD_NAME = "Metadata Parser Thread";
+    /**
+     * model.Metadata instance with metadata of this track
+     */
     private Metadata metadata;
+    /**
+     * system path to media file
+     */
     private String trackPath;
 
     /**
-     *
-     * @param trackPath
+     * Constructor for Track object expects system path to media file
+     * @param trackPath system path to media file
+     * @throws TrackUnsupportedFileTypeException on encountering unsupported file extension
      */
     public Track(String trackPath) throws IOException, TrackUnsupportedFileTypeException
     {
@@ -50,11 +65,21 @@ public class Track implements MediaListElementInterface {
         parserThread.start();
     }
 
+    /**
+     * Method to return Metadata of track
+     * @return Model.Metadata object containing metadata of track
+     */
     public Metadata getMetadata()
     {
         return this.metadata;
     }
 
+    /**
+     * Method to create javafx.Mediaplayer
+     * @return MedaiPlayer containing medai file of track
+     * @throws TrackFileInaccessibleException on file IO operation error containing system path + name of file
+     * @throws TrackUnsupportedFileTypeException on opening unknown/unsuppoerted file type
+     */
     public MediaPlayer getTrackMediaPlayer() throws TrackFileInaccessibleException, TrackUnsupportedFileTypeException
     {
         Media media;
@@ -74,15 +99,26 @@ public class Track implements MediaListElementInterface {
         return new MediaPlayer(media);
     }
 
+    /**
+     * Method to return system path of media file (of track).
+     * @return String containing system path of media file
+     */
     public String getLocation() {
         return trackPath;
     }
 
+    /**
+     * Method to convert system path to uri
+     * @return system path as uri of media file
+     */
     private String getUri()
     {
         return ("file:///" + trackPath.replace("\\", "/")).replace(" ", "%20");
     }
 
+    /**
+     * Property indicating if metadata are loaded
+     */
     private SimpleBooleanProperty metadataReady;
 
     public boolean isMetadataReady() {
@@ -97,6 +133,10 @@ public class Track implements MediaListElementInterface {
         this.metadataReady.set(metadataReady);
     }
 
+    /**
+     * Method to get metadata information (artist and title) as String
+     * @return String containing information of metadata object as String, if empty return file name
+     */
     @Override
     public String toString() {
         if(isMetadataReady())
