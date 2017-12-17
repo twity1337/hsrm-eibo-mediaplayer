@@ -11,6 +11,10 @@ import java.util.ArrayList;
 
 public class M3uParserTask extends Task<String[]>
 {
+    /**
+     * The Thread name for parser thread.
+     */
+    public static final String M3U_PARSER_THREAD_NAME = "M3U Parser Thread";
     private File playlistFile;
 
     public M3uParserTask(File playlistFile) {
