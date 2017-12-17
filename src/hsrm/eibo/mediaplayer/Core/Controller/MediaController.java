@@ -137,7 +137,7 @@ public class MediaController {
     {
         if (!isMediaplayerPresent())
             return;
-        if (this.getCurrentPlaybackIndex() >0)
+        if (this.currentPlaybackIndexProperty().get() >0)
             this.setCurrentPlaybackIndex(this.currentPlaybackIndex.get()-1);
         this.setCurrentMediaplayer();
         if (!this.isStopped())
@@ -150,8 +150,24 @@ public class MediaController {
      */
     public void skipToIndex(int playlistIndex)
     {
-        this.setCurrentPlaybackIndex(playlistIndex);
-        this.setCurrentMediaplayer();
+        if (!this.isInShuffleMode()) {
+            this.setCurrentPlaybackIndex(playlistIndex);
+            this.setCurrentMediaplayer();
+            if (this.isPlaying())
+                this.play();
+            return;
+        }
+
+        for (int i = 0; i<shuffleList.length; i++)
+        {
+            if (shuffleList[i] != playlistIndex)
+                continue;
+            this.setCurrentPlaybackIndex(i);
+            this.setCurrentMediaplayer();
+            if (this.isPlaying())
+                this.play();
+            return;
+        }
     }
 
     /**
@@ -208,7 +224,6 @@ public class MediaController {
             err.notifyErrorObserver("Fehler beim Auswählen des Tracks");
         }
         bindListenersToCurrentMediaPlayer();
-        System.out.println("Track: " + track.getLocation());
     }
 
     /**
@@ -263,7 +278,7 @@ public class MediaController {
         this.currentMediaplayer.setOnPlaying(() -> instance.setPlaying(true));
 
         this.currentMediaplayer.setOnHalted(() -> {
-            // TODO: job for exception handling
+            // TODO: job for exception handlin
             System.err.println("Critical Error: player no longer useable");
             instance.currentMediaplayer.dispose();
             instance.currentMediaplayer=null;
@@ -284,6 +299,7 @@ public class MediaController {
         this.currentMediaplayer.setOnEndOfMedia(() -> {
             instance.setEndOfMedia();
             currentMediaplayer.stop();
+            this.setCurrentTime(0);
             if (instance.isEndOfPlaylist() && instance.getRepeatMode() == RepeatMode.NONE){
                 this.setCurrentPlaybackIndex(0);
                 this.setStopped(true);
@@ -512,7 +528,7 @@ public class MediaController {
      * Method that returns index, if shuffle mode on returns "random" index
      * @return index of current track in playlist
      */
-    private int getCurrentPlaybackIndex() {
+    public int getCurrentPlaybackIndex() {
         if (isInShuffleMode())
             return shuffleList[this.currentPlaybackIndex.get()];
         return this.currentPlaybackIndex.get();

@@ -331,9 +331,6 @@ public class MainBorderPane extends BorderPane {
     {
         Button b = new Button("play");
         applyIconToLabeledElement(b, "play"); //initial setting
-        controller.endOfMediaProperty().addListener((observable, oldValue, newValue) -> {
-            controller.setCurrentTime(0);
-        });
         controller.playingProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue) // is playing
             {
@@ -626,7 +623,7 @@ public class MainBorderPane extends BorderPane {
         controller.currentPlaybackIndexProperty().addListener(((observable, oldValue, newValue) -> {
             tree.getSelectionModel().select(
                     PlaylistManager.getInstance().getAbsoluteIndexForAllPlaylists(
-                            controller.getPlaylist(), newValue.intValue()
+                            controller.getPlaylist(), controller.getCurrentPlaybackIndex()
                     )
             );
         }));
