@@ -1,12 +1,11 @@
 package hsrm.eibo.mediaplayer.Core.Util;
 
-
-import hsrm.eibo.mediaplayer.Core.Model.Playlist;
-import javafx.scene.media.MediaPlayer;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Utility class containing methods for media file handling and MediaController
+ */
 public class MediaUtil {
 
     public static int FILETYPE_GID_AUDIO = 1;
@@ -36,12 +35,11 @@ public class MediaUtil {
     }
 
     /**
-     * method to generate list of length n with randomly order numbers 0,...,(n-1)
-     *
+     * Method to generate list with length n in random order: 0,...,(n-1)
      * @param length of integer array
      * @return integer array with length n and numbers 0,...,(n-1)
      */
-    public static int[] generateShuffelList(int length) {
+    public static int[] generateShuffleList(int length) {
         int[] randomizedList = new int[length];
 
         for (int i = 1; i < length; i++) {

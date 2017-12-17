@@ -21,7 +21,7 @@ public class Metadata {
      * @param album String
      * @param artist String
      * @param year String
-     * @param genre STring
+     * @param genre String
      * @param length double
      * @param bitrate double
      */

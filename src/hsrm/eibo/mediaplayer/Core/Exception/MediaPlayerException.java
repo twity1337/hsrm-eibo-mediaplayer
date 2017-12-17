@@ -1,5 +1,8 @@
 package hsrm.eibo.mediaplayer.Core.Exception;
 
+/**
+ * Exception thrown by media player logic (MediaController)
+ */
 public class MediaPlayerException extends Exception {
     public MediaPlayerException() {
     }
