@@ -3,7 +3,7 @@ package hsrm.eibo.mediaplayer.Core.Util;
 import java.io.File;
 
 /**
- * utility class for File IO purposes
+ * Utility class for File IO purposes
  */
 public class FileIOUtil {
 
