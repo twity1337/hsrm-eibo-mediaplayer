@@ -7,8 +7,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Objects of class Metadata contain metadata information (as String) of media file.
+ * E.g.: title, name of album, artist, length and many more.
+ */
 public class Metadata {
 
+    /**
+     * All information is saved in a HashMap
+     */
     private Map<String, String> metadataMap = new HashMap<>();
 
     public Metadata(String title, String album, String artist,
