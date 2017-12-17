@@ -76,10 +76,12 @@ public class MainBorderPane extends BorderPane {
 
         Menu[] menus = {
                 new Menu("Datei"),
+                /*
                 new Menu("Wiedergabe"),
                 new Menu("Playlist"),
                 new Menu("Ansicht"),
                 new Menu("?")
+                */
         };
 
         MenuItem openMenuItem = new MenuItem("Öffnen...");
@@ -143,12 +145,6 @@ public class MainBorderPane extends BorderPane {
         };
 
         menus[0].getItems().addAll(fileSubMenu);
-
-        MenuItem clearPlaylistItem = new MenuItem("Playlist leeren");
-        clearPlaylistItem.setOnAction(event -> {
-            PlaylistManager.getInstance().clear();
-        });
-        menus[2].getItems().addAll(clearPlaylistItem);
 
         if(debugModeEnabled) {
             applyOptionalDebugItems(menus[0]);
