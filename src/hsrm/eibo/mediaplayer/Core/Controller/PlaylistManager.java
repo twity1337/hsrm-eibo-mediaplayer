@@ -9,7 +9,9 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * PlaylistManager is handling loading playlists from file(s), retaining them for furthrt use,
@@ -35,17 +37,22 @@ public class PlaylistManager extends ArrayList<Playlist>{
     private static ArrayList<PlaylistManagerObserver> observers = new ArrayList<>();
 
     /**
-     * Method to sign up an Observer object
-     * @param obj observer to notify on change
+     * Binds an onChange observer to this class.
+     * @param obj the Observer
      */
     public static void addOnChangeObserver(PlaylistManagerObserver obj)
     {
         observers.add(obj);
     }
-
     /**
-     * Method to notify all known observers
+     * Binds an onChange observer to this class.
+     * @param obj the Observer
      */
+    public static void removeOnChangeObserver(PlaylistManagerObserver obj)
+    {
+        observers.remove(obj);
+    }
+
     private void notifyOnChangeObservers()
     {
         PlaylistManager ths = this;
@@ -79,16 +86,13 @@ public class PlaylistManager extends ArrayList<Playlist>{
             }
         });
         //TODO: throw Exceptions to View
-        parser.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                setIsLoadingList(false);
-                ErrorHandler err = ErrorHandler.getInstance();
-                err.addError(event.getSource().getException());
-                err.notifyErrorObserver("Fehler beim Laden der Metadaten");
-            }
+        parser.setOnFailed(event -> {
+            setIsLoadingList(false);
+            ErrorHandler err = ErrorHandler.getInstance();
+            err.addError(event.getSource().getException());
+            err.notifyErrorObserver("Fehler beim Laden der Metadaten");
         });
-        Thread parserThread = new Thread(parser, M3U_PARSER_THREAD_NAME);
+        Thread parserThread = new Thread(parser, M3uParserTask.M3U_PARSER_THREAD_NAME);
         parserThread.setDaemon(true);
         parserThread.start();
     }

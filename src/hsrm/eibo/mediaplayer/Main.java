@@ -21,16 +21,7 @@ public class Main extends Application {
         ViewBuilder.getInstance()
                 .setDebugModeEnabled(DEBUG_MODE_ENABLED)
                 .initPrimaryStage(primaryStage);
-        this.initExceptionHandling();
+        ErrorHandler.initExceptionHandling();
         primaryStage.show();
-    }
-
-    private void initExceptionHandling()
-    {
-        Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
-            ErrorHandler err = ErrorHandler.getInstance();
-            err.addError(e);
-            err.notifyErrorObserver("Es ist ein unerwarteter Fehler aufgetreten");
-        });
     }
 }

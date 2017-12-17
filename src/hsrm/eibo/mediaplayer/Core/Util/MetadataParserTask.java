@@ -12,7 +12,6 @@ import org.apache.tika.sax.BodyContentHandler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.HashMap;
 
 /**
  * service to provide threaded metadata parsing
@@ -20,6 +19,8 @@ import java.util.HashMap;
 
 //TODO: rework to TrackService, on failure return file filePathOfMediaFile
 public class MetadataParserTask extends Task<Metadata>{
+
+    public static final String METADATA_PARSER_THREAD_NAME = "Metadata Parser Thread";
 
     private static final Parser[] AUTO_DETECT_EXCEPTED_PARSERS = {
             new AudioParser(),

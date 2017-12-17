@@ -23,10 +23,6 @@ import java.io.IOException;
 public class Track implements MediaListElementInterface {
 
     /**
-     * name of the metadata parsing thread
-     */
-    private static final String METADATA_PARSER_THREAD_NAME = "Metadata Parser Thread";
-    /**
      * model.Metadata instance with metadata of this track
      */
     private Metadata metadata;
@@ -60,7 +56,7 @@ public class Track implements MediaListElementInterface {
                 setMetadataReady(true);
             }
         });
-        Thread parserThread = new Thread(parserTask, METADATA_PARSER_THREAD_NAME);
+        Thread parserThread = new Thread(parserTask, MetadataParserTask.METADATA_PARSER_THREAD_NAME);
         parserThread.setDaemon(true);
         parserThread.start();
     }
