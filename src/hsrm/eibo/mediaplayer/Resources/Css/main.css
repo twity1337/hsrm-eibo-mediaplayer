@@ -43,18 +43,18 @@
     -fx-alignment: center-right;
 }
 
-.button
+.button, .toggle-button
 {
     -fx-border-radius: 7px;
     -fx-border-color: rgba(155,155,155,0.4);
+    -fx-background-insets: 1px;
     -fx-background-color: transparent;
 }
-.button:hover
+.button:hover, .toggle-button:hover
 {
     -fx-background-color: rgba(215, 215, 215, 0.4);
-    -fx-background-insets: 1px;
 }
-.button:pressed
+.button:pressed, .toggle-button:pressed, .toggle-button:selected
 {
     -fx-background-color: rgba(104, 104, 104, 0.4);
 }
@@ -98,27 +98,26 @@
     -fx-alignment: center;
     -fx-start-margin: 20px;
 }
+
+.metadata
+{
+    -fx-pref-height: 30px;
+}
 .label.metadata
 {
-    -fx-alignment: center;
+    -fx-alignment: top-center;
 }
 .label.metadata-label
 {
     -fx-end-margin: 10px;
     -fx-font-weight: bold;
     -fx-min-width: 60px;
+    -fx-padding: 0 20px 0 0;
 }
 .label.metadata-value
 {
-    -fx-alignment: center-left;
-}
-.label.metadata-label.left
-{
-    -fx-padding: 0 0 0 50px;
-}
-.label.metadata-label.right
-{
-    -fx-padding: 0 50px 0 0;
+    -fx-alignment: top-left;
+    -fx-min-width: 150px;
 }
 
 

@@ -13,9 +13,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -27,7 +25,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.*;
 
 import java.io.File;
@@ -222,25 +219,36 @@ public class MainBorderPane extends BorderPane {
         topBox.setAlignment(Pos.CENTER);
         controllBox.getStyleClass().addAll("media-control-elements", "inner-spacing");
 
-        Button rewindButton = this.createPreviousTrackButton();
-        Button playPauseButton = this.createPlayPauseButton();
-        Button nextButton = this.createNextTrackButton();
-        Button volumeButton = this.createVolumeButton();
-        Slider volumeSlider = this.createVolumeSlider();
-        Label currentTime = this.createTimeLabel();
         Slider progressSlider = this.createProgressSlider();
-        Button shuffleButton = this.createShuffleButton();
-        Button repeatButton = this.createRepeatButton();
-
-        final Pane metadataLine = this.createMetadataLabels();
 
         bottomBox.setHgrow(progressSlider, Priority.ALWAYS);
-        topBox.getChildren().addAll(rewindButton, playPauseButton, nextButton, shuffleButton, repeatButton, volumeButton, volumeSlider);
-        bottomBox.getChildren().addAll(currentTime, progressSlider);
+        topBox.setSpacing(5);
+        topBox.getChildren().addAll(
+                this.createPreviousTrackButton(),
+                this.createPlayPauseButton(),
+                this.createNextTrackButton(),
+                this.createSpacerRegion(10),
+                this.createShuffleButton(),
+                this.createRepeatButton(),
+                this.createSpacerRegion(10),
+                this.createVolumeButton(),
+                this.createVolumeSlider()
+        );
+        bottomBox.getChildren().addAll(
+                this.createTimeLabel(),
+                progressSlider
+        );
 
-        controllBox.getChildren().addAll(metadataLine, topBox, bottomBox);
+        controllBox.getChildren().addAll(this.createMetadataLabels(), topBox, bottomBox);
 
         return controllBox;
+    }
+
+    private Region createSpacerRegion(int width) {
+        Region spacer = new Region();
+        spacer.setPrefWidth(width);
+        return spacer;
+
     }
 
     private Pane createMetadataLabels() {
@@ -257,12 +265,17 @@ public class MainBorderPane extends BorderPane {
         l.add(spacer);
         l.add(labelGroup1);
 
+        labelTitle0.setVisible(false);
+        labelTitle1.setVisible(false);
         labelTitle0.getStyleClass().addAll("metadata", "metadata-label", "left");
         labelTitle1.getStyleClass().addAll("metadata", "metadata-label", "right");
         labelText0.getStyleClass().addAll("metadata", "metadata-value", "left");
         labelText1.getStyleClass().addAll("metadata", "metadata-value", "right");
 
         controller.currentTrackMetadataProperty().addListener(((observable, oldValue, newValue) -> {
+            Boolean isVisible = controller.getTrackDuration() > 0;
+            labelTitle0.setVisible(isVisible);
+            labelTitle1.setVisible(isVisible);
             labelText0.setText(newValue.getMetadataMap().get("title"));
             labelText1.setText(newValue.getMetadataMap().get("artist"));
         }));
@@ -385,6 +398,8 @@ public class MainBorderPane extends BorderPane {
         // set max Value of Slider
         this.controller.trackDurationProperty().addListener((observable, oldValue, newValue) -> {
             s.setMax(newValue.doubleValue());
+
+            // prevent invlid slider initialization, due to invalid max value
             s.setDisable(Double.isNaN(newValue.doubleValue()));
             s.setValue(0);
         });
@@ -407,18 +422,20 @@ public class MainBorderPane extends BorderPane {
         return s;
     }
 
-    private Button createShuffleButton()
+    private ToggleButton createShuffleButton()
     {
-        Button b = new Button("zufällige Wiedergabe aus");
-        applyIconToLabeledElement(b, "unshuffle");
+        ToggleButton b = new ToggleButton("zufällige Wiedergabe aus");
+        applyIconToLabeledElement(b, "shuffle");
         controller.inShuffleModeProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue && !newValue)
             {
-                b.setText("zufällige Wiedergabe ein");
+                b.setText("zufällige Wiedergabe aus");
+                b.setSelected(false);
                 applyIconToLabeledElement(b, "unshuffle");
             } else if (!oldValue && newValue)
             {
-                b.setText("zufällige Wiedergabe aus");
+                b.setText("zufällige Wiedergabe ein");
+                b.setSelected(true);
                 applyIconToLabeledElement(b, "shuffle");
             }
         });
@@ -428,22 +445,25 @@ public class MainBorderPane extends BorderPane {
         return b;
     }
 
-    private Button createRepeatButton()
+    private ToggleButton createRepeatButton()
     {
-        Button b = new Button("Keine Wiederholung");
+        ToggleButton b = new ToggleButton("Keine Wiederholung");
         applyIconToLabeledElement(b, "repeat-none");
         controller.repeatModeProperty().addListener((observable, oldValue,  newValue) -> {
             if (newValue == MediaController.RepeatMode.NONE)
             {
                 applyIconToLabeledElement(b, "repeat-none");
+                b.setSelected(false);
                 b.setText("keine Wiederholung");
             } else if(newValue == MediaController.RepeatMode.ALL)
             {
                 applyIconToLabeledElement(b, "repeat-all");
+                b.setSelected(true);
                 b.setText("playlist wiederholen");
             } else if (newValue == MediaController.RepeatMode.SINGLE)
             {
                 applyIconToLabeledElement(b, "repeat-single");
+                b.setSelected(true);
                 b.setText("track wiederholen");
             }
         });
