@@ -1,5 +1,6 @@
 package hsrm.eibo.mediaplayer.Core.View.Components;
 
+import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Core.Controller.MediaController;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManager;
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
@@ -100,10 +101,10 @@ public class MainBorderPane extends BorderPane {
                     playlistManager.createPlaylistFromFile(chosenFiles);
                 }catch (PlaylistIOException e)
                 {
-                    // TODO: Make that better... (error modal window..)
-                    System.err.println("ERROR: Error loading files: " + e.getLocalizedMessage());
+                    ErrorHandler err = ErrorHandler.getInstance();
+                    err.addError(e);
+                    err.notifyErrorObserver("Fehler beim Laden der Dateien");
                 }
-                System.out.println(chosenFiles.toString());
             }
 
         });

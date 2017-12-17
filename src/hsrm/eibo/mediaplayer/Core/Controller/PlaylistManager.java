@@ -98,7 +98,7 @@ public class PlaylistManager extends ArrayList<Playlist>{
                 }
             }
         });
-        //TODO: throw Exceptions to View
+
         parser.setOnFailed(event -> {
             setIsLoadingList(false);
             ErrorHandler err = ErrorHandler.getInstance();

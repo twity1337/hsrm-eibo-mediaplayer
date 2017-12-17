@@ -278,8 +278,8 @@ public class MediaController {
         this.currentMediaplayer.setOnPlaying(() -> instance.setPlaying(true));
 
         this.currentMediaplayer.setOnHalted(() -> {
-            // TODO: job for exception handlin
-            System.err.println("Critical Error: player no longer useable");
+            ErrorHandler.getInstance()
+                    .notifyErrorObserver("Fehler bei der Wiedergabe: Aktuelle Wiedergabe ist nicht mehr verfügbar.");
             instance.currentMediaplayer.dispose();
             instance.currentMediaplayer=null;
         });
