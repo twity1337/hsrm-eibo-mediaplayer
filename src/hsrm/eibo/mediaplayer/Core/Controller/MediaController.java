@@ -211,13 +211,23 @@ public class MediaController {
         System.out.println("Track: " + track.getLocation());
     }
 
+    /**
+     * Method to check if currentMediaplayer is null.
+     * @return true if currentMediaplayer is NOT null, false else
+     */
     private boolean mediaplayerSet(){return this.currentMediaplayer != null;}
 
+    /**
+     * Method to set currentTime of currentMediaplayer to beginning of track
+     */
     private void rewind()
     {
         this.currentMediaplayer.seek(this.currentMediaplayer.getStartTime());
     }
 
+    /**
+     * Method to create reference list containing integers for shuffeld playlist playback.
+     */
     private void createShuffleList()
     {
         if (playlist == null)
@@ -226,7 +236,7 @@ public class MediaController {
     }
 
     /**
-     * method that handels automatic playback of playlist
+     * method that handles continuous/automatic playback of playlist
      */
     private void playNext()
     {
@@ -237,11 +247,18 @@ public class MediaController {
         this.play();
     }
 
+    /**
+     * Method to check if playback is at the end of playlist.
+     * @return true if currentMediaplayer is last in playist, false else
+     */
     private boolean isEndOfPlaylist()
     {
         return (this.getCurrentPlaybackIndex() >= this.playlist.size()-1);
     }
 
+    /**
+     * Method to create Listeners nad Bindings for and on a newly set Mediaplayer
+     */
     private void bindListenersToCurrentMediaPlayer() {
         this.currentMediaplayer.setOnPlaying(() -> instance.setPlaying(true));
 
@@ -281,10 +298,11 @@ public class MediaController {
             instance.coverProperty.set((Image)currentMediaplayer.getMedia().getMetadata().get("image"));
             instance.trackDurationProperty().set(currentMediaplayer.getTotalDuration().toSeconds());
         });
-        //bind volume property bidirectional
+
         this.currentMediaplayer.volumeProperty().bind(this.volumeProperty());
-        // currentTime(double) listens to mediaplayer.currentTimeProperty(ReadOnlyObjectProperty<Duration>)
+
         this.currentMediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> currentTimeProperty().set(newValue.toSeconds()));
+
         this.currentMediaplayer.muteProperty().bindBidirectional(this.muted);
 
         Track currentTrack = this.playlist.get(this.getCurrentPlaybackIndex());
@@ -300,10 +318,16 @@ public class MediaController {
 //  Properties and classes                                                    //
 ////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Property containing image of mediafile (if any present)
+     */
     private SimpleObjectProperty<Image> coverProperty;
 
     public SimpleObjectProperty<Image> coverProperty(){return coverProperty;}
 
+    /**
+     * boolean Property if playlist is being played randomly
+     */
     private BooleanProperty inShuffleMode;
 
     public boolean isInShuffleMode() {
@@ -333,6 +357,9 @@ public class MediaController {
         this.setCurrentPlaybackIndex(this.shuffleList[this.getCurrentPlaybackIndex()]);
     }
 
+    /**
+     * boolean Property if currentMediaplayer reached on of file/playback
+     */
     private BooleanProperty endOfMedia;
 
     public BooleanProperty endOfMediaProperty() {
@@ -343,6 +370,9 @@ public class MediaController {
         this.endOfMedia.set(true);
     }
 
+    /**
+     * boolean Property if currentMediaplayer is playing.
+     */
     private BooleanProperty playing;
 
     public boolean isPlaying() {
