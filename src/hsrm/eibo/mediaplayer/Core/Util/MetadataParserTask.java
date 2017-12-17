@@ -14,26 +14,42 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
- * service to provide threaded metadata parsing
+ * Task to provide threaded metadata parsing
  */
-
-//TODO: rework to TrackService, on failure return file filePathOfMediaFile
 public class MetadataParserTask extends Task<Metadata>{
 
+    /**
+     * Name of Parser thread
+     */
     public static final String METADATA_PARSER_THREAD_NAME = "Metadata Parser Thread";
 
+    /**
+     * List of Parsers: determines filetypes which can be parsed.
+     */
     private static final Parser[] AUTO_DETECT_EXCEPTED_PARSERS = {
             new AudioParser(),
             new MidiParser(),
             new Mp3Parser()
     };
 
+    /**
+     * reference to media file
+     */
     private String filePathOfMediaFile;
 
+    /**
+     * Constructor creates parser task with file path to file
+     * @param filePathOfMediaFile path of file to load
+     */
     public MetadataParserTask(String filePathOfMediaFile) {
         this.filePathOfMediaFile = filePathOfMediaFile;
     }
 
+    /**
+     * Method to get artist information as String. Differnet tags can beset
+     * @param m source of metadata
+     * @return name of srtist, null if no information in media file
+     */
     private final String getArtist(org.apache.tika.metadata.Metadata m)
     {
         String a;
@@ -43,6 +59,12 @@ public class MetadataParserTask extends Task<Metadata>{
             ;
         return a;
     }
+
+    /**
+     * Method to start thread of Task object, creates an tika.metadata object to read data from
+     * @return metadata as Model.Metadata object
+     * @throws Exception
+     */
     @Override
     protected Metadata call() throws Exception {
         Metadata dataToAdd;
