@@ -23,7 +23,7 @@ public class MediaController {
     private int[] shuffleList;
 
     /**
-     * JavaFx Mediaplayer thats selected for replay
+     * JavaFx Mediaplayer that is selected for replay
      */
     private MediaPlayer currentMediaplayer;
 
@@ -232,7 +232,7 @@ public class MediaController {
     {
         if (playlist == null)
             return;
-        this.shuffleList = MediaUtil.generateShuffelList(this.playlist.size());
+        this.shuffleList = MediaUtil.generateShuffleList(this.playlist.size());
     }
 
     /**

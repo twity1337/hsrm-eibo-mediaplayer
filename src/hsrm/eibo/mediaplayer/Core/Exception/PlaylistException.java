@@ -17,7 +17,7 @@ public class PlaylistException extends MediaPlayerException implements HasAdditi
 
     /**
      * method to extract file paths not loaded from exception.
-     * @return
+     * @return file paths as String
      */
     @Override
     public String getAddionalInformationMessage()

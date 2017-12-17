@@ -50,7 +50,7 @@ public class MetadataParserTask extends Task<Metadata>{
      * @param m source of metadata
      * @return name of srtist, null if no information in media file
      */
-    private final String getArtist(org.apache.tika.metadata.Metadata m)
+    private String getArtist(org.apache.tika.metadata.Metadata m)
     {
         String a;
         if ((a=m.get("creator"))!=null

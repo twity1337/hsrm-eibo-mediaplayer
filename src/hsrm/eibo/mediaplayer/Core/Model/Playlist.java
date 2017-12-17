@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 /**
  * Playlist contains model.Track objects,
- * a given name (or empty), and a file path of oigin (or empty).
+ * a given name (or empty), and a file path of origin (or empty).
  */
 public class Playlist extends ArrayList<Track> implements MediaListElementInterface {
     /**

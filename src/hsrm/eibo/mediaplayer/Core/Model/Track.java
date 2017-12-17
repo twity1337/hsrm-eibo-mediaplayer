@@ -72,9 +72,9 @@ public class Track implements MediaListElementInterface {
 
     /**
      * Method to create javafx.Mediaplayer
-     * @return MedaiPlayer containing medai file of track
+     * @return MediaPlayer containing media file of track
      * @throws TrackFileInaccessibleException on file IO operation error containing file path + name of file
-     * @throws TrackUnsupportedFileTypeException on opening unknown/unsuppoerted file type
+     * @throws TrackUnsupportedFileTypeException on opening unknown/unsupported file type
      */
     public MediaPlayer getTrackMediaPlayer() throws TrackFileInaccessibleException, TrackUnsupportedFileTypeException
     {

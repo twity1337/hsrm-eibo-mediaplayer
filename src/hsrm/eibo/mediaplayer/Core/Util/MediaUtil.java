@@ -39,7 +39,7 @@ public class MediaUtil {
      * @param length of integer array
      * @return integer array with length n and numbers 0,...,(n-1)
      */
-    public static int[] generateShuffelList(int length) {
+    public static int[] generateShuffleList(int length) {
         int[] randomizedList = new int[length];
 
         for (int i = 1; i < length; i++) {
