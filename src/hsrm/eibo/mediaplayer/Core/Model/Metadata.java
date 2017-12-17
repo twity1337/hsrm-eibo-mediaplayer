@@ -15,6 +15,16 @@ public class Metadata {
      */
     private Map<String, String> metadataMap = new HashMap<>();
 
+    /**
+     * Constructor expects metadata information of media file
+     * @param title String
+     * @param album String
+     * @param artist String
+     * @param year String
+     * @param genre STring
+     * @param length double
+     * @param bitrate double
+     */
     public Metadata(String title, String album, String artist,
                     String year, String genre, double length, double bitrate) {
         this.metadataMap.put("title", title);
