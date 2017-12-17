@@ -20,10 +20,6 @@ import java.util.List;
  */
 public class PlaylistManager extends ArrayList<Playlist>{
     /**
-     * name of parsinf plalyist to media file list
-     */
-    private static final String M3U_PARSER_THREAD_NAME = "M3U Parser Thread";
-    /**
      * reference to singleton instances of PlaylistManager
      */
     private static PlaylistManager instance = new PlaylistManager();
@@ -72,6 +68,7 @@ public class PlaylistManager extends ArrayList<Playlist>{
 
     /**
      * Constructor private to create only one instance of PlaylistManager
+     * @see #getInstance()
      */
     private PlaylistManager(){this.isLoadingList = new SimpleBooleanProperty(false);}
 
