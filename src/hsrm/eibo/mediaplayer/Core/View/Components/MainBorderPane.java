@@ -1,6 +1,7 @@
 package hsrm.eibo.mediaplayer.Core.View.Components;
 
 import hsrm.eibo.mediaplayer.Core.Controller.MediaController;
+import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManager;
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
 import hsrm.eibo.mediaplayer.Core.Model.MediaListElementInterface;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
@@ -8,8 +9,6 @@ import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
 import hsrm.eibo.mediaplayer.Core.Util.TreeViewTranslator;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
-import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManager;
-import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManagerObserver;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -19,25 +18,43 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.stage.*;
+import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
+/**
+ * Main view for mp3 player
+ */
 public class MainBorderPane extends BorderPane {
 
+    /**
+     * Resource path for button images and icons.
+     */
     private static final String ICON_RESOURCE_PATH = "/hsrm/eibo/mediaplayer/Resources/Icons/";
+    /**
+     * A Boolean which indicates, if the application runs in debug mode.
+     * In Debug mode additional MenuItems (for loading default m3u playlists, reloading css, ...) will be displayed.
+     */
     private boolean debugModeEnabled = false;
 
+    /**
+     * Singleton instance of MediaController
+     */
     private final MediaController controller = MediaController.getInstance();
+    /**
+     * Singleton instance of ViewBuilder
+     */
     private final ViewBuilder viewBuilder;
 
-    private MenuBar menuBar = new MenuBar();
 
+    /**
+     * Default constructor
+     * @param vb the ViewBuilder instance
+     * @param debugModeEnabled a boolean indicating if the application runs in debug mode
+     */
     public MainBorderPane(ViewBuilder vb, boolean debugModeEnabled) {
         this.viewBuilder = vb;
         this.debugModeEnabled = debugModeEnabled;
@@ -48,7 +65,10 @@ public class MainBorderPane extends BorderPane {
         this.getStyleClass().add("main-border-pane");
     }
 
-
+    /**
+     * The generator for Menu Items in top area.
+     * @return javafx.scene.Parent A VBox containing all MenuItem elements.
+     */
     private Parent getMenuItems() {
         VBox topVBox = new VBox();
         MainBorderPane ths = this;
@@ -140,12 +160,17 @@ public class MainBorderPane extends BorderPane {
             applyOptionalDebugItems(menus[0]);
         }
 
-        this.menuBar.getMenus().addAll(menus);
-        topVBox.getChildren().addAll(this.menuBar);
+        MenuBar menuBar = new MenuBar();
+        menuBar.getMenus().addAll(menus);
+        topVBox.getChildren().addAll(menuBar);
 
         return topVBox;
     }
 
+    /**
+     * Adds additional MenuItems to the given menu, if debug mode is enabled.
+     * @param root the Menu item to extend.
+     */
     private void applyOptionalDebugItems(Menu root) {
         if(!debugModeEnabled)
             return;
@@ -188,6 +213,10 @@ public class MainBorderPane extends BorderPane {
         root.getItems().addAll(items);
     }
 
+    /**
+     * Creates the elements for center area.
+     * @return A parent object containing the center elements.
+     */
     private Parent getCenterComponents() {
 
         TabPane tabPane = new TabPane();
@@ -206,6 +235,10 @@ public class MainBorderPane extends BorderPane {
         return tabPane;
     }
 
+    /**
+     * Creates the elements for bottom area.
+     * @return A Parent object containing the bottom elements.
+     */
     private Parent getBottomComponents()
     {
         VBox controllBox = new VBox();
@@ -240,6 +273,11 @@ public class MainBorderPane extends BorderPane {
         return controllBox;
     }
 
+    /**
+     * Creates an non visible spacer element with a given width.
+     * @param width the width in pixel
+     * @return Region the spacer region.
+     */
     private Region createSpacerRegion(int width) {
         Region spacer = new Region();
         spacer.setPrefWidth(width);
@@ -247,6 +285,10 @@ public class MainBorderPane extends BorderPane {
 
     }
 
+    /**
+     * Creates the metadata label elements for bottom area of view.
+     * @return A Pane object containing the elements.
+     */
     private Pane createMetadataLabels() {
         HBox box = new HBox();
         ArrayList<Node> l = new ArrayList<>();
@@ -281,6 +323,10 @@ public class MainBorderPane extends BorderPane {
         return box;
     }
 
+    /**
+     * Creates the Play/Pause button and binds all necessary listeners to it.
+     * @return A Button representing the Play/Pause button.
+     */
     private Button createPlayPauseButton()
     {
         Button b = new Button("play");
@@ -308,6 +354,10 @@ public class MainBorderPane extends BorderPane {
         return b;
     }
 
+    /**
+     * Creates the "skip to previous" button and adds all bindings.
+     * @return An Button representing the Previous-Button.
+     */
     private Button createPreviousTrackButton()
     {
         Button b = new Button("Vorheriger Titel");
@@ -320,6 +370,10 @@ public class MainBorderPane extends BorderPane {
         return b;
     }
 
+    /**
+     * Creates the "skip to next" button and adds all bindings.
+     * @return An Button representing the Previous-Button.
+     */
     private Button createNextTrackButton()
     {
         Button b = new Button("Nächster Titel");
@@ -332,6 +386,10 @@ public class MainBorderPane extends BorderPane {
         return b;
     }
 
+    /**
+     * Creates a button with mute/unmkute functionality.
+     * @return Button the volume button
+     */
     private Button createVolumeButton()
     {
         Button b = new Button("volume: ");
@@ -364,6 +422,10 @@ public class MainBorderPane extends BorderPane {
         return b;
     }
 
+    /**
+     * Creates a Slider for volume in- and decreasing.
+     * @return the volume slider
+     */
     private Slider createVolumeSlider()
     {
         Slider s = new Slider(0, 1, 0.5);
@@ -372,6 +434,10 @@ public class MainBorderPane extends BorderPane {
         return s;
     }
 
+    /**
+     * Creates the Time label with automatic reload.
+     * @return An Label element representing the current track time.
+     */
     private Label createTimeLabel()
     {
         Label l = new Label("--:--");
@@ -387,6 +453,10 @@ public class MainBorderPane extends BorderPane {
         return l;
     }
 
+    /**
+     * Creates the Progress slider and binds it to the current track time.
+     * @return The Slider element.
+     */
     private Slider createProgressSlider()
     {
         Slider s = new Slider(0,0.1,0);
@@ -418,6 +488,10 @@ public class MainBorderPane extends BorderPane {
         return s;
     }
 
+    /**
+     * Creates a shuffle button with Toggle-Functionality.
+     * @return A ToggleButton with Shuffle-Functionality
+     */
     private ToggleButton createShuffleButton()
     {
         ToggleButton b = new ToggleButton("zufällige Wiedergabe aus");
@@ -441,6 +515,11 @@ public class MainBorderPane extends BorderPane {
         return b;
     }
 
+    /**
+     * Creates a Repeat button with Toggle-Functionality
+     * ToggleButton with Triple-Toggle (None, Single, All)
+     * @return A ToggleButton with Repeat-Functionality
+     */
     private ToggleButton createRepeatButton()
     {
         ToggleButton b = new ToggleButton("Keine Wiederholung");
@@ -478,6 +557,10 @@ public class MainBorderPane extends BorderPane {
         return b;
     }
 
+    /**
+     * Creates the tab content for current playback.
+     * @return A Parent object containing all current playback elements.
+     */
     private Parent getTabContent_CurrentPlayback()
     {
         BorderPane coverBorderPane = new BorderPane();
@@ -489,59 +572,54 @@ public class MainBorderPane extends BorderPane {
         return coverBorderPane;
     }
 
+    /**
+     * Creates the Playlist-tab content.
+     * @return A Parent object containing containing all elements for Playlist view.
+     */
     private Parent getTabContent_Playlist()
     {
         PlaylistTreeView tree = new PlaylistTreeView();
 
-        PlaylistManager.addOnChangeObserver(new PlaylistManagerObserver() {
-            @Override
-            public void update(PlaylistManager playlistManager) {
-                // onChange of Playlist
+        PlaylistManager.addOnChangeObserver(playlistManager -> {
+            // onChange of Playlist
 
-                Playlist addedPlaylist = playlistManager.getLastAddedPlaylist();
-                final TreeItem<MediaListElementInterface> playlistTreeItem = new TreeItem<>(addedPlaylist);
-                playlistTreeItem.setExpanded(true);
+            Playlist addedPlaylist = playlistManager.getLastAddedPlaylist();
+            final TreeItem<MediaListElementInterface> playlistTreeItem = new TreeItem<>(addedPlaylist);
+            playlistTreeItem.setExpanded(true);
 
-                addedPlaylist.forEach(new Consumer<Track>() {
+            addedPlaylist.forEach(track -> {
+                // forEach Track in Listview
+                track.metadataReadyProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
-                    public void accept(Track track) {
-                        // forEach Track in Listview
-                        track.metadataReadyProperty().addListener(new ChangeListener<Boolean>() {
-                            @Override
-                            public synchronized void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                                // Metadata ready on single track in TreeView.
-                                if(newValue)
-                                {
-                                    tree.redraw();
-                                }
-                            }
-                        });
-                        playlistTreeItem.getChildren().add(new TreeItem<>(track));
+                    public synchronized void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        // Metadata ready on single track in TreeView.
+                        if(newValue)
+                        {
+                            tree.redraw();
+                        }
                     }
                 });
-                // add playlist to TreeView
-                tree.getRoot().getChildren().add(playlistTreeItem);
-            }
+                playlistTreeItem.getChildren().add(new TreeItem<>(track));
+            });
+            // add playlist to TreeView
+            tree.getRoot().getChildren().add(playlistTreeItem);
         });
 
-        tree.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(event.getClickCount() != 2 || tree.getSelectionModel().isEmpty())
-                    return;
+        tree.setOnMouseClicked(event -> {
+            if(event.getClickCount() != 2 || tree.getSelectionModel().isEmpty())
+                return;
 
-                MediaListElementInterface selectedElement = tree.getSelectionModel().getSelectedItem().getValue();
-                if(selectedElement == null) // no selected item
-                    return;
-                if (selectedElement instanceof Track)
-                {
-                    TreeViewTranslator translator = new TreeViewTranslator();
-                    translator.setSelectedIndex(tree.getSelectionModel().getSelectedIndex());
-                    controller.setPlaylist(translator.lookupPlaylistForTreeIndex());
-                    controller.skipToIndex(translator.getRelativePlaylistIndex());
+            MediaListElementInterface selectedElement = tree.getSelectionModel().getSelectedItem().getValue();
+            if(selectedElement == null) // no selected item
+                return;
+            if (selectedElement instanceof Track)
+            {
+                TreeViewTranslator translator = new TreeViewTranslator();
+                translator.setSelectedIndex(tree.getSelectionModel().getSelectedIndex());
+                controller.setPlaylist(translator.lookupPlaylistForTreeIndex());
+                controller.skipToIndex(translator.getRelativePlaylistIndex());
 
-                    controller.play();
-                }
+                controller.play();
             }
         });
 
@@ -559,6 +637,11 @@ public class MainBorderPane extends BorderPane {
         return vbox;
     }
 
+    /**
+     * Adds an Icon/Image to a given Labeled element. Lookup path is defined in ICON_RESOURCE_PATH.
+     * @param element The labeled element to extend
+     * @param name The file name key for icon file.
+     */
     private void applyIconToLabeledElement(Labeled element, String name) {
         ImageView image = new ImageView(this.getClass().getResource(ICON_RESOURCE_PATH + name + ".png").toString());
         image.setFitHeight(32);
@@ -567,6 +650,11 @@ public class MainBorderPane extends BorderPane {
         element.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     }
 
+    /**
+     * Returns a human-readable time string for display in labeled elements.
+     * @param timeInSeconds the time in seconds to format.
+     * @return the formatted Time String
+     */
     private String parseToTimeString(double timeInSeconds)
     {
         if(timeInSeconds < (60 * 60) )
