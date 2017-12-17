@@ -1,10 +1,7 @@
 package hsrm.eibo.mediaplayer.Core.Model;
 
-import hsrm.eibo.mediaplayer.Core.Exception.PlaylistException;
 import hsrm.eibo.mediaplayer.Core.Exception.PlaylistIOException;
 import hsrm.eibo.mediaplayer.Core.Exception.TrackUnsupportedFileTypeException;
-import org.apache.tika.exception.TikaException;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.ArrayList;
