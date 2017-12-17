@@ -113,7 +113,7 @@ public class MediaController {
      */
     public void skipToNext()
     {
-        if (!mediaplayerSet())
+        if (!isMediaplayerPresent())
             return;
         if (!isEndOfPlaylist())
         {
