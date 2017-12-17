@@ -117,7 +117,7 @@ public class MediaController {
             return;
         if (!isEndOfPlaylist())
         {
-            this.setCurrentPlaybackIndex(this.getCurrentPlaybackIndex()+1);
+            this.setCurrentPlaybackIndex(this.currentPlaybackIndex.get()+1);
         }
         else if (this.getRepeatMode().equals(RepeatMode.ALL) && this.isEndOfPlaylist())
         {
@@ -138,7 +138,7 @@ public class MediaController {
         if (!mediaplayerSet())
             return;
         if (this.getCurrentPlaybackIndex() >0)
-            this.setCurrentPlaybackIndex(this.getCurrentPlaybackIndex()-1); //TODO: logik im shuffle mode überarbeiten
+            this.setCurrentPlaybackIndex(this.currentPlaybackIndex.get()-1);
         this.setCurrentMediaplayer();
         if (!this.isStopped())
             play();
