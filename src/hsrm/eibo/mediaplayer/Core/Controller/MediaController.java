@@ -71,7 +71,7 @@ public class MediaController {
      */
     public void play()
     {
-        if (!this.mediaplayerSet()  || this.currentMediaplayer.getStatus() == MediaPlayer.Status.HALTED)
+        if (!this.isMediaplayerPresent()  || this.currentMediaplayer.getStatus() == MediaPlayer.Status.HALTED)
         {
             return;
         }
@@ -96,7 +96,7 @@ public class MediaController {
      */
     public void pause()
     {
-        if (this.mediaplayerSet())
+        if (this.isMediaplayerPresent())
         {
             this.currentMediaplayer.pause();
             this.setPlaying(false);
@@ -113,7 +113,7 @@ public class MediaController {
      */
     public void skipToNext()
     {
-        if (!mediaplayerSet())
+        if (!isMediaplayerPresent())
             return;
         if (!isEndOfPlaylist())
         {
@@ -135,7 +135,7 @@ public class MediaController {
      */
     public void skipToPrevious()
     {
-        if (!mediaplayerSet())
+        if (!isMediaplayerPresent())
             return;
         if (this.getCurrentPlaybackIndex() >0)
             this.setCurrentPlaybackIndex(this.currentPlaybackIndex.get()-1);
@@ -155,18 +155,18 @@ public class MediaController {
     }
 
     /**
-     * Method to set current time in currrent Mediaplayer
-     * @param time in seconds to set mediaplayer.currentTime
+     * Forwards the current mediaplayer to a given amount of seconds.
+     * @param time in seconds the Mediaplayer current time should be set to
      */
     public void seek(double time)
     {
-        if (!this.mediaplayerSet())
+        if (!this.isMediaplayerPresent())
             return;
         this.currentMediaplayer.seek(new Duration(time*1000));
     }
 
     /**
-     * Method to set Playlist (List of track objects) for Controller
+     * Changes the current playlist to the given playlist and recreates the internal shuffle list.
      * @param playlist to set controller to
      */
     public void setPlaylist(Playlist playlist)
@@ -194,7 +194,7 @@ public class MediaController {
     {
         Track track = this.playlist.get(this.getCurrentPlaybackIndex());
         //stopping old mediaplayer and cleanup
-        if(this.mediaplayerSet())
+        if(this.isMediaplayerPresent())
             this.currentMediaplayer.dispose();
         this.setPlaying(false);
         this.resetTrackDuration();
@@ -215,7 +215,7 @@ public class MediaController {
      * Method to check if currentMediaplayer is null.
      * @return true if currentMediaplayer is NOT null, false else
      */
-    private boolean mediaplayerSet(){return this.currentMediaplayer != null;}
+    private boolean isMediaplayerPresent(){return this.currentMediaplayer != null;}
 
     /**
      * Method to set currentTime of currentMediaplayer to beginning of track
