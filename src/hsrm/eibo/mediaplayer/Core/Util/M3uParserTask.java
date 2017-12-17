@@ -7,20 +7,34 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 
-//TODO: make extended m3u compatible
-
+/**
+ * Class to create Parser Thread for reading m3u playlist files
+ * and convert them to String array
+ */
 public class M3uParserTask extends Task<String[]>
 {
     /**
      * The Thread name for parser thread.
      */
     public static final String M3U_PARSER_THREAD_NAME = "M3U Parser Thread";
+    /**
+     * reference to file loaded
+     */
     private File playlistFile;
 
+    /**
+     * Constructor expects file object of playlist to load
+     * @param playlistFile File obejct to load
+     */
     public M3uParserTask(File playlistFile) {
         this.playlistFile = playlistFile;
     }
 
+    /**
+     * Method to start Parser task
+     * @return list of file paths to media files
+     * @throws Exception
+     */
     @Override
     protected String[] call() throws Exception {
         ArrayList<String> buffer = new ArrayList<>();
