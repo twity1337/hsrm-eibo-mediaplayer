@@ -55,7 +55,7 @@ public class MediaController {
         inShuffleMode = new SimpleBooleanProperty(false);
         repeatMode = new SimpleObjectProperty<>(RepeatMode.NONE);
         playing = new SimpleBooleanProperty(false);
-        stopped = new SimpleBooleanProperty(false);
+        stopped = new SimpleBooleanProperty(true);
         endOfMedia = new SimpleBooleanProperty(true);
         volume = new SimpleDoubleProperty(0.5);
         currentTime = new SimpleDoubleProperty(0);
@@ -371,7 +371,7 @@ public class MediaController {
     }
 
     /**
-     * boolean Property if currentMediaplayer is playing.
+     * boolean Property contains status information if player is playing
      */
     private BooleanProperty playing;
 
@@ -387,6 +387,9 @@ public class MediaController {
         this.playing.set(playing);
     }
 
+    /**
+     * boolean Property contains status information if player is stopped
+     */
     private BooleanProperty stopped;
 
     private boolean isStopped() {
@@ -397,6 +400,9 @@ public class MediaController {
         this.stopped.set(stopped);
     }
 
+    /**
+     * double Property containing volume level of mediaplayer
+     */
     private DoubleProperty volume;
 
     public double getVolume() {
@@ -411,6 +417,9 @@ public class MediaController {
         this.volume.set(volume);
     }
 
+    /**
+     * double Property containing current time in track
+     */
     private DoubleProperty currentTime;
 
     public DoubleProperty currentTimeProperty() {
@@ -421,8 +430,14 @@ public class MediaController {
         this.currentTime.set(currentTime);
     }
 
+    /**
+     * enum containing possible repeat mode (states)
+     */
     public enum RepeatMode {NONE,SINGLE,ALL}
 
+    /**
+     * Property representing repeat mode Controller is in
+     */
     private SimpleObjectProperty<RepeatMode> repeatMode;
 
     public RepeatMode getRepeatMode() {
@@ -437,6 +452,9 @@ public class MediaController {
         this.repeatMode.set(repeatMode);
     }
 
+    /**
+     * double Property containing total duration value of current track
+     */
     private DoubleProperty trackDuration;
 
     public double getTrackDuration() {
@@ -451,6 +469,9 @@ public class MediaController {
         this.trackDuration.set(0.1);
     }
 
+    /**
+     * Property to reference metadata of current media file
+     */
     private SimpleObjectProperty<Metadata> currentTrackMetadata;
 
     public SimpleObjectProperty<Metadata> currentTrackMetadataProperty() {
@@ -461,6 +482,9 @@ public class MediaController {
         this.currentTrackMetadata.set(currentTrackMetadata);
     }
 
+    /**
+     * boolean Property contains status information if player is muted
+     */
     private SimpleBooleanProperty muted;
 
     public boolean isMuted() {
@@ -475,12 +499,19 @@ public class MediaController {
         this.muted.set(muted);
     }
 
+    /**
+     * integer property containing positional index in playlist
+     */
     private SimpleIntegerProperty currentPlaybackIndex;
 
     public SimpleIntegerProperty currentPlaybackIndexProperty() {
         return currentPlaybackIndex;
     }
 
+    /**
+     * Method that returns index, if shuffle mode on returns "random" index
+     * @return index of current track in playlist
+     */
     private int getCurrentPlaybackIndex() {
         if (isInShuffleMode())
             return shuffleList[this.currentPlaybackIndex.get()];
