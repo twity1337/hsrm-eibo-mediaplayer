@@ -6,6 +6,7 @@ import hsrm.eibo.mediaplayer.Core.Model.MediaListElementInterface;
 import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
+import hsrm.eibo.mediaplayer.Core.Util.TreeViewTranslator;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManager;
 import hsrm.eibo.mediaplayer.Core.Controller.PlaylistManagerObserver;
@@ -539,15 +540,22 @@ public class MainBorderPane extends BorderPane {
                     return;
                 if (selectedElement instanceof Track)
                 {
-                    //controller.setCurrentMediaplayer((Track) selectedElement);
-                    controller.skipToIndex(tree.getSelectionModel().getSelectedIndex()-1);//apparently this index starts at '1'
+                    TreeViewTranslator translator = new TreeViewTranslator();
+                    translator.setSelectedIndex(tree.getSelectionModel().getSelectedIndex());
+                    controller.setPlaylist(translator.lookupPlaylistForTreeIndex());
+                    controller.skipToIndex(translator.getRelativePlaylistIndex());
+
                     controller.play();
                 }
             }
         });
 
         controller.currentPlaybackIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            tree.getSelectionModel().select(newValue.intValue()+1);
+            tree.getSelectionModel().select(
+                    PlaylistManager.getInstance().getAbsoluteIndexForAllPlaylists(
+                            controller.getPlaylist(), newValue.intValue()
+                    )
+            );
         }));
         VBox vbox = new VBox();
         VBox.setVgrow(tree, Priority.ALWAYS);

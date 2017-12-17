@@ -27,7 +27,7 @@ public class MediaController {
     private MediaPlayer currentMediaplayer;
 
     /**
-     * list of Track objects
+     * the current Playlist
      */
     private Playlist playlist;
 
@@ -143,9 +143,9 @@ public class MediaController {
             play();
     }
 
-    public void skipToIndex(int index)
+    public void skipToIndex(int playlistIndex)
     {
-        this.setCurrentPlaybackIndex(index);
+        this.setCurrentPlaybackIndex(playlistIndex);
         this.setCurrentMediaplayer();
     }
 
@@ -168,6 +168,10 @@ public class MediaController {
         this.setCurrentPlaybackIndex(0);
         this.setCurrentMediaplayer();
         System.out.println("Playlist: " + playlist.getLocation());
+    }
+
+    public Playlist getPlaylist() {
+        return playlist;
     }
 
     /**

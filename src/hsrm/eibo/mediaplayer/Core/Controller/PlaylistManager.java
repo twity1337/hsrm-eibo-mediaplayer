@@ -135,4 +135,17 @@ public class PlaylistManager extends ArrayList<Playlist>{
         playlist.addAll(Arrays.asList(tracksToAd));
         notifyOnChangeObservers();
     }
+
+    public int getAbsoluteIndexForAllPlaylists(Playlist playlist, int trackIndex)
+    {
+        Playlist[] list = super.toArray(new  Playlist[]{});
+        int passedIndices = 0;
+        for(Playlist pl : list)
+        {
+            if(pl.equals(playlist))
+                break;
+            passedIndices += pl.size()+1;
+        }
+        return passedIndices + trackIndex + 1;
+    }
 }
