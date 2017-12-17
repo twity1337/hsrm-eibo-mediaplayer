@@ -113,7 +113,7 @@ public class MediaController {
      */
     public void skipToNext()
     {
-        if (!isMediaplayerPresent())
+        if (!mediaplayerSet())
             return;
         if (!isEndOfPlaylist())
         {
@@ -145,8 +145,8 @@ public class MediaController {
     }
 
     /**
-     * Sets current playback index to n'th track in current playlist.
-     * @param playlistIndex the n
+     * Method to select specific track by position in playlist.
+     * @param playlistIndex position of track in playlist
      */
     public void skipToIndex(int playlistIndex)
     {
@@ -167,33 +167,37 @@ public class MediaController {
 
     /**
      * Changes the current playlist to the given playlist and recreates the internal shuffle list.
-     * @param playlist
+     * @param playlist to set controller to
      */
     public void setPlaylist(Playlist playlist)
     {
         this.playlist = playlist;
+        //for shuffle mode create random list of integers for order reference
         if (isInShuffleMode())
             createShuffleList();
         this.setCurrentPlaybackIndex(0);
         this.setCurrentMediaplayer();
-        System.out.println("Playlist: " + playlist.getLocation());
     }
 
+    /**
+     * Method to get current playlist of controller
+     * @return playlist currently set in controller
+     */
     public Playlist getPlaylist() {
         return playlist;
     }
 
     /**
      * method to set Mediaplayer in MediaController
-     * @param track from where MediaPlayer objekt is extracted
      */
-    private void setCurrentMediaplayer(Track track)
+    private void setCurrentMediaplayer()
     {
+        Track track = this.playlist.get(this.getCurrentPlaybackIndex());
         //stopping old mediaplayer and cleanup
         if(this.isMediaplayerPresent())
             this.currentMediaplayer.dispose();
         this.setPlaying(false);
-
+        this.resetTrackDuration();
         // setting new mediaplayer and its eventhandler
         try {
             this.currentMediaplayer = track.getTrackMediaPlayer();
@@ -208,13 +212,6 @@ public class MediaController {
     }
 
     private boolean isMediaplayerPresent(){return this.currentMediaplayer != null;}
-
-    private void setCurrentMediaplayer()
-    {
-        this.resetTrackDuration();
-        this.setCurrentMediaplayer(
-                this.playlist.get(this.getCurrentPlaybackIndex()));
-    }
 
     private void rewind()
     {
