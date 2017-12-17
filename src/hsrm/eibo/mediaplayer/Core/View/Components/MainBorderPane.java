@@ -12,7 +12,6 @@ import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -83,69 +82,57 @@ public class MainBorderPane extends BorderPane {
         };
 
         MenuItem openMenuItem = new MenuItem("Öffnen...");
-        openMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Alle Mediendateien",
-                                MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_AUDIO | MediaUtil.FILETYPE_GID_VIDEO)
-                        ),
-                        new FileChooser.ExtensionFilter("Audiodateien", MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_AUDIO)),
-                        new FileChooser.ExtensionFilter("Videodateien", MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_VIDEO))
-                );
-                fileChooser.setTitle("Medium öffnen ...");
-                fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
-                List<File> chosenFiles = fileChooser.showOpenMultipleDialog(null);
-                if(chosenFiles != null)
+        openMenuItem.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Alle Mediendateien",
+                            MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_AUDIO | MediaUtil.FILETYPE_GID_VIDEO)
+                    ),
+                    new FileChooser.ExtensionFilter("Audiodateien", MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_AUDIO)),
+                    new FileChooser.ExtensionFilter("Videodateien", MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_VIDEO))
+            );
+            fileChooser.setTitle("Medium öffnen ...");
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
+            List<File> chosenFiles = fileChooser.showOpenMultipleDialog(null);
+            if(chosenFiles != null)
+            {
+                try {
+                    playlistManager.createPlaylistFromFile(chosenFiles);
+                }catch (PlaylistIOException e)
                 {
-                    try {
-                        playlistManager.createPlaylistFromFile(chosenFiles);
-                    }catch (PlaylistIOException e)
-                    {
-                        // TODO: Make that better... (error modal window..)
-                        System.err.println("ERROR: Error loading files: " + e.getLocalizedMessage());
-                    }
-                    System.out.println(chosenFiles.toString());
+                    // TODO: Make that better... (error modal window..)
+                    System.err.println("ERROR: Error loading files: " + e.getLocalizedMessage());
                 }
-
+                System.out.println(chosenFiles.toString());
             }
+
         });
 
         MenuItem openPlaylistItem = new MenuItem("Playlist öffnen...");
-        openPlaylistItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Unterstützte Playlisten", MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_PLAYLIST))
-                );
-                fileChooser.setTitle("Playlist öffnen ...");
-                fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
-                File chosenFile = fileChooser.showOpenDialog(null);
-                if(chosenFile != null)
-                {
-                    playlistManager.createPlaylistFromFile(chosenFile);
-                    playlistManager.isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
-                        Playlist playlistToAdd;
-                        if (oldValue && !newValue &&
-                                (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
-                        {
-                            controller.setPlaylist(playlistToAdd);
-                        }
-                    });
-                }
+        openPlaylistItem.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Unterstützte Playlisten", MediaUtil.getSupportedFileTypes(MediaUtil.FILETYPE_GID_PLAYLIST))
+            );
+            fileChooser.setTitle("Playlist öffnen ...");
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
+            File chosenFile = fileChooser.showOpenDialog(null);
+            if(chosenFile != null)
+            {
+                playlistManager.createPlaylistFromFile(chosenFile);
+                playlistManager.isLoadingListProperty().addListener((observable, oldValue, newValue) -> {
+                    Playlist playlistToAdd;
+                    if (oldValue && !newValue &&
+                            (playlistToAdd=PlaylistManager.getInstance().getLastAddedPlaylist())!=null)
+                    {
+                        controller.setPlaylist(playlistToAdd);
+                    }
+                });
             }
         });
 
         MenuItem exitMenuItem = new MenuItem("Beenden");
-        exitMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                ths.viewBuilder.handleShutdown();
-            }
-        });
+        exitMenuItem.setOnAction(event -> ths.viewBuilder.handleShutdown());
 
         MenuItem[] fileSubMenu = {
                 openMenuItem,
@@ -155,6 +142,12 @@ public class MainBorderPane extends BorderPane {
         };
 
         menus[0].getItems().addAll(fileSubMenu);
+
+        MenuItem clearPlaylistItem = new MenuItem("Playlist leeren");
+        clearPlaylistItem.setOnAction(event -> {
+            PlaylistManager.getInstance().clear();
+        });
+        menus[2].getItems().addAll(clearPlaylistItem);
 
         if(debugModeEnabled) {
             applyOptionalDebugItems(menus[0]);
@@ -331,9 +324,8 @@ public class MainBorderPane extends BorderPane {
     {
         Button b = new Button("play");
         applyIconToLabeledElement(b, "play"); //initial setting
-        controller.endOfMediaProperty().addListener((observable, oldValue, newValue) -> {
-            controller.setCurrentTime(0);
-        });
+
+        // Change button content on different playing states.
         controller.playingProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue) // is playing
             {
@@ -345,6 +337,7 @@ public class MainBorderPane extends BorderPane {
                 applyIconToLabeledElement(b, "play");
             }
         });
+        // toggle "isPlaying" on click
         b.setOnAction(event -> {
             if(controller.isPlaying())
                 controller.pause();
@@ -394,6 +387,7 @@ public class MainBorderPane extends BorderPane {
     {
         Button b = new Button("volume: ");
         applyIconToLabeledElement(b, "speaker"); //initial setting
+        // Change button content on change of mute property.
         controller.mutedProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue && !newValue)
             {
@@ -441,6 +435,8 @@ public class MainBorderPane extends BorderPane {
     private Label createTimeLabel()
     {
         Label l = new Label("--:--");
+
+        // reset time label on change of track / track duration...
         controller.trackDurationProperty().addListener((observable, oldValue, newValue) -> {
             l.setText("--:--"); //reset text on mediaplayer stop
         });
@@ -461,7 +457,7 @@ public class MainBorderPane extends BorderPane {
     {
         Slider s = new Slider(0,0.1,0);
         s.setDisable(true);
-        // set max Value of Slider
+        // set max Value of Slider on change of current Track
         this.controller.trackDurationProperty().addListener((observable, oldValue, newValue) -> {
             s.setMax(newValue.doubleValue());
 
@@ -496,6 +492,7 @@ public class MainBorderPane extends BorderPane {
     {
         ToggleButton b = new ToggleButton("zufällige Wiedergabe aus");
         applyIconToLabeledElement(b, "unshuffle");
+        // Change Shuffle button content on change of shuffle property ...
         controller.inShuffleModeProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue && !newValue)
             {
@@ -509,9 +506,8 @@ public class MainBorderPane extends BorderPane {
                 applyIconToLabeledElement(b, "shuffle");
             }
         });
-        b.setOnMouseClicked(event -> {
-            controller.setInShuffleMode(!controller.isInShuffleMode());
-        });
+        // Toggle shuffle property on click of button
+        b.setOnMouseClicked(event -> controller.setInShuffleMode(!controller.isInShuffleMode()));
         return b;
     }
 
@@ -524,6 +520,8 @@ public class MainBorderPane extends BorderPane {
     {
         ToggleButton b = new ToggleButton("Keine Wiederholung");
         applyIconToLabeledElement(b, "repeat-none");
+
+        // Change button content on change of repeat mode
         controller.repeatModeProperty().addListener((observable, oldValue,  newValue) -> {
             if (newValue == MediaController.RepeatMode.NONE)
             {
@@ -542,6 +540,8 @@ public class MainBorderPane extends BorderPane {
                 b.setText("track wiederholen");
             }
         });
+
+        // Toggle repeat mode on click on button
         b.setOnMouseClicked(event -> {
             if (controller.getRepeatMode() == MediaController.RepeatMode.NONE)
             {
@@ -580,6 +580,7 @@ public class MainBorderPane extends BorderPane {
     {
         PlaylistTreeView tree = new PlaylistTreeView();
 
+        // Redraw TreeView on change of playlists...
         PlaylistManager.addOnChangeObserver(playlistManager -> {
             // onChange of Playlist
 
@@ -605,6 +606,7 @@ public class MainBorderPane extends BorderPane {
             tree.getRoot().getChildren().add(playlistTreeItem);
         });
 
+        // Change current media on double click on TreeView item
         tree.setOnMouseClicked(event -> {
             if(event.getClickCount() != 2 || tree.getSelectionModel().isEmpty())
                 return;
@@ -623,13 +625,14 @@ public class MainBorderPane extends BorderPane {
             }
         });
 
-        controller.currentPlaybackIndexProperty().addListener(((observable, oldValue, newValue) -> {
+        // Update current TreeView selection on new track
+        controller.currentPlaybackIndexProperty().addListener(((observable, oldValue, newValue) ->
             tree.getSelectionModel().select(
-                    PlaylistManager.getInstance().getAbsoluteIndexForAllPlaylists(
-                            controller.getPlaylist(), newValue.intValue()
-                    )
-            );
-        }));
+                PlaylistManager.getInstance().getAbsoluteIndexForAllPlaylists(
+                        controller.getPlaylist(), newValue.intValue()
+                )
+            )
+        ));
         VBox vbox = new VBox();
         VBox.setVgrow(tree, Priority.ALWAYS);
         vbox.getStyleClass().add("inner-spacing");
