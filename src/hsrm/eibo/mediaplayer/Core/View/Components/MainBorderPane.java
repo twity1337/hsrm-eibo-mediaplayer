@@ -628,11 +628,11 @@ public class MainBorderPane extends BorderPane {
         // Update current TreeView selection on new track
         controller.currentPlaybackIndexProperty().addListener(((observable, oldValue, newValue) ->
             tree.getSelectionModel().select(
-                    PlaylistManager.getInstance().getAbsoluteIndexForAllPlaylists(
-                            controller.getPlaylist(), controller.getCurrentPlaybackIndex()
-                    )
-            );
-        }));
+                PlaylistManager.getInstance().getAbsoluteIndexForAllPlaylists(
+                        controller.getPlaylist(), controller.getCurrentPlaybackIndex()
+                )
+            )
+        ));
         VBox vbox = new VBox();
         VBox.setVgrow(tree, Priority.ALWAYS);
         vbox.getStyleClass().add("inner-spacing");
