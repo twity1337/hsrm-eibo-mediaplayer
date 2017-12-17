@@ -5,31 +5,47 @@ import hsrm.eibo.mediaplayer.Core.Model.Playlist;
 import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.Util.M3uParserTask;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 
 import java.io.File;
 import java.util.*;
 
+/**
+ * PlaylistManager is handling loading playlists from file(s), retaining them for furthrt use,
+ * handing palylists over to other instances and (possibly) saving them to a playlist file.
+ * PlaylistManager is a Singleton.
+ */
 public class PlaylistManager extends ArrayList<Playlist>{
+    /**
+     * name of parsinf plalyist to media file list
+     */
     private static final String M3U_PARSER_THREAD_NAME = "M3U Parser Thread";
+    /**
+     * reference to singleton instances of PlaylistManager
+     */
     private static PlaylistManager instance = new PlaylistManager();
-    private static ObservableList<Playlist> observableInstance = FXCollections.observableArrayList(instance);
+    /**
+     * reference to last added playlist
+     */
     private Playlist lastAddedPlaylist;
-
+    /**
+     * list containing all active observers on PlaylistManager instance;
+     */
     private static ArrayList<PlaylistManagerObserver> observers = new ArrayList<>();
 
+    /**
+     * Method to sign up an Observer object
+     * @param obj observer to notify on change
+     */
     public static void addOnChangeObserver(PlaylistManagerObserver obj)
     {
         observers.add(obj);
     }
-    public static void removeOnChangeObserver(PlaylistManagerObserver obj)
-    {
-        observers.remove(obj);
-    }
 
+    /**
+     * Method to notify all known observers
+     */
     private void notifyOnChangeObservers()
     {
         PlaylistManager ths = this;
