@@ -71,7 +71,7 @@ public class MediaController {
      */
     public void play()
     {
-        if (!this.mediaplayerSet()  || this.currentMediaplayer.getStatus() == MediaPlayer.Status.HALTED)
+        if (!this.isMediaplayerPresent()  || this.currentMediaplayer.getStatus() == MediaPlayer.Status.HALTED)
         {
             return;
         }
@@ -96,7 +96,7 @@ public class MediaController {
      */
     public void pause()
     {
-        if (this.mediaplayerSet())
+        if (this.isMediaplayerPresent())
         {
             this.currentMediaplayer.pause();
             this.setPlaying(false);
@@ -113,7 +113,7 @@ public class MediaController {
      */
     public void skipToNext()
     {
-        if (!mediaplayerSet())
+        if (!isMediaplayerPresent())
             return;
         if (!isEndOfPlaylist())
         {
@@ -135,7 +135,7 @@ public class MediaController {
      */
     public void skipToPrevious()
     {
-        if (!mediaplayerSet())
+        if (!isMediaplayerPresent())
             return;
         if (this.getCurrentPlaybackIndex() >0)
             this.setCurrentPlaybackIndex(this.currentPlaybackIndex.get()-1);
@@ -144,6 +144,10 @@ public class MediaController {
             play();
     }
 
+    /**
+     * Sets current playback index to n'th track in current playlist.
+     * @param playlistIndex the n
+     */
     public void skipToIndex(int playlistIndex)
     {
         this.setCurrentPlaybackIndex(playlistIndex);
@@ -151,16 +155,20 @@ public class MediaController {
     }
 
     /**
-     *
-     * @param time in seconds mediaplayer.currentTime should be set to
+     * Forwards the current mediaplayer to a given amount of seconds.
+     * @param time in seconds the Mediaplayer current time should be set to
      */
     public void seek(double time)
     {
-        if (!this.mediaplayerSet())
+        if (!this.isMediaplayerPresent())
             return;
         this.currentMediaplayer.seek(new Duration(time*1000));
     }
 
+    /**
+     * Changes the current playlist to the given playlist and recreates the internal shuffle list.
+     * @param playlist
+     */
     public void setPlaylist(Playlist playlist)
     {
         this.playlist = playlist;
@@ -182,7 +190,7 @@ public class MediaController {
     private void setCurrentMediaplayer(Track track)
     {
         //stopping old mediaplayer and cleanup
-        if(this.mediaplayerSet())
+        if(this.isMediaplayerPresent())
             this.currentMediaplayer.dispose();
         this.setPlaying(false);
 
@@ -199,7 +207,7 @@ public class MediaController {
         System.out.println("Track: " + track.getLocation());
     }
 
-    private boolean mediaplayerSet(){return this.currentMediaplayer != null;}
+    private boolean isMediaplayerPresent(){return this.currentMediaplayer != null;}
 
     private void setCurrentMediaplayer()
     {
