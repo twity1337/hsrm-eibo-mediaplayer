@@ -53,21 +53,37 @@ public class PlaylistManager extends ArrayList<Playlist>{
         observers.remove(obj);
     }
 
+    /**
+     * notify all known observers
+     */
     private void notifyOnChangeObservers()
     {
         PlaylistManager ths = this;
         observers.forEach(observer -> observer.update(ths));
     }
 
+    /**
+     * Method to access PlaylistManager instance
+     * @return Singleton instance of PlaylistManager
+     */
     public static PlaylistManager getInstance() {
         return instance;
     }
 
+    /**
+     * Constructor private to create only one instance of PlaylistManager
+     */
     private PlaylistManager(){this.isLoadingList = new SimpleBooleanProperty(false);}
 
+    /**
+     * Method to create playlist from playlist file
+     * @see Playlist
+     * @param playlistFile File to load
+     */
     public void createPlaylistFromFile(File playlistFile)
     {
         this.setIsLoadingList(true);
+        //instantiate Parser of playlist file in new thread
         M3uParserTask parser = new M3uParserTask(playlistFile);
         parser.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
@@ -97,6 +113,11 @@ public class PlaylistManager extends ArrayList<Playlist>{
         parserThread.start();
     }
 
+    /**
+     * Method to load playlist with track files as content
+     * @param trackFiles Listr of track files to load
+     * @throws PlaylistIOException on file IO error
+     */
     public void createPlaylistFromFile(List<File> trackFiles) throws PlaylistIOException
     {
         int trackFileSize = trackFiles.size();
@@ -118,10 +139,11 @@ public class PlaylistManager extends ArrayList<Playlist>{
         notifyOnChangeObservers();
     }
 
-    public void savePlaylistToFile(Playlist playlist){
-        //TODO: fill me i'm a stub
-    }
-
+    /**
+     * Method to get playlist by its name
+     * @param name of playlist to return
+     * @return Playlist with given name, null if not existent
+     */
     public Playlist getPlaylist(String name)
     {
         for (Playlist playlist:this){
@@ -131,10 +153,17 @@ public class PlaylistManager extends ArrayList<Playlist>{
         return null;
     }
 
+    /**
+     * method to get reference to last loaded playlist
+     * @return last loaded playlist object
+     */
     public Playlist getLastAddedPlaylist() {
         return lastAddedPlaylist;
     }
 
+    /**
+     * Property to indicate status: true if currently loading a playlist, false if not
+     */
     private SimpleBooleanProperty isLoadingList;
 
     public boolean isIsLoadingList() {
@@ -150,10 +179,10 @@ public class PlaylistManager extends ArrayList<Playlist>{
     }
 
     /**
-     *
-     * @param playlist
-     * @param tracksToAd
-     * @throws PlaylistIOException
+     * Method to add track object(s) to given specific playlist
+     * @param playlist tracks should be added to
+     * @param tracksToAd to add to playlist
+     * @throws PlaylistIOException on media file IO error
      */
     public void addTrackToPlaylist(Playlist playlist, Track...tracksToAd)
             throws PlaylistIOException
@@ -162,6 +191,12 @@ public class PlaylistManager extends ArrayList<Playlist>{
         notifyOnChangeObservers();
     }
 
+    /**
+     *
+     * @param playlist
+     * @param trackIndex
+     * @return
+     */
     public int getAbsoluteIndexForAllPlaylists(Playlist playlist, int trackIndex)
     {
         Playlist[] list = super.toArray(new  Playlist[]{});

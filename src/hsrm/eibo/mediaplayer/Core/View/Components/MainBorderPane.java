@@ -421,7 +421,7 @@ public class MainBorderPane extends BorderPane {
     private ToggleButton createShuffleButton()
     {
         ToggleButton b = new ToggleButton("zufällige Wiedergabe aus");
-        applyIconToLabeledElement(b, "shuffle");
+        applyIconToLabeledElement(b, "unshuffle");
         controller.inShuffleModeProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue && !newValue)
             {
