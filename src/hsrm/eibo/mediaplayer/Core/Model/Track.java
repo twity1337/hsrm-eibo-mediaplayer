@@ -16,7 +16,7 @@ import org.apache.commons.lang.ArrayUtils;
 import java.io.IOException;
 
 /**
- * Track objects contain the Metadata of a media file and the system path to the media file.
+ * Track objects contain the Metadata of a media file and the file path to the media file.
  * On creation metadata will be read in a different thread and published on completing the thread.
  * MediaListElementInterface provides ClassCast safety.
  */
@@ -31,13 +31,13 @@ public class Track implements MediaListElementInterface {
      */
     private Metadata metadata;
     /**
-     * system path to media file
+     * file path to media file
      */
     private String trackPath;
 
     /**
-     * Constructor for Track object expects system path to media file
-     * @param trackPath system path to media file
+     * Constructor for Track object expects file path to media file
+     * @param trackPath file path to media file
      * @throws TrackUnsupportedFileTypeException on encountering unsupported file extension
      */
     public Track(String trackPath) throws IOException, TrackUnsupportedFileTypeException
@@ -77,7 +77,7 @@ public class Track implements MediaListElementInterface {
     /**
      * Method to create javafx.Mediaplayer
      * @return MedaiPlayer containing medai file of track
-     * @throws TrackFileInaccessibleException on file IO operation error containing system path + name of file
+     * @throws TrackFileInaccessibleException on file IO operation error containing file path + name of file
      * @throws TrackUnsupportedFileTypeException on opening unknown/unsuppoerted file type
      */
     public MediaPlayer getTrackMediaPlayer() throws TrackFileInaccessibleException, TrackUnsupportedFileTypeException
@@ -100,16 +100,16 @@ public class Track implements MediaListElementInterface {
     }
 
     /**
-     * Method to return system path of media file (of track).
-     * @return String containing system path of media file
+     * Method to return file path of media file (of track).
+     * @return String containing file path of media file
      */
     public String getLocation() {
         return trackPath;
     }
 
     /**
-     * Method to convert system path to uri
-     * @return system path as uri of media file
+     * Method to convert file path to uri
+     * @return file path as uri of media file
      */
     private String getUri()
     {
