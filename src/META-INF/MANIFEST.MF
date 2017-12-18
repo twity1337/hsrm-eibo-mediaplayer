@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: tika-app-1.16.jar
+Main-Class: hsrm.eibo.mediaplayer.Main
+
