@@ -4,6 +4,7 @@ import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Core.Exception.HasAdditionalInformation;
 import hsrm.eibo.mediaplayer.Core.View.Components.MainBorderPane;
 import hsrm.eibo.mediaplayer.Core.View.Components.NotificationScene;
+import hsrm.eibo.mediaplayer.Game.View.JoinGamePane;
 import hsrm.eibo.mediaplayer.Game.View.NewGamePane;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -153,8 +154,8 @@ public class ViewBuilder implements Observer{
     public void showJoinGameDialog()
     {
         Stage dialog = createDialogStage(300, 500, "Spiel beitreten...");
-//        Scene rootScene = new Scene(new JoinGameDialog(), 300, 500);
-//        dialog.setScene(rootScene);
+        Scene rootScene = new Scene(new JoinGamePane(dialog), 300, 500);
+        dialog.setScene(rootScene);
         dialog.show();
 
     }
