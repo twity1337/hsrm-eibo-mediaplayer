@@ -45,7 +45,7 @@ public abstract class GameOptionPane extends GridPane {
      * Getter for parent stage.
      * @return parentStage
      */
-    public Stage getParentStage() {
+    protected Stage getParentStage() {
         return parentStage;
     }
 
