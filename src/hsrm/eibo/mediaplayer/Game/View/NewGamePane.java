@@ -1,8 +1,7 @@
 package hsrm.eibo.mediaplayer.Game.View;
 
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
-import hsrm.eibo.mediaplayer.Game.Service.KeyboardListenerService;
-import javafx.concurrent.Service;
+import hsrm.eibo.mediaplayer.Game.Controller.GameController;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -21,8 +20,7 @@ public class NewGamePane extends GameOptionPane {
         Button defaultButton = new Button("Spiel erstellen");
         defaultButton.setOnAction(event -> {
             System.out.println("Do stuff...");
-            Service keyboardService = new KeyboardListenerService();
-            keyboardService.start();
+            GameController.getInstance().initialize().startNewGame();
         });
         return defaultButton;
     }
