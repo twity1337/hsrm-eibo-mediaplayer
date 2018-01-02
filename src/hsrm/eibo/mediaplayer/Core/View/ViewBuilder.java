@@ -4,13 +4,10 @@ import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Core.Exception.HasAdditionalInformation;
 import hsrm.eibo.mediaplayer.Core.View.Components.MainBorderPane;
 import hsrm.eibo.mediaplayer.Core.View.Components.NotificationScene;
-import hsrm.eibo.mediaplayer.Game.View.JoinGamePane;
-import hsrm.eibo.mediaplayer.Game.View.NewGamePane;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -138,36 +135,20 @@ public class ViewBuilder implements Observer{
     }
 
     /**
-     * Opens a "new game" dialog with options to set up a new game.
-     */
-    public void showNewGameDialog()
-    {
-        Stage dialog = this.createDialogStage(300, 500, "Neues Spiel erstellen ...");
-        Scene rootScene = new Scene(new NewGamePane(dialog), 300, 500);
-        dialog.setScene(rootScene);
-        dialog.show();
-    }
-
-    /**
-     * Opens a "join game" dialog with options to join an exisiting game.
-     */
-    public void showJoinGameDialog()
-    {
-        Stage dialog = createDialogStage(300, 500, "Spiel beitreten...");
-        Scene rootScene = new Scene(new JoinGamePane(dialog), 300, 500);
-        dialog.setScene(rootScene);
-        dialog.show();
-
-    }
-
-    /**
      * Opens an error dialog with the given error mesasage and exception text.
      * @param message a summary of all occurred errors, listed in this dialog.
      * @param exceptionText A detail message of any occured problem.
      */
     public void showErrorDialog(String message, String exceptionText)
     {
-        Stage dialog = createDialogStage(NOTIFICATION_DIALOG_HEIGHT, NOTIFICATION_DIALOG_WIDTH, "Fehler");
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initOwner(this.primaryStage);
+        dialog.setTitle("Fehler");
+        dialog.setResizable(false);
+        dialog.setHeight(NOTIFICATION_DIALOG_HEIGHT);
+        dialog.setWidth(NOTIFICATION_DIALOG_WIDTH);
+
         NotificationScene scene = new NotificationScene(dialog, NOTIFICATION_DIALOG_WIDTH, NOTIFICATION_DIALOG_HEIGHT);
         scene.setMessage(message);
         if(exceptionText != null)
@@ -220,17 +201,5 @@ public class ViewBuilder implements Observer{
             }
             ths.showErrorDialog(observable.getLastErrorSummary(), errorSummary);
         });
-    }
-
-    @NotNull
-    private Stage createDialogStage(int stageHeight, int stageWidth, String stageTitle) {
-        Stage dialog = new Stage();
-        dialog.initModality(Modality.WINDOW_MODAL);
-        dialog.initOwner(this.primaryStage);
-        dialog.setTitle(stageTitle);
-        dialog.setResizable(false);
-        dialog.setHeight(stageHeight);
-        dialog.setWidth(stageWidth);
-        return dialog;
     }
 }

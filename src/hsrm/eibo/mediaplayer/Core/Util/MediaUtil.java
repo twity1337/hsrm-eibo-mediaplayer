@@ -8,12 +8,12 @@ import java.util.Arrays;
  */
 public class MediaUtil {
 
-    public static final int FILETYPE_GID_AUDIO = 1;
-    public static final int FILETYPE_GID_VIDEO = 1<<1;
-    public static final int FILETYPE_GID_PLAYLIST = 1<<2;
+    public static int FILETYPE_GID_AUDIO = 1;
+    public static int FILETYPE_GID_VIDEO = 1<<1;
+    public static int FILETYPE_GID_PLAYLIST = 1<<2;
 
 
-    private static final String[][] supportedFiletype_managingArray = {
+    private static String[][] supportedFiletype_managingArray = {
         {}, // GID 0 : not used
         {"*.mp3","*.mp4", "*.wav"}, // GID 1 : Audio
         {"*.mp4","*.mkv"}, // GID 2 : Video
