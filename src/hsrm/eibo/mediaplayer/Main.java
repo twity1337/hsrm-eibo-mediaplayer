@@ -2,6 +2,9 @@ package hsrm.eibo.mediaplayer;
 
 import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
+import hsrm.eibo.mediaplayer.Game.Synthesizer.Band;
+import hsrm.eibo.mediaplayer.Game.Synthesizer.BandMember;
+import hsrm.eibo.mediaplayer.Game.Synthesizer.SynthesizerManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -25,6 +28,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        //TESt
+        BandMember bm = new BandMember("p1", SynthesizerManager.getInstance().getInstrumentHashMap().get(1));
+        Band b = Band.getInstance();
+        b.addBandMember(bm.getId(),bm);
+        SynthesizerManager sm = SynthesizerManager.getInstance();
+        sm.occupyChannel(bm.getId());
+        sm.playNote(bm.getId());
+        //
         ViewBuilder.getInstance()
                 .setDebugModeEnabled(DEBUG_MODE_ENABLED)
                 .initPrimaryStage(primaryStage);
