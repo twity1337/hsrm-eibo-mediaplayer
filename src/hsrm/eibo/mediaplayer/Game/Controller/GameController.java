@@ -1,6 +1,9 @@
 package hsrm.eibo.mediaplayer.Game.Controller;
 
-import hsrm.eibo.mediaplayer.Game.Network.SocketHostManager;
+import hsrm.eibo.mediaplayer.Game.Network.Client.SocketClientManager;
+import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
+
+import java.net.InetAddress;
 
 public class GameController {
 
@@ -31,7 +34,15 @@ public class GameController {
     public GameController startNewGame() {
 
         SocketHostManager socketHManager = new SocketHostManager();
-        socketHManager.startServerThread();
+        socketHManager.startP2pServerThread();
+
+        return this;
+    }
+
+    public GameController joinNetworkGame(InetAddress serverAddress) {
+
+        SocketClientManager socketCManager = new SocketClientManager(serverAddress);
+        socketCManager.startClient();
 
         return this;
     }

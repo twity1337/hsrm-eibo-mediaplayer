@@ -4,6 +4,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -11,6 +12,8 @@ public abstract class GameOptionPane extends GridPane {
 
     private Stage parentStage;
     private int lastRowIndex = 0;
+    protected TextField nameField;
+    protected ComboBox<String> instrumentComboBox;
 
     GameOptionPane(Stage parentStage) {
         this.parentStage = parentStage;
@@ -53,16 +56,15 @@ public abstract class GameOptionPane extends GridPane {
      * Initializes all basic components displayed on "new game" dialog.
      */
     private void initBasicPaneComponents() {
-        Label text0 = new Label("Instrument:");
-        ComboBox<String> comboBox0 = new ComboBox<>();
-        comboBox0.getItems().addAll("Klavier", "Gitarre", "Test");
+        Label text0 = new Label("Name:");
+        nameField = new TextField();
 
+        Label text1 = new Label("Instrument:");
+        instrumentComboBox = new ComboBox<>();
+        instrumentComboBox.getItems().addAll("Klavier", "Gitarre", "Test");
 
-        Button okButton = new Button("OK");
-        okButton.setDefaultButton(true);
-        okButton.setOnAction(event -> this.parentStage.close());
-
-        this.appendNewRow(text0,  comboBox0);
+        this.appendNewRow(text0, nameField);
+        this.appendNewRow(text1, instrumentComboBox);
     }
 
     /**

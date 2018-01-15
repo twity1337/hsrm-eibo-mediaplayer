@@ -1,4 +1,4 @@
-package hsrm.eibo.mediaplayer.Game.Network.Thread.Host;
+package hsrm.eibo.mediaplayer.Game.Network.Host.Thread;
 
 import hsrm.eibo.mediaplayer.Game.Network.SocketManager;
 
@@ -12,7 +12,7 @@ public class P2pServerThread extends Thread {
     private int serverPort;
 
     public P2pServerThread(int port) {
-        super("Thread-Game-Host-P2pServer");
+        super("Thread-Game-Thread-P2pServer");
         this.setDaemon(true);
         this.serverPort = port;
     }
@@ -33,7 +33,8 @@ public class P2pServerThread extends Thread {
                 byte[] content = new byte[SocketManager.PACKET_LENGTH];
                 DatagramPacket packet = new DatagramPacket(content, SocketManager.PACKET_LENGTH);
                 socket.receive(packet);
-                System.out.println("Test");
+                System.out.println("~~ package received ~~");
+                System.out.println(new String(packet.getData()));
             } catch (IOException e) {
                 e.printStackTrace();
                 this.interrupt();
