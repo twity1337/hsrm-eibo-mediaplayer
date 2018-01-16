@@ -30,4 +30,8 @@ public class Band extends Observable{
         activeMembers.remove(id);
         this.setChanged();
     }
+
+    public BandMember getBandMemberByID(String id){
+        return this.activeMembers.get(id);
+    }
 }

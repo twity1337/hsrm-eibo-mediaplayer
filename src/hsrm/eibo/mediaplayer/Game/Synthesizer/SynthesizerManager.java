@@ -1,10 +1,6 @@
 package hsrm.eibo.mediaplayer.Game.Synthesizer;
 
-import javax.sound.midi.Instrument;
-import javax.sound.midi.MidiChannel;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Synthesizer;
+import javax.sound.midi.*;
 import java.util.HashMap;
 
 /**
@@ -37,6 +33,7 @@ public class SynthesizerManager {
         int index = 0;
         for (Instrument i : instruments)
         {
+            System.out.println(i.toString());
             map.put(index++,i);
         }
         return map;
@@ -49,13 +46,15 @@ public class SynthesizerManager {
                 i++;
             } else {
                 midiChannels.put(id,synthesizer.getChannels()[i]);
+                midiChannels.get(id).programChange(Band.getInstance().getBandMemberByID(id).getInstrumentBankId());
                 return;
             }
         }
         System.out.println("Maximale Anzahl Spieler erreicht");
     }
     //Testing reasons
-    public void playNote(String id){
-        midiChannels.get(id).noteOn(60,600);
+    public void playNote(String id, BandMember bm){
+            midiChannels.get(id).noteOn(60,600);
+            midiChannels.get(id).noteOn(70,600);
     }
 }

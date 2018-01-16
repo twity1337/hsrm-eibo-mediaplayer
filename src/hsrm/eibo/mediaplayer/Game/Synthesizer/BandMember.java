@@ -10,17 +10,19 @@ import java.util.Observable;
 
 public class BandMember extends Observable{
     private Instrument instrument;
+    private int instrumentBankId;
     private HashSet<Integer> set = new HashSet<>();
     private ObservableSet<Integer> pressedKeys = new ObservableSetWrapper<>(set);
     private String id;
 
-    public BandMember(String id, Instrument i){
+    public BandMember(String id, int instrumentBankId){
         this.id = id;
-        this.instrument = i;
+        this.instrumentBankId = instrumentBankId;
+        this.instrument = SynthesizerManager.getInstance().getInstrumentHashMap().get(instrumentBankId);
     }
 
     public BandMember(String id){
-        this(id, SynthesizerManager.getInstance().getInstrumentHashMap().get(0));
+        this(id, 0);
     }
 
     //add Observerpattern
@@ -46,4 +48,7 @@ public class BandMember extends Observable{
     public String getId() {
         return id;
     }
+
+    public int getInstrumentBankId(){return instrumentBankId;}
+
 }

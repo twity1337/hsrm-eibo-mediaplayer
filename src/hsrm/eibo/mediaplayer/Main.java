@@ -29,12 +29,13 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         //TESt
-        BandMember bm = new BandMember("p1", SynthesizerManager.getInstance().getInstrumentHashMap().get(1));
+        System.out.println(SynthesizerManager.getInstance().getInstrumentHashMap().toString());
+        BandMember bm = new BandMember("p1", 73);
         Band b = Band.getInstance();
         b.addBandMember(bm.getId(),bm);
         SynthesizerManager sm = SynthesizerManager.getInstance();
         sm.occupyChannel(bm.getId());
-        sm.playNote(bm.getId());
+        sm.playNote(bm.getId(),bm);
         //
         ViewBuilder.getInstance()
                 .setDebugModeEnabled(DEBUG_MODE_ENABLED)
