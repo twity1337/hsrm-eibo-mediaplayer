@@ -75,7 +75,11 @@ public class SynthesizerManager { //Service?
     public void playNote(String id, int o){
         if (Keyboard.LAYOUT.containsKey(o))
             midiChannels.get(id).noteOn(calculateNote(Keyboard.LAYOUT.get(o)), BASIC_PITCH);
-        System.out.println(o);
+    }
+
+    public void stopNote(String id, int o){
+        if (Keyboard.LAYOUT.containsKey(o))
+            midiChannels.get(id).noteOff(calculateNote(Keyboard.LAYOUT.get(o)), BASIC_PITCH);
     }
 
     private int calculateNote(int index){

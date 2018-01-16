@@ -37,6 +37,7 @@ public abstract class BandMember{
 
     public void keyReleased(KeyCode k){
         pressedKeys.remove(k);
+        synthInstance.stopNote(this.id,k.ordinal());
     }
 
     public void setInstrumentBankId(int bankId){

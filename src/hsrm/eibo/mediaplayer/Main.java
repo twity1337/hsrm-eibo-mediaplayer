@@ -31,7 +31,7 @@ public class Main extends Application {
         BandMember bm = MyMusician.getInstance();//flute
         GameWindow.getInstance().start();
         bm.setId("p1");
-        bm.setInstrumentBankId(1);
+        bm.setInstrumentBankId(73);
         Band b = Band.getInstance();
         b.addBandMember(bm.getId(),bm);
         SynthesizerManager sm = SynthesizerManager.getInstance();
