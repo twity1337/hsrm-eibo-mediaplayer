@@ -56,7 +56,7 @@ public class P2pClientThread extends Thread {
                     byte[] data = this.dataProcessingQueue.poll();
                     DatagramPacket packet = new DatagramPacket(data, data.length, this.serverAddress, SocketManager.APPLICATION_PORT);
                     socket.send(packet);
-                    System.out.println("~~ package sent ~~");
+                    System.out.println("~~ package sent to " + this.serverAddress.toString() + " ~~");
                 } catch (IOException e) {
                     e.printStackTrace();
                     this.interrupt();

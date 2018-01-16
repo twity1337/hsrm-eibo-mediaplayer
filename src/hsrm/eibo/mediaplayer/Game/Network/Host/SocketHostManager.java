@@ -36,6 +36,7 @@ public class SocketHostManager extends SocketManager {
     public void startP2pServerThread() {
         serverThread = new P2pServerThread(APPLICATION_PORT);
         serverThread.start();
+        System.out.println("Server started at: " + localhost.toString() + " on port " + APPLICATION_PORT + "....");
     }
 
     public void startP2pClientThread()

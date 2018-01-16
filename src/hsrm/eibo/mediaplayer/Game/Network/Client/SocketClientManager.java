@@ -9,10 +9,11 @@ import java.net.UnknownHostException;
 public class SocketClientManager extends SocketManager {
 
     private Thread clientThread, serverThread;
-    private InetAddress localhost;
+    private InetAddress localhost, serverAddress;
 
     public SocketClientManager(InetAddress serverAddress) {
         try {
+            this.serverAddress = serverAddress;
             localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -23,7 +24,7 @@ public class SocketClientManager extends SocketManager {
 
     public void startClient()
     {
-        clientThread = new P2pClientThread(localhost, APPLICATION_PORT);
+        clientThread = new P2pClientThread(this.serverAddress, APPLICATION_PORT);
         clientThread.start();
         ((P2pClientThread)clientThread).pushToProcessingQueue("hello;User with Toaster".getBytes());
     }
