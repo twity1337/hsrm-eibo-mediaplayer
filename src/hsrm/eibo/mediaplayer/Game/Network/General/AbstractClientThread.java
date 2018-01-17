@@ -1,7 +1,5 @@
 package hsrm.eibo.mediaplayer.Game.Network.General;
 
-import org.apache.commons.lang.ArrayUtils;
-
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -31,7 +29,8 @@ public abstract class AbstractClientThread extends Thread {
     public synchronized void pushToProcessingQueue(byte[] data) {
 
         // add timecode prefix to data before checking packet length..
-        byte[] processedData = ArrayUtils.addAll(ArrayUtils.addAll(this.generateTimeCode(), new byte[]{0,0}), data);
+        byte[] processedData = data;
+//        byte[] processedData = ArrayUtils.addAll(ArrayUtils.addAll(this.generateTimeCode(), new byte[]{0,0}), data);
 
         if(processedData.length >= AbstractSocketManager.PACKET_LENGTH)
         {
@@ -60,16 +59,5 @@ public abstract class AbstractClientThread extends Thread {
     protected boolean hasDataToProcess()
     {
         return dataProcessingQueue.isEmpty();
-    }
-
-    private byte[] generateTimeCode()
-    {
-        long currentTime = System.currentTimeMillis();
-        return new byte[] {
-            (byte) (currentTime >> 24),
-            (byte) (currentTime >> 16),
-            (byte) (currentTime >> 8),
-            (byte) currentTime
-        };
     }
 }
