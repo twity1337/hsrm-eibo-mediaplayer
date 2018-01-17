@@ -18,8 +18,8 @@ public class NetworkEventDispatcher {
     };
 
 
-    public byte[] dispatch(NetworkEventType type, byte[] args) {
-        return type.eventHandler.handleRequest(args);
+    public byte[] dispatch(NetworkEventType type, byte[] data) {
+        return type.eventHandler.handleRequest(data);
     }
 
 }

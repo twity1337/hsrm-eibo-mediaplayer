@@ -1,20 +1,17 @@
 package hsrm.eibo.mediaplayer.Game.Network.Host.Thread;
 
-import hsrm.eibo.mediaplayer.Game.Network.SocketManager;
+import hsrm.eibo.mediaplayer.Game.Network.General.AbstractServerThread;
+import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-public class P2pServerThread extends Thread {
-
-    private int serverPort;
+public class P2pServerThread extends AbstractServerThread {
 
     public P2pServerThread(int port) {
-        super("Thread-Game-Thread-P2pServer");
-        this.setDaemon(true);
-        this.serverPort = port;
+        super("Thread-Game-Thread-P2pServer", port);
     }
 
     @Override
@@ -26,15 +23,15 @@ public class P2pServerThread extends Thread {
             e.printStackTrace();
             return;
         }
+        System.out.println("Server successfully started on port " + this.serverPort + " ...");
 
         do
         {
             try {
-                byte[] content = new byte[SocketManager.PACKET_LENGTH];
-                DatagramPacket packet = new DatagramPacket(content, SocketManager.PACKET_LENGTH);
+                byte[] content = new byte[AbstractSocketManager.PACKET_LENGTH];
+                DatagramPacket packet = new DatagramPacket(content, AbstractSocketManager.PACKET_LENGTH);
                 socket.receive(packet);
-                System.out.println("~~ package received ~~");
-                System.out.println(new String(packet.getData()));
+                System.out.println("~~ package received from " + packet.getAddress().toString() + ": " + new String(packet.getData()));
             } catch (IOException e) {
                 e.printStackTrace();
                 this.interrupt();

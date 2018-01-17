@@ -1,14 +1,15 @@
 package hsrm.eibo.mediaplayer.Game.Network.Client;
 
 import hsrm.eibo.mediaplayer.Game.Network.Client.Thread.P2pClientThread;
-import hsrm.eibo.mediaplayer.Game.Network.SocketManager;
+import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class SocketClientManager extends SocketManager {
+public class SocketClientManager extends AbstractSocketManager {
 
-    private Thread clientThread, serverThread;
+    private P2pClientThread clientThread;
+    private Thread serverThread;
     private InetAddress localhost, serverAddress;
 
     public SocketClientManager(InetAddress serverAddress) {
@@ -26,7 +27,8 @@ public class SocketClientManager extends SocketManager {
     {
         clientThread = new P2pClientThread(this.serverAddress, APPLICATION_PORT);
         clientThread.start();
-        ((P2pClientThread)clientThread).pushToProcessingQueue("hello;User with Toaster".getBytes());
-    }
 
+        // initiate connection start..
+        clientThread.pushToProcessingQueue("hello;User with Toaster");
+    }
 }

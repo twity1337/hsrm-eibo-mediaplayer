@@ -32,10 +32,7 @@ public class GameController {
 
 
     public GameController startNewGame() {
-
-        SocketHostManager socketHManager = new SocketHostManager();
-        socketHManager.startP2pServerThread();
-
+        SocketHostManager.getInstance().startP2pServerThread();
         return this;
     }
 

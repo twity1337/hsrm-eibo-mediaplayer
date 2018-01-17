@@ -1,38 +1,17 @@
 package hsrm.eibo.mediaplayer.Game.Network.Client.Thread;
 
-import hsrm.eibo.mediaplayer.Game.Network.SocketManager;
+import hsrm.eibo.mediaplayer.Game.Network.General.AbstractClientThread;
+import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class P2pClientThread extends Thread {
-
-    private int serverPort;
-    private InetAddress serverAddress;
-
-    /**
-     * The processing queue of all commands to process.
-     */
-    private Queue<byte[]> dataProcessingQueue = new ConcurrentLinkedQueue<>();
-
+public class P2pClientThread extends AbstractClientThread {
 
     public P2pClientThread(InetAddress serverAddress, int port) {
-        super("Thread-Game-Thread-P2pClient");
-        serverPort = port;
-        this.serverAddress = serverAddress;
-    }
-
-    public synchronized void pushToProcessingQueue(byte[] data) {
-        if(data.length >= SocketManager.PACKET_LENGTH)
-        {
-            throw new RuntimeException("Length of data parameter is too big. Data must be maximal " + SocketManager.PACKET_LENGTH + " bytes.");
-        }
-        this.dataProcessingQueue.add(data);
+        super("Thread-Game-Thread-P2pClient", port, serverAddress);
     }
 
     @Override
@@ -40,21 +19,16 @@ public class P2pClientThread extends Thread {
 
         // TODO: machen... ;; Bisher nur zum Testen...
 
-        DatagramSocket socket = null;
-        try {
-            socket = new DatagramSocket();
-        } catch (SocketException e) {
-            e.printStackTrace();
-            socket.close();
+        DatagramSocket socket = this.openSocket();
+        if(socket == null)
             return;
-        }
 
         while(!super.isInterrupted())
         {
-            while(!this.dataProcessingQueue.isEmpty()) {
+            while(!this.hasDataToProcess()) {
                 try {
-                    byte[] data = this.dataProcessingQueue.poll();
-                    DatagramPacket packet = new DatagramPacket(data, data.length, this.serverAddress, SocketManager.APPLICATION_PORT);
+                    byte[] data = this.pollDataToProcess();
+                    DatagramPacket packet = new DatagramPacket(data, data.length, this.serverAddress, AbstractSocketManager.APPLICATION_PORT);
                     socket.send(packet);
                     System.out.println("~~ package sent to " + this.serverAddress.toString() + " ~~");
                 } catch (IOException e) {
