@@ -76,7 +76,6 @@ public class MainBorderPane extends BorderPane {
 
         Menu[] menus = {
                 new Menu("Datei"),
-                new Menu("Spiel"),
                 /*
                 new Menu("Wiedergabe"),
                 new Menu("Playlist"),
@@ -146,14 +145,6 @@ public class MainBorderPane extends BorderPane {
         };
 
         menus[0].getItems().addAll(fileSubMenu);
-
-        MenuItem newGameItem = new MenuItem("Neues Spiel...");
-        newGameItem.setOnAction(event -> this.viewBuilder.showNewGameDialog());
-        menus[1].getItems().addAll(newGameItem);
-
-        MenuItem joinGameItem = new MenuItem("Spiel beitreten...");
-        joinGameItem.setOnAction(event -> this.viewBuilder.showJoinGameDialog());
-        menus[1].getItems().addAll(joinGameItem);
 
         if(debugModeEnabled) {
             applyOptionalDebugItems(menus[0]);
