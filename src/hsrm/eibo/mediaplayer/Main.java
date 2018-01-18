@@ -2,7 +2,6 @@ package hsrm.eibo.mediaplayer;
 
 import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
-import hsrm.eibo.mediaplayer.Game.Synthesizer.*;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -26,18 +25,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        //TESt
-        System.out.println(SynthesizerManager.getInstance().getInstrumentHashMap().toString());
-        BandMember bm = MyMusician.getInstance();//flute
-        GameWindow.getInstance().start();
-        bm.setId("p1");
-        bm.setInstrumentBankId(73);
-        Band b = Band.getInstance();
-        b.addBandMember(bm.getId(),bm);
-        SynthesizerManager sm = SynthesizerManager.getInstance();
-        sm.occupyChannel(bm.getId());
-        //sm.playNote(bm.getId(),bm);
-        //
         ViewBuilder.getInstance()
                 .setDebugModeEnabled(DEBUG_MODE_ENABLED)
                 .initPrimaryStage(primaryStage);
