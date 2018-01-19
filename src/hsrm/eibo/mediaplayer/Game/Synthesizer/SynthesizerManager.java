@@ -1,12 +1,11 @@
 package hsrm.eibo.mediaplayer.Game.Synthesizer;
 
 import javax.sound.midi.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * class to observe {@link BandMember}'s and play instruments accordingly
+ * class to play instruments accordingly
  */
 public class SynthesizerManager { //Service?
     public final static int BASIC_C_NOTE = 60;//? sollte tiefes c sein
@@ -68,18 +67,18 @@ public class SynthesizerManager { //Service?
     }
 /*    //Testing reasons
     public void playNote(String id){
-            midiChannels.get(id).noteOn(calculateNote(Keyboard.LAYOUT.get()),600);
-            midiChannels.get(id).noteOn(calculateNote(Keyboard.LAYOUT.indexOf("a")),600);
+            midiChannels.get(id).noteOn(calculateNote(Keyboard.ORDINAL_LAYOUT.get()),600);
+            midiChannels.get(id).noteOn(calculateNote(Keyboard.ORDINAL_LAYOUT.indexOf("a")),600);
     }*/
 
     public void playNote(String id, int o){
-        if (Keyboard.LAYOUT.containsKey(o))
-            midiChannels.get(id).noteOn(calculateNote(Keyboard.LAYOUT.get(o)), BASIC_PITCH);
+        if (Keyboard.ORDINAL_LAYOUT.containsKey(o))
+            midiChannels.get(id).noteOn(calculateNote(Keyboard.ORDINAL_LAYOUT.get(o)), BASIC_PITCH);
     }
 
     public void stopNote(String id, int o){
-        if (Keyboard.LAYOUT.containsKey(o))
-            midiChannels.get(id).noteOff(calculateNote(Keyboard.LAYOUT.get(o)), BASIC_PITCH);
+        if (Keyboard.ORDINAL_LAYOUT.containsKey(o))
+            midiChannels.get(id).noteOff(calculateNote(Keyboard.ORDINAL_LAYOUT.get(o)), BASIC_PITCH);
     }
 
     private int calculateNote(int index){

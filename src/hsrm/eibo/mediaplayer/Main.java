@@ -6,6 +6,8 @@ import hsrm.eibo.mediaplayer.Game.Synthesizer.*;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import javax.sound.sampled.TargetDataLine;
+
 /**
  * @author Marc Lucas Pflueger
  * @author Tim Wissmann
@@ -28,15 +30,14 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         //TESt
         System.out.println(SynthesizerManager.getInstance().getInstrumentHashMap().toString());
-        BandMember bm = MyMusician.getInstance();//flute
+        BandMember bm = MyMusician.getInstance();
         GameWindow.getInstance().start();
         bm.setId("p1");
-        bm.setInstrumentBankId(73);
+        bm.setInstrumentBankId(73);//flute
         Band b = Band.getInstance();
         b.addBandMember(bm.getId(),bm);
         SynthesizerManager sm = SynthesizerManager.getInstance();
         sm.occupyChannel(bm.getId());
-        //sm.playNote(bm.getId(),bm);
         //
         ViewBuilder.getInstance()
                 .setDebugModeEnabled(DEBUG_MODE_ENABLED)

@@ -25,6 +25,7 @@ public class GameWindow {
 
     public void start(){
         Group game = new Group();
+        game.getChildren().add(KeyboardPane.getPianoKeyboard());
         Scene scene = new Scene(game, 200,200);
         gameStage.setTitle("Game");
         gameStage.setScene(scene);

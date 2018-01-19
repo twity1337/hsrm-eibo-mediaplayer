@@ -1,13 +1,9 @@
 package hsrm.eibo.mediaplayer.Game.Synthesizer;
 
-import com.sun.javafx.collections.ObservableSetWrapper;
-import javafx.collections.ObservableSet;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
 import javax.sound.midi.Instrument;
 import java.util.HashSet;
-import java.util.Observable;
 
 public abstract class BandMember{
     private Instrument instrument;
@@ -19,14 +15,6 @@ public abstract class BandMember{
     public BandMember() {
         synthInstance = SynthesizerManager.getInstance();
     }
-
- /*   public void addPressedKeys(KeyCode k){
-        pressedKeys.add(Keyboard.LAYOUT.indexOf(k));
-    }
-
-    public void removePressedKey(KeyCode k){
-        pressedKeys.remove(Keyboard.LAYOUT.indexOf(k.getCharacter()));
-    }*/
 
     public void keyPressed(KeyCode k){
         if (pressedKeys.contains(k))
