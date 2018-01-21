@@ -1,5 +1,7 @@
 package hsrm.eibo.mediaplayer.Game.View;
 
+import hsrm.eibo.mediaplayer.Game.Model.GameSettings;
+import hsrm.eibo.mediaplayer.Game.Model.InstrumentSelectionModel;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -10,13 +12,13 @@ import javafx.stage.Stage;
 
 public abstract class GameOptionPane extends GridPane {
 
-    private Stage parentStage;
+    private Stage parentWindow;
     private int lastRowIndex = 0;
     protected TextField nameField;
-    protected ComboBox<String> instrumentComboBox;
+    protected ComboBox<InstrumentSelectionModel> instrumentComboBox;
 
-    GameOptionPane(Stage parentStage) {
-        this.parentStage = parentStage;
+    GameOptionPane(Stage parentWindow) {
+        this.parentWindow = parentWindow;
         initBasicPaneComponents();
         initAdditionalComponents();
         completeBeforeRendering();
@@ -34,6 +36,13 @@ public abstract class GameOptionPane extends GridPane {
      */
     protected abstract void initAdditionalComponents();
 
+
+    /**
+     * Method which extends the given GameSettings with values from additional components, if necessary.
+     * @param gameSettings the game settings which were set through the basic components so far.
+     */
+    protected void updateGameSettingsByAdditionalValues(GameSettings gameSettings) {}
+
     /**
      * Adds a new row of Node objects to the underlying GridPane.
      * Respects the current index of existing rows.
@@ -46,10 +55,23 @@ public abstract class GameOptionPane extends GridPane {
 
     /**
      * Getter for parent stage.
-     * @return parentStage
+     * @return parentWindow
      */
-    protected Stage getParentStage() {
-        return parentStage;
+    protected Stage getParentWindow() {
+        return parentWindow;
+    }
+
+    /**
+     * Getter for the filled game settings of values from option pane.
+     * @return The defined game settings.
+     */
+    protected GameSettings getPreparedGameSettings()
+    {
+        GameSettings settings = new GameSettings();
+
+        this.setBasicGameSettingValues(settings);
+        this.updateGameSettingsByAdditionalValues(settings);
+        return settings;
     }
 
     /**
@@ -61,10 +83,23 @@ public abstract class GameOptionPane extends GridPane {
 
         Label text1 = new Label("Instrument:");
         instrumentComboBox = new ComboBox<>();
-        instrumentComboBox.getItems().addAll("Klavier", "Gitarre", "Test");
+        instrumentComboBox.getItems().addAll(
+                new InstrumentSelectionModel("Klavier", 0),
+                new InstrumentSelectionModel("Gitarre", 1),
+                new InstrumentSelectionModel("Test", 2)
+        );
+        instrumentComboBox.getSelectionModel().select(0);
 
         this.appendNewRow(text0, nameField);
         this.appendNewRow(text1, instrumentComboBox);
+    }
+
+    private void setBasicGameSettingValues(GameSettings settings)
+    {
+        settings.setPlayerName(nameField.getText());
+        InstrumentSelectionModel instrument = instrumentComboBox.getSelectionModel().getSelectedItem();
+        settings.setInstrumentTitle(instrument.getTitle());
+        settings.setInstrumentId(instrument.getInstrumentId());
     }
 
     /**
@@ -73,7 +108,7 @@ public abstract class GameOptionPane extends GridPane {
     private void completeBeforeRendering() {
         Button cancelButton = new Button("Abbrechen");
         cancelButton.setCancelButton(true);
-        cancelButton.setOnAction(event -> this.parentStage.close());
+        cancelButton.setOnAction(event -> this.parentWindow.close());
 
         Button defaultAction = getDefaultButton();
         defaultAction.setDefaultButton(true);

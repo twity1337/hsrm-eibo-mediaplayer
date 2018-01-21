@@ -22,8 +22,9 @@ public class JoinGamePane extends GameOptionPane {
     protected Button getDefaultButton() {
         Button defaultButton = new Button("Spiel beitreten");
         defaultButton.setOnAction(event -> {
-            System.out.println("Do stuff...");
+            GameController.setGameSettings(this.getPreparedGameSettings());
             GameController.getInstance().initialize().joinNetworkGame(extractServerIpAdress());
+            this.getParentWindow().close();
         });
 
         return defaultButton;
@@ -48,4 +49,6 @@ public class JoinGamePane extends GameOptionPane {
         }
         return serverAdress;
     }
+
+
 }

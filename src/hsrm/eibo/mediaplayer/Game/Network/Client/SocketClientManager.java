@@ -31,4 +31,8 @@ public class SocketClientManager extends AbstractSocketManager {
         // initiate connection start..
         clientThread.pushToProcessingQueue("hello;User with Toaster");
     }
+
+    public void close() {
+        clientThread.interrupt();
+    }
 }

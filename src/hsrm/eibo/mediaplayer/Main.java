@@ -18,7 +18,7 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
-    private static final boolean DEBUG_MODE_ENABLED = false;
+    private static final boolean DEBUG_MODE_ENABLED = true;
 
     public static void main(String[] args) {
             launch(args);

@@ -1,5 +1,6 @@
 package hsrm.eibo.mediaplayer.Game.Network.Host.Thread;
 
+import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractServerThread;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
 
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 public class P2pServerThread extends AbstractServerThread {
 
@@ -19,8 +21,9 @@ public class P2pServerThread extends AbstractServerThread {
         DatagramSocket socket;
         try {
             socket = new DatagramSocket(this.serverPort);
+            socket.setSoTimeout(SO_TIMEOUT);
         } catch (SocketException e) {
-            e.printStackTrace();
+            ErrorHandler.getInstance().addError(e);
             return;
         }
         System.out.println("Server successfully started on port " + this.serverPort + " ...");
@@ -32,6 +35,9 @@ public class P2pServerThread extends AbstractServerThread {
                 DatagramPacket packet = new DatagramPacket(content, AbstractSocketManager.PACKET_LENGTH);
                 socket.receive(packet);
                 System.out.println("~~ package received from " + packet.getAddress().toString() + ": " + new String(packet.getData()));
+            } catch (SocketTimeoutException e)
+            {
+                // do nothing on SocketTimeout - just don't get stuck in loop...
             } catch (IOException e) {
                 e.printStackTrace();
                 this.interrupt();
@@ -39,5 +45,6 @@ public class P2pServerThread extends AbstractServerThread {
             }
         } while(!super.isInterrupted());
         socket.close();
+        System.out.println("Server socket closed");
     }
 }

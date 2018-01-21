@@ -23,6 +23,12 @@ public class SocketHostManager extends AbstractSocketManager {
      * Singleton instance
      */
     private static SocketHostManager instance = new SocketHostManager();
+
+    /**
+     * A boolean, indicating if a server is running.
+     */
+    private boolean running = false;
+
     public static SocketHostManager getInstance() {return instance;}
 
     private SocketHostManager() {
@@ -32,6 +38,14 @@ public class SocketHostManager extends AbstractSocketManager {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Getter for running field.
+     * @return
+     */
+    public boolean isRunning() {
+        return running;
     }
 
     /**
@@ -59,13 +73,25 @@ public class SocketHostManager extends AbstractSocketManager {
         return connectedClientAdresses;
     }
 
+    /**
+     * Starts the peer to peer server.
+     */
     public void startP2pServerThread() {
+        running = true;
         serverThread = new P2pServerThread(APPLICATION_PORT);
         serverThread.start();
     }
 
     public void startP2pClientThread()
     {
+        running = true;
         clientThread = new P2pClientThread(localhost, APPLICATION_PORT);
+    }
+
+    public void close() {
+        if(serverThread != null)
+            serverThread.interrupt();
+        if(clientThread != null)
+            clientThread.interrupt();
     }
 }
