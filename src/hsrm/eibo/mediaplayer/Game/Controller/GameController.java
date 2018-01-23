@@ -1,6 +1,8 @@
 package hsrm.eibo.mediaplayer.Game.Controller;
 
 import hsrm.eibo.mediaplayer.Game.Network.SocketHostManager;
+import hsrm.eibo.mediaplayer.Game.Synthesizer.GameWindow;
+import hsrm.eibo.mediaplayer.Game.Synthesizer.Keyboard;
 
 public class GameController {
 
@@ -23,6 +25,9 @@ public class GameController {
          * - Initializing network service
          * - etc...
         */
+
+        Keyboard.init();
+        GameWindow.getInstance().start();
 
         return this;
     }
