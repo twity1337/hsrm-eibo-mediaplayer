@@ -17,16 +17,6 @@ public class NetworkEventDispatcher {
             this.id = (byte) id;
             this.eventHandler = eventHandler;
         }
-
-        public byte getId() {
-            return id;
-        }
-
-        public static NetworkEventType getEnumById(byte value) {
-            for(NetworkEventType v : values())
-                if(v.getId() == value) return v;
-            throw new IllegalArgumentException();
-        }
     };
 
 
