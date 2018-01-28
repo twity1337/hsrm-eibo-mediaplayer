@@ -5,20 +5,32 @@ import hsrm.eibo.mediaplayer.Game.Network.Host.Event.Handler.*;
 public class NetworkEventDispatcher {
 
     public enum NetworkEventType {
-        EVENT_HELLO(new NewClientHandler()),
-        EVENT_GOODBYE(new DisconnectClientHandler()),
-        EVENT_PING(new PingHandler()),
-        EVENT_NOTE(new PlayNoteHandler());
+        EVENT_HELLO(0x0, new NewClientHandler()),
+        EVENT_GOODBYE(0x1, new DisconnectClientHandler()),
+        EVENT_PING(0x2, new PingHandler()),
+        EVENT_NOTE(0x3, new PlayNoteHandler());
+        byte id;
         NetworkEventHandlerInterface eventHandler;
 
-        NetworkEventType(NetworkEventHandlerInterface eventHandler)
+        NetworkEventType(int id, NetworkEventHandlerInterface eventHandler)
         {
+            this.id = (byte) id;
             this.eventHandler = eventHandler;
+        }
+
+        public byte getId() {
+            return id;
+        }
+
+        public static NetworkEventType getEnumById(byte value) {
+            for(NetworkEventType v : values())
+                if(v.getId() == value) return v;
+            throw new IllegalArgumentException();
         }
     };
 
 
-    public byte[] dispatch(NetworkEventType type, byte[] data) {
+    public static byte[] dispatch(NetworkEventType type, byte[] data) {
         return type.eventHandler.handleRequest(data);
     }
 

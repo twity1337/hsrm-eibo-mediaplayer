@@ -2,12 +2,19 @@ package hsrm.eibo.mediaplayer.Game.Network.General.Model;
 
 import hsrm.eibo.mediaplayer.Game.Network.Host.Event.NetworkEventDispatcher;
 
-public class NetworkEventPacket {
+import java.io.Serializable;
+
+/**
+ * A serializable Packet object for sending packages over network protocols.
+ */
+public class NetworkEventPacket implements Serializable{
+
+    private static final long serialVersionUID = -2908104199930149826L;
 
     /**
-     * The last 4 bytes of current milliseconds
+     * ID of senderId; 0 is serverclient
      */
-    private int timecode = 0;
+    private byte senderId = 0;
 
     /**
      * Second segment of the data packet representing the network event.
@@ -22,48 +29,37 @@ public class NetworkEventPacket {
 
     /**
      * Generates a NetworkEventPacket out of given parameters.
-     * @param timecode
+     *
      * @param eventType
      * @param eventArgs
      */
-    public NetworkEventPacket(int timecode, NetworkEventDispatcher.NetworkEventType eventType, String[] eventArgs) {
-        this.timecode = timecode;
+    public NetworkEventPacket(byte senderId, NetworkEventDispatcher.NetworkEventType eventType, String[] eventArgs) {
+        this.senderId = senderId;
         this.eventType = eventType;
         this.eventArgs = eventArgs;
     }
 
     /**
-     * Generates a NetworkEventPacket out of a byte array.
-     * @param packetData
+     * Getter for eventType
+     * @return
      */
-    public NetworkEventPacket(byte[] packetData) {
-
-    }
-
-    public int getTimecode() {
-        return timecode;
-    }
-
     public NetworkEventDispatcher.NetworkEventType getEventType() {
         return eventType;
     }
 
+    /**
+     * Getter for eventArgs
+     * @return
+     */
     public String[] getEventArgs() {
         return eventArgs;
     }
 
-    public byte[] toBytes() {
-        return null;
-    }
-
-    private byte[] generateTimeCode()
-    {
-        long currentTime = System.currentTimeMillis();
-        return new byte[] {
-                (byte) (currentTime >> 24),
-                (byte) (currentTime >> 16),
-                (byte) (currentTime >> 8),
-                (byte) currentTime
-        };
+    /**
+     * Getter for Sender id
+     * @return
+     */
+    public byte getSenderId() {
+        return senderId;
     }
 }
