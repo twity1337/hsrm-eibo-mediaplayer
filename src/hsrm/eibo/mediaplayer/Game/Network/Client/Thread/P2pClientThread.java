@@ -1,5 +1,6 @@
 package hsrm.eibo.mediaplayer.Game.Network.Client.Thread;
 
+import hsrm.eibo.mediaplayer.Game.Controller.GameManager;
 import hsrm.eibo.mediaplayer.Game.Network.Client.SocketClientManager;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractClientThread;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
@@ -49,7 +50,7 @@ public class P2pClientThread extends AbstractClientThread {
 
         }
         byte[] data = SerializationUtils.serialize(new NetworkEventPacket(
-                SocketClientManager.getInstance().getCurrentSenderId(),
+                GameManager.getGameSettings().getPlayerName(),
                 NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_GOODBYE
         ));
         DatagramPacket packet = new DatagramPacket(data, data.length, this.serverAddress, AbstractSocketManager.APPLICATION_PORT);

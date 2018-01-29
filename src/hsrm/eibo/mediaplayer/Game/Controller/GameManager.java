@@ -4,8 +4,11 @@ import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.Game.Model.GameSettings;
 import hsrm.eibo.mediaplayer.Game.Network.Client.SocketClientManager;
+import hsrm.eibo.mediaplayer.Game.Network.Client.Thread.P2pClientThread;
+import hsrm.eibo.mediaplayer.Game.Network.General.Event.NetworkEventDispatcher;
+import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
 import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
-import javafx.scene.Group;
+import hsrm.eibo.mediaplayer.Game.Synthesizer.*;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -15,7 +18,7 @@ import javafx.stage.WindowEvent;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class GameController {
+public class GameManager {
 
     /**
      * The Game title displayed in game main window.
@@ -27,17 +30,17 @@ public class GameController {
      */
     private static GameSettings gameSettings = null;
 
-    private static GameController instance = new GameController();
+    private static GameManager instance = new GameManager();
     private Stage mainGameWindow;
     private SocketClientManager socketClientManager;
 
-    private GameController(){}
-    public static GameController getInstance() {
+    private GameManager(){}
+    public static GameManager getInstance() {
         return instance;
     }
 
     public static void setGameSettings(GameSettings gameSettings) {
-        GameController.gameSettings = gameSettings;
+        GameManager.gameSettings = gameSettings;
     }
 
     public static GameSettings getGameSettings() {
@@ -48,7 +51,7 @@ public class GameController {
      * Sets up all requirements for the game mode extension.
      * @return fluent interface
      */
-    public GameController initialize()
+    public GameManager initialize()
     {
         /* Use this method to set up all requirements for the game mode.
          * Examples are:
@@ -59,9 +62,22 @@ public class GameController {
         */
 
         if(gameSettings == null)
-            throw new RuntimeException("No game settings were set. GameSettings has to be set for successful GameController initialization.");
+            throw new RuntimeException("No game settings were set. GameSettings has to be set for successful GameManager initialization.");
+
+
+//        GameWindow.getInstance().start();
+//        MyMusician client = MyMusician.getInstance();
+//        client.setId(gameSettings.getPlayerName());
+//        client.setInstrumentBankId(2); // TODO:
+//        Band b = Band.getInstance();
+//        b.addBandMember(client);
+//        SynthesizerManager sm = SynthesizerManager.getInstance();
+//        sm.occupyChannel(client.getId());
+
+
 
         this.initGameWindow();
+        this.initMidiPiano();
 
         return this;
     }
@@ -71,16 +87,15 @@ public class GameController {
      * Handles all functionality for hosting a new network game.
      * @return fluent interface
      */
-    public GameController hostNewGame() {
+    public GameManager hostNewGame() {
         SocketHostManager.getInstance().startP2pServerThread();
 
         try {
-            socketClientManager = SocketClientManager.getInstance(InetAddress.getLocalHost());
+            this.joinNetworkGame(InetAddress.getLocalHost());
         } catch (UnknownHostException e) {
             ErrorHandler.getInstance().addError(e);
             ErrorHandler.getInstance().notifyErrorObserver("Fehler beim Hosten des Spiels");
         }
-        socketClientManager.startClient();
         return this;
     }
 
@@ -89,10 +104,14 @@ public class GameController {
      * @param serverAddress the InetAdress of the server located in the network.
      * @return fluent interface
      */
-    public GameController joinNetworkGame(InetAddress serverAddress) {
+    public GameManager joinNetworkGame(InetAddress serverAddress) {
 
         socketClientManager = SocketClientManager.getInstance(serverAddress);
         socketClientManager.startClient();
+
+
+        P2pClientThread clientThread = this.socketClientManager.getClientThread();
+        clientThread.pushToProcessingQueue(new NetworkEventPacket(gameSettings.getPlayerName(), NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_NOTE, new int[]{60}));
 
         return this;
     }
@@ -105,7 +124,7 @@ public class GameController {
         mainGameWindow = new Stage(StageStyle.UTILITY);
         mainGameWindow.initModality(Modality.WINDOW_MODAL);
         mainGameWindow.initOwner(ViewBuilder.getInstance().getPrimaryStage());
-        Scene scene = new Scene(new Group(), 200,200);
+        Scene scene = new Scene(Keyboard.createKeyboardPane(), 200,200);
         mainGameWindow.setTitle(GAME_WINDOW_TITLE);
         mainGameWindow.setScene(scene);
         mainGameWindow.setOnCloseRequest(this::handleGameCloseRequest);
@@ -113,6 +132,14 @@ public class GameController {
 
         mainGameWindow.show();
     }
+
+    /**
+     * Initializes the content of the Keyboard and synthesizers classes
+     */
+    private void initMidiPiano() {
+        Keyboard.init();
+    }
+
 
     /**
      * Calls all functions that should be run on close of game.

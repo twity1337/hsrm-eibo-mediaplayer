@@ -13,8 +13,9 @@ public class SynthesizerManager {
 
     private static SynthesizerManager instance = new SynthesizerManager();
     private Synthesizer synthesizer;
-    private Map<String,MidiChannel> midiChannels;
+    private Map<String,MidiChannel> midiChannelKeyMap;
     private int maxMidiChannels;
+    private final MidiChannel[] synthesizerChannels;
 
     public static SynthesizerManager getInstance() {
         return instance;
@@ -28,7 +29,9 @@ public class SynthesizerManager {
             e.printStackTrace();
         }
         maxMidiChannels = synthesizer.getChannels().length;
-        midiChannels = new HashMap<>(maxMidiChannels);
+        midiChannelKeyMap = new HashMap<>(maxMidiChannels);
+        synthesizerChannels = synthesizer.getChannels();
+
         Keyboard.init();
     }
 
@@ -51,29 +54,29 @@ public class SynthesizerManager {
             map.put(index++, i);
         return map;
     }
-    //on BandMemberHashMap change
-    public void occupyChannel(String id){
+
+    public void occupyChannel(String channelKey, int instrumentId){
         for (int i=0; i < maxMidiChannels; i++)
         {
-            if (midiChannels.containsValue(synthesizer.getChannels()[i])){
+            if (midiChannelKeyMap.containsValue(synthesizerChannels[i])){
                 i++;
             } else {
-                midiChannels.put(id,synthesizer.getChannels()[i]);
-                midiChannels.get(id).programChange(Band.getInstance().getBandMemberByID(id).getInstrumentBankId());
+                synthesizerChannels[i].programChange(instrumentId);
+                midiChannelKeyMap.put(channelKey,synthesizerChannels[i]);
                 return;
             }
         }
         System.out.println("Maximale Anzahl Spieler erreicht");
     }
 
-    public void playNote(String id, int o){
-        if (Keyboard.ORDINAL_LAYOUT.containsKey(o))
-            midiChannels.get(id).noteOn(calculateNote(Keyboard.ORDINAL_LAYOUT.get(o)), BASIC_PITCH);
+    public void playNote(String channelKey, int ordinalNote){
+        if (Keyboard.ORDINAL_LAYOUT.containsKey(ordinalNote))
+            midiChannelKeyMap.get(channelKey).noteOn(calculateNote(Keyboard.ORDINAL_LAYOUT.get(ordinalNote)), BASIC_PITCH);
     }
 
-    public void stopNote(String id, int o){
-        if (Keyboard.ORDINAL_LAYOUT.containsKey(o))
-            midiChannels.get(id).noteOff(calculateNote(Keyboard.ORDINAL_LAYOUT.get(o)), BASIC_PITCH);
+    public void stopNote(String channelKey, int ordinalNote){
+        if (Keyboard.ORDINAL_LAYOUT.containsKey(ordinalNote))
+            midiChannelKeyMap.get(channelKey).noteOff(calculateNote(Keyboard.ORDINAL_LAYOUT.get(ordinalNote)), BASIC_PITCH);
     }
 
     private int calculateNote(int index){

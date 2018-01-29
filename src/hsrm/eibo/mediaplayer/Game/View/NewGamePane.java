@@ -1,7 +1,7 @@
 package hsrm.eibo.mediaplayer.Game.View;
 
 import hsrm.eibo.mediaplayer.Core.Util.MediaUtil;
-import hsrm.eibo.mediaplayer.Game.Controller.GameController;
+import hsrm.eibo.mediaplayer.Game.Controller.GameManager;
 import hsrm.eibo.mediaplayer.Game.Model.GameSettings;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -24,8 +24,8 @@ public class NewGamePane extends GameOptionPane {
     protected Button getDefaultButton() {
         Button defaultButton = new Button("Spiel erstellen");
         defaultButton.setOnAction(event -> {
-            GameController.setGameSettings(this.getPreparedGameSettings());
-            GameController.getInstance().initialize().hostNewGame();
+            GameManager.setGameSettings(this.getPreparedGameSettings());
+            GameManager.getInstance().initialize().hostNewGame();
             this.getParentWindow().close();
         });
         return defaultButton;

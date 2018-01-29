@@ -13,9 +13,9 @@ public class NetworkEventPacket implements Serializable{
     private static final long serialVersionUID = -2908104199930149826L;
 
     /**
-     * ID of senderId; 0 is serverclient
+     * Username of sender
      */
-    private byte senderId = 0;
+    private String sender = "";
 
     /**
      * Second segment of the data packet representing the network event.
@@ -24,9 +24,9 @@ public class NetworkEventPacket implements Serializable{
 
     /**
      * Third segment of the data packet.
-     * An array with all string arguments followed by event type.
+     * An array with all arguments followed by event type.
      */
-    private String[] eventArgs;
+    private int[] eventArgs;
 
     /**
      * Remote InetAdress of packet sender. Is set after the packet has been received.
@@ -39,19 +39,19 @@ public class NetworkEventPacket implements Serializable{
      * @param eventType
      * @param eventArgs
      */
-    public NetworkEventPacket(byte senderId, NetworkEventDispatcher.NetworkEventType eventType, String[] eventArgs) {
-        this.senderId = senderId;
+    public NetworkEventPacket(String sender, NetworkEventDispatcher.NetworkEventType eventType, int[] eventArgs) {
+        this.sender = sender;
         this.eventType = eventType;
         this.eventArgs = eventArgs;
     }
 
     /**
      * Minimalistic constructor
-     * @param senderId
+     * @param sender
      * @param eventType
      */
-    public NetworkEventPacket(byte senderId, NetworkEventDispatcher.NetworkEventType eventType) {
-        this(senderId, eventType, new String[]{});
+    public NetworkEventPacket(String sender, NetworkEventDispatcher.NetworkEventType eventType) {
+        this(sender, eventType, new int[]{});
     }
 
     /**
@@ -66,16 +66,16 @@ public class NetworkEventPacket implements Serializable{
      * Getter for eventArgs
      * @return
      */
-    public String[] getEventArgs() {
+    public int[] getEventArgs() {
         return eventArgs;
     }
 
     /**
-     * Getter for Sender id
+     * Getter for Sendername
      * @return
      */
-    public byte getSenderId() {
-        return senderId;
+    public String getSenderName() {
+        return sender;
     }
 
     public InetAddress getRemoteIpAdress() {

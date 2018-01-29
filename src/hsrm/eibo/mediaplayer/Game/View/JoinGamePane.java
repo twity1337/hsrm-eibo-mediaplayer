@@ -1,7 +1,7 @@
 package hsrm.eibo.mediaplayer.Game.View;
 
 import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
-import hsrm.eibo.mediaplayer.Game.Controller.GameController;
+import hsrm.eibo.mediaplayer.Game.Controller.GameManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -22,8 +22,8 @@ public class JoinGamePane extends GameOptionPane {
     protected Button getDefaultButton() {
         Button defaultButton = new Button("Spiel beitreten");
         defaultButton.setOnAction(event -> {
-            GameController.setGameSettings(this.getPreparedGameSettings());
-            GameController.getInstance().initialize().joinNetworkGame(extractServerIpAdress());
+            GameManager.setGameSettings(this.getPreparedGameSettings());
+            GameManager.getInstance().initialize().joinNetworkGame(extractServerIpAdress());
             this.getParentWindow().close();
         });
 

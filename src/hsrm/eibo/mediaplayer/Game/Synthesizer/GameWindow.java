@@ -13,7 +13,6 @@ public class GameWindow {
     private static GameWindow ourInstance = new GameWindow();
     private Stage gameStage;
     private KeyboardListener listenerInstance;
-    private BandMember myMusician;
 
     public static GameWindow getInstance() {
         return ourInstance;
@@ -22,12 +21,10 @@ public class GameWindow {
     private GameWindow() {
         gameStage = new Stage();
         listenerInstance = KeyboardListener.getInstance();
-        myMusician = MyMusician.getInstance();
     }
 
     public void start(){
         Group game = new Group();
-        game.getChildren().add(Keyboard.createKeyboardPane(new Observable() {         @Override            public void addListener(InvalidationListener listener) {            }            @Override            public void removeListener(InvalidationListener listener) {            }      }));
         game.autosize();
         Scene scene = new Scene(game);
         gameStage.setTitle("Game");
@@ -44,14 +41,14 @@ public class GameWindow {
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                myMusician.keyPressed(event.getCode());
+               // myMusician.keyPressed(event.getCode());
             }
         });
 
         scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                myMusician.keyReleased(event.getCode());
+                // myMusician.keyReleased(event.getCode());
             }
         });
     }

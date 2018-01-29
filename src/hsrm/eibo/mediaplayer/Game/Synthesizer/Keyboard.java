@@ -33,7 +33,7 @@ public class Keyboard {
         }
     }
 
-    public static Pane createKeyboardPane(Observable pressedKeys){
+    public static Pane createKeyboardPane(){
         StackPane sPane = new StackPane();
         HBox whiteKeyboard = createWhiteKeyboard();
         HBox blackKeyboard = createBlackKeyboard();

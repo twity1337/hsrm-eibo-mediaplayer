@@ -1,6 +1,6 @@
 package hsrm.eibo.mediaplayer.Game.Network.Client;
 
-import hsrm.eibo.mediaplayer.Game.Controller.GameController;
+import hsrm.eibo.mediaplayer.Game.Controller.GameManager;
 import hsrm.eibo.mediaplayer.Game.Model.GameSettings;
 import hsrm.eibo.mediaplayer.Game.Network.Client.Thread.P2pClientThread;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
@@ -44,19 +44,17 @@ public class SocketClientManager extends AbstractSocketManager {
         clientThread.start();
 
         // initiate connection start..
-        GameSettings gSettings = GameController.getGameSettings();
+        GameSettings gSettings = GameManager.getGameSettings();
         NetworkEventPacket helloPacket = new NetworkEventPacket(
-                getCurrentSenderId(),
+                GameManager.getGameSettings().getPlayerName(),
                 NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_HELLO,
-                new String[]{
-                        gSettings.getPlayerName(),
-                        Integer.toString(gSettings.getInstrumentId())
-                });
+                new int[]{gSettings.getInstrumentId()}
+            );
         P2pClientThread.pushToProcessingQueue(helloPacket);
     }
 
-    public byte getCurrentSenderId() {
-        return 1;
+    public P2pClientThread getClientThread() {
+        return this.clientThread;
     }
 
     public void close() {
