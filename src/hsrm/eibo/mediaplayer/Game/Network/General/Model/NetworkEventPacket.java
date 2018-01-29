@@ -1,18 +1,26 @@
 package hsrm.eibo.mediaplayer.Game.Network.General.Model;
 
-import hsrm.eibo.mediaplayer.Game.Network.Host.Event.NetworkEventDispatcher;
+import hsrm.eibo.mediaplayer.Game.Network.General.Event.NetworkEventDispatcher;
 
-public class NetworkEventPacket {
+import java.io.Serializable;
+import java.net.InetAddress;
+
+/**
+ * A serializable Packet object for sending packages over network protocols.
+ */
+public class NetworkEventPacket implements Serializable{
+
+    private static final long serialVersionUID = -2908104199930149826L;
 
     /**
-     * The last 4 bytes of current milliseconds
+     * ID of senderId; 0 is serverclient
      */
-    private int timecode = 0;
+    private byte senderId = 0;
 
     /**
      * Second segment of the data packet representing the network event.
      */
-    private NetworkEventDispatcher.NetworkEventType eventType = null;
+    private NetworkEventDispatcher.NetworkEventType eventType;
 
     /**
      * Third segment of the data packet.
@@ -21,49 +29,60 @@ public class NetworkEventPacket {
     private String[] eventArgs;
 
     /**
+     * Remote InetAdress of packet sender. Is set after the packet has been received.
+     */
+    private transient InetAddress remoteIpAdress;
+
+    /**
      * Generates a NetworkEventPacket out of given parameters.
-     * @param timecode
+     *
      * @param eventType
      * @param eventArgs
      */
-    public NetworkEventPacket(int timecode, NetworkEventDispatcher.NetworkEventType eventType, String[] eventArgs) {
-        this.timecode = timecode;
+    public NetworkEventPacket(byte senderId, NetworkEventDispatcher.NetworkEventType eventType, String[] eventArgs) {
+        this.senderId = senderId;
         this.eventType = eventType;
         this.eventArgs = eventArgs;
     }
 
     /**
-     * Generates a NetworkEventPacket out of a byte array.
-     * @param packetData
+     * Minimalistic constructor
+     * @param senderId
+     * @param eventType
      */
-    public NetworkEventPacket(byte[] packetData) {
-
+    public NetworkEventPacket(byte senderId, NetworkEventDispatcher.NetworkEventType eventType) {
+        this(senderId, eventType, new String[]{});
     }
 
-    public int getTimecode() {
-        return timecode;
-    }
-
+    /**
+     * Getter for eventType
+     * @return
+     */
     public NetworkEventDispatcher.NetworkEventType getEventType() {
         return eventType;
     }
 
+    /**
+     * Getter for eventArgs
+     * @return
+     */
     public String[] getEventArgs() {
         return eventArgs;
     }
 
-    public byte[] toBytes() {
-        return null;
+    /**
+     * Getter for Sender id
+     * @return
+     */
+    public byte getSenderId() {
+        return senderId;
     }
 
-    private byte[] generateTimeCode()
-    {
-        long currentTime = System.currentTimeMillis();
-        return new byte[] {
-                (byte) (currentTime >> 24),
-                (byte) (currentTime >> 16),
-                (byte) (currentTime >> 8),
-                (byte) currentTime
-        };
+    public InetAddress getRemoteIpAdress() {
+        return remoteIpAdress;
+    }
+
+    public void setRemoteIpAdress(InetAddress remoteIpAdress) {
+        this.remoteIpAdress = remoteIpAdress;
     }
 }

@@ -2,10 +2,9 @@ package hsrm.eibo.mediaplayer.Game.Network.Host.Thread;
 
 import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractServerThread;
-import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
+import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -31,10 +30,9 @@ public class P2pServerThread extends AbstractServerThread {
         do
         {
             try {
-                byte[] content = new byte[AbstractSocketManager.PACKET_LENGTH];
-                DatagramPacket packet = new DatagramPacket(content, AbstractSocketManager.PACKET_LENGTH);
-                socket.receive(packet);
-                System.out.println("~~ package received from " + packet.getAddress().toString() + ": " + new String(packet.getData()));
+                    NetworkEventPacket response = this.receiveAndHandleNetworkPacket(socket);
+                    if(response != null)
+                        P2pClientThread.pushToProcessingQueue(response);
             } catch (SocketTimeoutException e)
             {
                 // do nothing on SocketTimeout - just don't get stuck in loop...

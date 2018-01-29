@@ -40,6 +40,10 @@ public class GameController {
         GameController.gameSettings = gameSettings;
     }
 
+    public static GameSettings getGameSettings() {
+        return gameSettings;
+    }
+
     /**
      * Sets up all requirements for the game mode extension.
      * @return fluent interface
@@ -71,7 +75,7 @@ public class GameController {
         SocketHostManager.getInstance().startP2pServerThread();
 
         try {
-            socketClientManager = new SocketClientManager(InetAddress.getLocalHost());
+            socketClientManager = SocketClientManager.getInstance(InetAddress.getLocalHost());
         } catch (UnknownHostException e) {
             ErrorHandler.getInstance().addError(e);
             ErrorHandler.getInstance().notifyErrorObserver("Fehler beim Hosten des Spiels");
@@ -87,7 +91,7 @@ public class GameController {
      */
     public GameController joinNetworkGame(InetAddress serverAddress) {
 
-        socketClientManager = new SocketClientManager(serverAddress);
+        socketClientManager = SocketClientManager.getInstance(serverAddress);
         socketClientManager.startClient();
 
         return this;
