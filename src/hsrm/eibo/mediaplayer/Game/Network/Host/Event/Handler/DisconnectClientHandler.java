@@ -1,11 +1,15 @@
 package hsrm.eibo.mediaplayer.Game.Network.Host.Event.Handler;
 
+import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
+import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
+
 public class DisconnectClientHandler implements NetworkEventHandlerInterface {
 
 
     @Override
-    public byte[] handleRequest(Object args) {
-
-        return new byte[0];
+    public NetworkEventPacket handleRequest(NetworkEventPacket packet) {
+        SocketHostManager.getInstance().removeConnectedClient(packet.getRemoteIpAdress());
+        System.out.println("Player disconnected.");
+        return null;
     }
 }

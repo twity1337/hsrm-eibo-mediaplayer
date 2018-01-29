@@ -1,5 +1,8 @@
 package hsrm.eibo.mediaplayer.Game.Network.General;
 
+import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
+import org.apache.commons.lang.SerializationUtils;
+
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -13,7 +16,7 @@ public abstract class AbstractClientThread extends Thread {
     /**
      * The processing queue of all commands to process.
      */
-    private Queue<byte[]> dataProcessingQueue = new ConcurrentLinkedQueue<>();
+    private static Queue<byte[]> dataProcessingQueue = new ConcurrentLinkedQueue<>();
 
     public AbstractClientThread(String threadName, int port, InetAddress address) {
         super(threadName);
@@ -21,22 +24,16 @@ public abstract class AbstractClientThread extends Thread {
         serverAddress = address;
     }
 
-
-    public synchronized void pushToProcessingQueue(String data) {
-        pushToProcessingQueue(data.getBytes());
-    }
-
-    public synchronized void pushToProcessingQueue(byte[] data) {
+    public static synchronized void pushToProcessingQueue(NetworkEventPacket packet) {
 
         // add timecode prefix to data before checking packet length..
-        byte[] processedData = data;
-//        byte[] processedData = ArrayUtils.addAll(ArrayUtils.addAll(this.generateTimeCode(), new byte[]{0,0}), data);
+        byte[] data = SerializationUtils.serialize(packet);
 
-        if(processedData.length >= AbstractSocketManager.PACKET_LENGTH)
+        if(data.length >= AbstractSocketManager.PACKET_LENGTH)
         {
             throw new RuntimeException("Length of data parameter is too big. Data must be maximal " + (AbstractSocketManager.PACKET_LENGTH-6) + " bytes.");
         }
-        this.dataProcessingQueue.add(processedData);
+        dataProcessingQueue.add(data);
     }
 
     protected DatagramSocket openSocket()
