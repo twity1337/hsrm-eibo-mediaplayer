@@ -85,8 +85,9 @@ public abstract class GameOptionPane extends GridPane {
         instrumentComboBox = new ComboBox<>();
         instrumentComboBox.getItems().addAll(
                 new InstrumentSelectionModel("Klavier", 0),
-                new InstrumentSelectionModel("Gitarre", 1),
-                new InstrumentSelectionModel("Test", 2)
+                new InstrumentSelectionModel("Gitarre", 105),
+                new InstrumentSelectionModel("Helicopter", 125),
+                new InstrumentSelectionModel("Orgel", 17)
         );
         instrumentComboBox.getSelectionModel().select(0);
 

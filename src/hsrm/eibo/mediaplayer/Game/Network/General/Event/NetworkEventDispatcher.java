@@ -13,7 +13,8 @@ public class NetworkEventDispatcher  {
         EVENT_CLIENT_HELLO(new NewClientHandler()),
         EVENT_CLIENT_GOODBYE(new DisconnectClientHandler()),
         EVENT_CLIENT_PING(new PingHandler()),
-        EVENT_CLIENT_NOTE(new PlayNoteHandler());
+        EVENT_CLIENT_PLAY_NOTE(new PlayNoteHandler()),
+        EVENT_CLIENT_STOP_NOTE(new StopNoteHandler());
         NetworkEventHandlerInterface eventHandler;
 
         NetworkEventType(NetworkEventHandlerInterface eventHandler)
@@ -25,10 +26,9 @@ public class NetworkEventDispatcher  {
     /**
      * Dispatches an incoming network request and sends returns it network answer as NetworkEventPacket
      * @param packet the packet to dispatch
-     * @return the resonse of the incoming request.
      */
-    public static NetworkEventPacket dispatch(NetworkEventPacket packet) {
-        return packet.getEventType().eventHandler.handleRequest(packet);
+    public static void dispatch(NetworkEventPacket packet) {
+        packet.getEventType().eventHandler.handleRequest(packet);
     }
 
 }

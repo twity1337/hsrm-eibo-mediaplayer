@@ -31,8 +31,6 @@ public class SynthesizerManager {
         maxMidiChannels = synthesizer.getChannels().length;
         midiChannelKeyMap = new HashMap<>(maxMidiChannels);
         synthesizerChannels = synthesizer.getChannels();
-
-        Keyboard.init();
     }
 
     public Map<Integer,Instrument> getInstrumentHashMap(){
@@ -69,14 +67,22 @@ public class SynthesizerManager {
         System.out.println("Maximale Anzahl Spieler erreicht");
     }
 
+    /**
+     *
+     * @param channelKey name of player as String
+     * @param ordinalNote is a integer representation of pressed key on a (hardware) keyboard
+     */
     public void playNote(String channelKey, int ordinalNote){
-        if (Keyboard.ORDINAL_LAYOUT.containsKey(ordinalNote))
-            midiChannelKeyMap.get(channelKey).noteOn(calculateNote(Keyboard.ORDINAL_LAYOUT.get(ordinalNote)), BASIC_PITCH);
+        midiChannelKeyMap.get(channelKey).noteOn(ordinalNote, BASIC_PITCH);
     }
 
+    /**
+     *
+     * @param channelKey name of player as String
+     * @param ordinalNote is a integer representation of pressed key on a (hardware) keyboard
+     */
     public void stopNote(String channelKey, int ordinalNote){
-        if (Keyboard.ORDINAL_LAYOUT.containsKey(ordinalNote))
-            midiChannelKeyMap.get(channelKey).noteOff(calculateNote(Keyboard.ORDINAL_LAYOUT.get(ordinalNote)), BASIC_PITCH);
+        midiChannelKeyMap.get(channelKey).noteOff(ordinalNote, BASIC_PITCH);
     }
 
     private int calculateNote(int index){

@@ -26,6 +26,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        //TODO: entfernen
+        System.out.println(SynthesizerManager.getInstance().getInstrumentHashMap().toString());
 
         ViewBuilder.getInstance()
                 .setDebugModeEnabled(DEBUG_MODE_ENABLED)

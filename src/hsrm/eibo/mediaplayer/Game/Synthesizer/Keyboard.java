@@ -1,12 +1,13 @@
 package hsrm.eibo.mediaplayer.Game.Synthesizer;
 
-import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,22 +17,15 @@ public class Keyboard {
     // Taste a = Ton c (violin Schlüssel 1. Hilfslinie), Halbtonschritte
     public static final Map<Integer,Integer> ORDINAL_LAYOUT = new HashMap<>();
     public static final String[] KEYNAMES_PIANO = new String[]{"C","Cis/Des","D","Dis/Es","E","","F","Fis/Ges","G","Gis/As","A","Ais/b","H","","C","Cis/Des","D","Dis/Es","E","","F","Fis/Ges","G","Gis/As","A","Ais/b","H","","C","Cis/Des","D","Dis/Es","E"};
-    public static final String[] KEYBOARD_KEYNAMES = new String[]{"Y","S","X","D","C","","V","G","B","H","N","J","M","","Q","2","W","3","E","","R","5","T","6","Z","7","U","","I","9","O","0","P"};
+    public static final String[] KEYBOARD_KEYNAMES = new String[]{"Y","S","X","D","C","V","G","B","H","N","J","M","Q","2","W","3","E","R","5","T","6","Z","7","U","I","9","O","0","P"};
     public static final int NR_OF_WHITE_KEYS = 17;
     public static final int NR_OF_BLACK_KEYS = 12;
     public final static int BASIC_C_NOTE = 60;
+
     private final static double BLACK_KEY_SIZE_FACTOR = 0.7;
     private final static int DEFAULT_KEY_HIGHT = 200;
     private final static int DEFAULT_KEY_WIDTH = 50;
-    private static int[] ordinalLayout = new int[]{60,54,59,39,38,57,42,37,43,49,45,48,52,26,58,27,40,53,29,55,30,61,31,56,44,33,50,24,51};//"ysxdcvgbhnjmq2w3er5t6zui9o0p";
-
-    public static void init(){
-        int i=0;
-        for (int o : ordinalLayout){
-            ORDINAL_LAYOUT.put(ordinalLayout[i],i);
-            i++;
-        }
-    }
+    public static final int KEY_NOT_ASSIGNED = -1;
 
     public static Pane createKeyboardPane(){
         StackPane sPane = new StackPane();
@@ -41,21 +35,39 @@ public class Keyboard {
         return sPane;
     }
 
+    public static int getKeyboardWidth(){return DEFAULT_KEY_WIDTH*NR_OF_WHITE_KEYS;}
+
+    public static int getKeyboardHeight(){return DEFAULT_KEY_HIGHT;}
+
+    public static int getNotePitchFromKeyevent(KeyEvent event){
+        String key = event.getCode().getName().toUpperCase();
+        int index;
+        if((index = ArrayUtils.indexOf(KEYBOARD_KEYNAMES, key))== ArrayUtils.INDEX_NOT_FOUND)
+            return KEY_NOT_ASSIGNED;
+        return BASIC_C_NOTE + index;
+    }
+
     private static HBox createWhiteKeyboard() {
         HBox wBoard = new HBox();
         wBoard.setMinWidth(DEFAULT_KEY_WIDTH*NR_OF_WHITE_KEYS);
         wBoard.setMinHeight(DEFAULT_KEY_HIGHT);
-        for (int i = 0; i < KEYBOARD_KEYNAMES.length ; i++)
+        int index = 0;
+        for (int i = 0; i < KEYNAMES_PIANO.length ; i++)
         {
             if (i%2 != 0)
+            {
+                if (KEYNAMES_PIANO[i].length() != 0)
+                    index++;
                 continue; // überspringe Zwischenräume
-            Canvas c = createImageWhiteKey(KEYBOARD_KEYNAMES[i]);
+            }
+            Canvas c = createImageWhiteKey(KEYBOARD_KEYNAMES[index]);
             int note = calculateNote(i);
             KeyboardKey whiteK = new KeyboardKey(note);
             whiteK.setMinWidth(DEFAULT_KEY_WIDTH);
             whiteK.setMinHeight(DEFAULT_KEY_HIGHT);
             whiteK.getChildren().add(c);
             wBoard.getChildren().add(whiteK);
+            index++;
         }
         return wBoard;
     }
@@ -69,20 +81,27 @@ public class Keyboard {
         HBox padding = new HBox();
         padding.setMinWidth(DEFAULT_KEY_WIDTH-DEFAULT_KEY_WIDTH*BLACK_KEY_SIZE_FACTOR);
         bBoard.getChildren().add(padding);
-
-        for (int i = 0; i < KEYBOARD_KEYNAMES.length ; i++)
+        int index = 0;
+        for (int i = 0; i < KEYNAMES_PIANO.length ; i++)
         {
-            if (i%2 == 0)
-                continue; // überspringe Ganztöne
+            if (i%2 == 0)  // überspringe Ganztöne
+            {
+                if (KEYNAMES_PIANO[i].length() == 0)
+                    continue;
+                index++;
+                continue;
+            }
 
-            Canvas c = createImageBlackKey(KEYBOARD_KEYNAMES[i]);
+            Canvas c = createImageBlackKey(KEYBOARD_KEYNAMES[index]);
             int note = calculateNote(i);
             KeyboardKey blackK = new KeyboardKey(note);
 
-            if (KEYBOARD_KEYNAMES[i].length()==0)
+            if (KEYNAMES_PIANO[i].length()==0) // überspringe halb Tontasten die nicht da sind
             {
                 blackK.setMouseTransparent(true);
                 c = new Canvas();
+            } else {
+                index++;
             }
             blackK.setMinWidth(DEFAULT_KEY_WIDTH*BLACK_KEY_SIZE_FACTOR);
             blackK.setMinHeight(DEFAULT_KEY_HIGHT*BLACK_KEY_SIZE_FACTOR);

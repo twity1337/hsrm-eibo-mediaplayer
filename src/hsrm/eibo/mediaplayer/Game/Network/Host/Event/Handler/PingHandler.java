@@ -6,7 +6,7 @@ public class PingHandler implements NetworkEventHandlerInterface {
 
 
     @Override
-    public NetworkEventPacket handleRequest(NetworkEventPacket packet) {
-        return null;
+    public void handleRequest(NetworkEventPacket packet) {
+
     }
 }

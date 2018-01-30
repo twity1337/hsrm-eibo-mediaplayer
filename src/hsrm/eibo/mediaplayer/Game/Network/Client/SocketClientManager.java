@@ -50,7 +50,7 @@ public class SocketClientManager extends AbstractSocketManager {
                 NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_HELLO,
                 new int[]{gSettings.getInstrumentId()}
             );
-        P2pClientThread.pushToProcessingQueue(helloPacket);
+        clientThread.pushToProcessingQueue(helloPacket);
     }
 
     public P2pClientThread getClientThread() {

@@ -9,7 +9,9 @@ import hsrm.eibo.mediaplayer.Game.Network.General.Event.NetworkEventDispatcher;
 import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
 import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
 import hsrm.eibo.mediaplayer.Game.Synthesizer.*;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -17,6 +19,8 @@ import javafx.stage.WindowEvent;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GameManager {
 
@@ -33,8 +37,9 @@ public class GameManager {
     private static GameManager instance = new GameManager();
     private Stage mainGameWindow;
     private SocketClientManager socketClientManager;
-
+    private P2pClientThread clientThread;
     private GameManager(){}
+    private Set<Integer> pressedKeys = new HashSet<>();
     public static GameManager getInstance() {
         return instance;
     }
@@ -77,7 +82,6 @@ public class GameManager {
 
 
         this.initGameWindow();
-        this.initMidiPiano();
 
         return this;
     }
@@ -108,11 +112,7 @@ public class GameManager {
 
         socketClientManager = SocketClientManager.getInstance(serverAddress);
         socketClientManager.startClient();
-
-
-        P2pClientThread clientThread = this.socketClientManager.getClientThread();
-        clientThread.pushToProcessingQueue(new NetworkEventPacket(gameSettings.getPlayerName(), NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_NOTE, new int[]{60}));
-
+        clientThread = this.socketClientManager.getClientThread();
         return this;
     }
 
@@ -124,22 +124,45 @@ public class GameManager {
         mainGameWindow = new Stage(StageStyle.UTILITY);
         mainGameWindow.initModality(Modality.WINDOW_MODAL);
         mainGameWindow.initOwner(ViewBuilder.getInstance().getPrimaryStage());
-        Scene scene = new Scene(Keyboard.createKeyboardPane(), 200,200);
+        Scene scene = new Scene(Keyboard.createKeyboardPane(), Keyboard.getKeyboardWidth()+20,Keyboard.getKeyboardHeight()+20);
         mainGameWindow.setTitle(GAME_WINDOW_TITLE);
         mainGameWindow.setScene(scene);
         mainGameWindow.setOnCloseRequest(this::handleGameCloseRequest);
 
+        initKeyboardListener(scene);
 
         mainGameWindow.show();
     }
 
-    /**
-     * Initializes the content of the Keyboard and synthesizers classes
-     */
-    private void initMidiPiano() {
-        Keyboard.init();
-    }
+    private void initKeyboardListener(Scene scene) {
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                int pitch;
+                if((pitch = Keyboard.getNotePitchFromKeyevent(event)) != Keyboard.KEY_NOT_ASSIGNED && !pressedKeys.contains(pitch)) {
+                    NetworkEventPacket p = new NetworkEventPacket(gameSettings.getPlayerName(),
+                            NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_PLAY_NOTE,
+                            new int[]{pitch});
+                    clientThread.pushToProcessingQueue(p);
+                    pressedKeys.add(pitch);
+                }
+            }
+        });
 
+        scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                int pitch;
+                if((pitch = Keyboard.getNotePitchFromKeyevent(event)) != Keyboard.KEY_NOT_ASSIGNED) {
+                    NetworkEventPacket p = new NetworkEventPacket(gameSettings.getPlayerName(),
+                            NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_STOP_NOTE,
+                            new int[]{pitch});
+                    clientThread.pushToProcessingQueue(p);
+                    pressedKeys.remove(pitch);
+                }
+            }
+        });
+    }
 
     /**
      * Calls all functions that should be run on close of game.

@@ -7,9 +7,8 @@ public class DisconnectClientHandler implements NetworkEventHandlerInterface {
 
 
     @Override
-    public NetworkEventPacket handleRequest(NetworkEventPacket packet) {
+    public void handleRequest(NetworkEventPacket packet) {
         SocketHostManager.getInstance().removeConnectedClient(packet.getRemoteIpAdress());
         System.out.println("Player disconnected.");
-        return null;
     }
 }

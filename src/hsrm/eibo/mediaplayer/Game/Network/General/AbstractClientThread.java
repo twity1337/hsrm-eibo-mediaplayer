@@ -24,7 +24,7 @@ public abstract class AbstractClientThread extends Thread {
         serverAddress = address;
     }
 
-    public static synchronized void pushToProcessingQueue(NetworkEventPacket packet) {
+    public synchronized void pushToProcessingQueue(NetworkEventPacket packet) {
 
         // add timecode prefix to data before checking packet length..
         byte[] data = SerializationUtils.serialize(packet);

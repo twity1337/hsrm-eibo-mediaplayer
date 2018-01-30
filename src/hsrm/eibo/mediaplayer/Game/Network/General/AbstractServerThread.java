@@ -18,15 +18,15 @@ public abstract class AbstractServerThread extends Thread {
         this.serverPort = port;
     }
 
-    protected NetworkEventPacket receiveAndHandleNetworkPacket(DatagramSocket socket) throws IOException {
+    protected void receiveAndHandleNetworkPacket(DatagramSocket socket) throws IOException {
         DatagramPacket datagramPacket = new DatagramPacket(new byte[AbstractSocketManager.PACKET_LENGTH], AbstractSocketManager.PACKET_LENGTH);
         socket.receive(datagramPacket);
         System.out.println("~~ [" + this.getClass().getName() + "] package received from " + datagramPacket.getAddress().toString());
         Object deserializedPacket = SerializationUtils.deserialize(datagramPacket.getData());
         if (deserializedPacket instanceof NetworkEventPacket){
             ((NetworkEventPacket) deserializedPacket).setRemoteIpAdress(datagramPacket.getAddress());
-            return NetworkEventDispatcher.dispatch((NetworkEventPacket) deserializedPacket);
+            NetworkEventDispatcher.dispatch((NetworkEventPacket) deserializedPacket);
+            return;
         }
-        return null;
     }
 }

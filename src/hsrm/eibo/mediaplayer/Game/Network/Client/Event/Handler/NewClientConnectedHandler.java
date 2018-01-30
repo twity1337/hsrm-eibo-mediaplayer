@@ -7,9 +7,8 @@ public class NewClientConnectedHandler implements NetworkEventHandlerInterface {
 
 
     @Override
-    public NetworkEventPacket handleRequest(NetworkEventPacket packet) {
+    public void handleRequest(NetworkEventPacket packet) {
 
         System.out.println(packet.getEventArgs()[0] + " joined the game.");
-        return null;
     }
 }

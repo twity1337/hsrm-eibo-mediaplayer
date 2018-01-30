@@ -9,11 +9,10 @@ public class NewClientHandler implements NetworkEventHandlerInterface {
 
 
     @Override
-    public NetworkEventPacket handleRequest(NetworkEventPacket packet) {
+    public void handleRequest(NetworkEventPacket packet) {
 
         SocketHostManager.getInstance().addConnectedClient(packet.getRemoteIpAdress());
         System.out.println("Hello " + packet.getSenderName());
         SynthesizerManager.getInstance().occupyChannel(packet.getSenderName(), packet.getEventArgs()[0]);
-        return new NetworkEventPacket("Server", NetworkEventDispatcher.NetworkEventType.EVENT_SERVER_HELLO, packet.getEventArgs());
-}
+    }
 }

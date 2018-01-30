@@ -30,9 +30,7 @@ public class P2pServerThread extends AbstractServerThread {
         do
         {
             try {
-                    NetworkEventPacket response = this.receiveAndHandleNetworkPacket(socket);
-                    if(response != null)
-                        P2pClientThread.pushToProcessingQueue(response);
+                    this.receiveAndHandleNetworkPacket(socket);
             } catch (SocketTimeoutException e)
             {
                 // do nothing on SocketTimeout - just don't get stuck in loop...
