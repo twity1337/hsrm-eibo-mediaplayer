@@ -9,6 +9,7 @@ import hsrm.eibo.mediaplayer.Game.Network.General.Event.NetworkEventDispatcher;
 import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
 import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
 import hsrm.eibo.mediaplayer.Game.Synthesizer.*;
+import hsrm.eibo.mediaplayer.Game.View.HostGamePane;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
@@ -35,7 +36,7 @@ public class GameManager {
     private static GameSettings gameSettings = null;
 
     private static GameManager instance = new GameManager();
-    private Stage mainGameWindow;
+    private Stage mainGameWindow, hostWindow;
     private SocketClientManager socketClientManager;
     private P2pClientThread clientThread;
     private GameManager(){}
@@ -100,6 +101,8 @@ public class GameManager {
             ErrorHandler.getInstance().addError(e);
             ErrorHandler.getInstance().notifyErrorObserver("Fehler beim Hosten des Spiels");
         }
+
+        this.createHostWindow();
         return this;
     }
 
@@ -132,6 +135,16 @@ public class GameManager {
         initKeyboardListener(scene);
 
         mainGameWindow.show();
+    }
+
+    private void createHostWindow() {
+        hostWindow = new Stage(StageStyle.UNDECORATED);
+        hostWindow.initModality(Modality.NONE);
+        hostWindow.initOwner(mainGameWindow);
+        Scene scene = new Scene(new HostGamePane());
+        hostWindow.setScene(scene);
+
+        hostWindow.show();
     }
 
     private void initKeyboardListener(Scene scene) {
