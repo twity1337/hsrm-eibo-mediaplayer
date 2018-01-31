@@ -26,7 +26,7 @@ public class P2pClientThread extends AbstractClientThread {
                 try {
                     InetAddress[] connectedClients = SocketHostManager
                             .getInstance()
-                            .getConnectedClientAddresses();
+                            .getConnectedClientList().getAll();
                     for (InetAddress clientAddress : connectedClients) {
                         DatagramPacket packet = new DatagramPacket(this.pollDataToProcess(), AbstractSocketManager.PACKET_LENGTH, clientAddress, AbstractSocketManager.APPLICATION_PORT);
                         socket.send(packet);

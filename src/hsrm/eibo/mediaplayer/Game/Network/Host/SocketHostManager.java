@@ -1,29 +1,20 @@
 package hsrm.eibo.mediaplayer.Game.Network.Host;
 
-import hsrm.eibo.mediaplayer.Game.Model.BandMember;
+import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
+import hsrm.eibo.mediaplayer.Game.Network.General.ObservableConnectedClientList;
 import hsrm.eibo.mediaplayer.Game.Network.Host.Thread.P2pClientThread;
 import hsrm.eibo.mediaplayer.Game.Network.Host.Thread.P2pServerThread;
-import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
-public class SocketHostManager extends AbstractSocketManager {
+public class SocketHostManager extends AbstractSocketManager{
 
     private Thread clientThread, serverThread;
     private InetAddress localhost;
 
 
-    /**
-     * An array list of connected clients for broadcast messages.
-     */
-    private ArrayList<BandMember> connectedClients = new ArrayList<>();
-
-    /**
-     * All connected client InetAddress-objects
-     */
-    private InetAddress[] connectedClientAddresses = null;
+    private ObservableConnectedClientList connectedClients = new ObservableConnectedClientList();
 
     /**
      * Singleton instance
@@ -58,49 +49,11 @@ public class SocketHostManager extends AbstractSocketManager {
     }
 
     /**
-     * Adds a new connected client.
-     *
-     * @param client The client to add.
-     */
-    public void addConnectedClient(BandMember client) {
-        this.connectedClientAddresses = null; // invalidate cached connectedClients on change
-        this.connectedClients.add(client);
-    }
-
-    /**
-     * Removes / Disconnects a connected client.
-     * The given client will no longer get network messages.
-     *
-     * @param client The client to remove.
-     */
-    public void removeConnectedClient(BandMember client) {
-        this.connectedClientAddresses = null; // invalidate cached connectedClients on change
-        this.connectedClients.remove(client);
-    }
-
-    /**
      * Getter for connected client band members
      * @return
      */
-    public ArrayList<BandMember> getConnectedClients() {
+    public ObservableConnectedClientList getConnectedClientList() {
         return connectedClients;
-    }
-
-    /**
-     * Returns all connected client addresses as an array list.
-     *
-     * @return
-     */
-    public synchronized InetAddress[] getConnectedClientAddresses() {
-        // check if cached connected clients are invalidated..
-        if (this.connectedClientAddresses == null) {
-            InetAddress[] addresses = new InetAddress[this.connectedClients.size()];
-            for (int i = 0; i <= this.connectedClients.size(); i++) {
-                addresses[i] = this.connectedClients.get(i).getClientAddress();
-            }
-            this.connectedClientAddresses = addresses;
-        }
-        return this.connectedClientAddresses;
     }
 
     /**

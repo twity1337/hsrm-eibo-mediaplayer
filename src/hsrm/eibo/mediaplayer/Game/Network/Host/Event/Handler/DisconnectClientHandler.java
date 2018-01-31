@@ -9,11 +9,11 @@ public class DisconnectClientHandler implements NetworkEventHandlerInterface {
 
     @Override
     public void handleRequest(NetworkEventPacket packet) {
-        SocketHostManager.getInstance().removeConnectedClient(
+        SocketHostManager.getInstance().getConnectedClientList().remove(
                 new BandMember(packet.getSenderName(), packet.getRemoteIpAdress())
         );
         System.out.println("Player " + packet.getSenderName() + " disconnected.");
         System.out.println("Connected clients are:");
-        System.out.println(SocketHostManager.getInstance().getConnectedClients().toString());
+        System.out.println(SocketHostManager.getInstance().getConnectedClientList().toString());
     }
 }

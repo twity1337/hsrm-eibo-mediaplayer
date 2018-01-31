@@ -12,11 +12,11 @@ public class NewClientHandler implements NetworkEventHandlerInterface {
     public void handleRequest(NetworkEventPacket packet) {
 
         int[] eventArgs = packet.getEventArgs();
-        SocketHostManager.getInstance().addConnectedClient(new BandMember(packet.getSenderName(), eventArgs[0], packet.getRemoteIpAdress()));
+        SocketHostManager.getInstance().getConnectedClientList().add(new BandMember(packet.getSenderName(), eventArgs[0], packet.getRemoteIpAdress()));
         System.out.println(packet.getSenderName() + " connected");
         SynthesizerManager.getInstance().occupyChannel(packet.getSenderName(), eventArgs[0]);
 
         System.out.println("Connected clients are:");
-        System.out.println(SocketHostManager.getInstance().getConnectedClients().toString());
+        System.out.println(SocketHostManager.getInstance().getConnectedClientList().toString());
     }
 }
