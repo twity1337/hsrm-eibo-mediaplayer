@@ -15,15 +15,16 @@ import java.util.Observer;
 
 public class HostGamePane extends BorderPane implements Observer{
 
-    ArrayList<BandMember> connectedClient;
+    ArrayList<BandMember> connectedClients;
+    private VBox listBox;
 
     public HostGamePane() {
         SocketHostManager.getInstance().getConnectedClientList().addObserver(this);
-        this.setCenter(getPlayerListView());
+        this.setCenter(createPlayerListView());
     }
 
-    private Pane getPlayerListView(){
-        VBox listBox = new VBox(createListHeader());
+    private Pane createPlayerListView(){
+        listBox = new VBox(createListHeader());
         return listBox;
     }
 
@@ -34,13 +35,17 @@ public class HostGamePane extends BorderPane implements Observer{
     }
 
     private void updateLayout() {
-
-        this.requestLayout();
+        listBox.getChildren().clear();
+        listBox.getChildren().add(createListHeader());
+        for (BandMember bandMember : connectedClients) {
+            listBox.getChildren().add(new HBox(new Label(bandMember.getName()), new Label(Integer.toString(bandMember.getInstrument()))));
+        }
+        requestLayout();
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        connectedClient = (ArrayList<BandMember>) arg;
+        connectedClients = (ArrayList<BandMember>) arg;
         Platform.runLater(this::updateLayout);
     }
 }

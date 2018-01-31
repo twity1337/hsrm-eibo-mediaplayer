@@ -8,11 +8,9 @@ import hsrm.eibo.mediaplayer.Game.Network.Client.Thread.P2pClientThread;
 import hsrm.eibo.mediaplayer.Game.Network.General.Event.NetworkEventDispatcher;
 import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
 import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
-import hsrm.eibo.mediaplayer.Game.Synthesizer.*;
+import hsrm.eibo.mediaplayer.Game.Synthesizer.Keyboard;
 import hsrm.eibo.mediaplayer.Game.View.HostGamePane;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -70,18 +68,6 @@ public class GameManager {
         if(gameSettings == null)
             throw new RuntimeException("No game settings were set. GameSettings has to be set for successful GameManager initialization.");
 
-
-//        GameWindow.getInstance().start();
-//        MyMusician client = MyMusician.getInstance();
-//        client.setId(gameSettings.getPlayerName());
-//        client.setInstrumentBankId(2); // TODO:
-//        Band b = Band.getInstance();
-//        b.addBandMember(client);
-//        SynthesizerManager sm = SynthesizerManager.getInstance();
-//        sm.occupyChannel(client.getId());
-
-
-
         this.initGameWindow();
 
         return this;
@@ -128,11 +114,12 @@ public class GameManager {
         mainGameWindow.initModality(Modality.WINDOW_MODAL);
         mainGameWindow.initOwner(ViewBuilder.getInstance().getPrimaryStage());
         Scene scene = new Scene(Keyboard.createKeyboardPane(), Keyboard.getKeyboardWidth()+20,Keyboard.getKeyboardHeight()+20);
+        initKeyboardListener(scene);
+
         mainGameWindow.setTitle(GAME_WINDOW_TITLE);
         mainGameWindow.setScene(scene);
         mainGameWindow.setOnCloseRequest(this::handleGameCloseRequest);
 
-        initKeyboardListener(scene);
 
         mainGameWindow.show();
     }
@@ -141,6 +128,9 @@ public class GameManager {
         hostWindow = new Stage(StageStyle.UNDECORATED);
         hostWindow.initModality(Modality.NONE);
         hostWindow.initOwner(mainGameWindow);
+        hostWindow.setX(0);
+        hostWindow.setHeight(300);
+        hostWindow.setWidth(100);
         Scene scene = new Scene(new HostGamePane());
         hostWindow.setScene(scene);
 
@@ -148,31 +138,25 @@ public class GameManager {
     }
 
     private void initKeyboardListener(Scene scene) {
-        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                int pitch;
-                if((pitch = Keyboard.getNotePitchFromKeyevent(event)) != Keyboard.KEY_NOT_ASSIGNED && !pressedKeys.contains(pitch)) {
-                    NetworkEventPacket p = new NetworkEventPacket(gameSettings.getPlayerName(),
-                            NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_PLAY_NOTE,
-                            new int[]{pitch});
-                    clientThread.pushToProcessingQueue(p);
-                    pressedKeys.add(pitch);
-                }
+        scene.setOnKeyPressed(event -> {
+            int pitch;
+            if((pitch = Keyboard.getNotePitchFromKeyevent(event)) != Keyboard.KEY_NOT_ASSIGNED && !pressedKeys.contains(pitch)) {
+                NetworkEventPacket p = new NetworkEventPacket(gameSettings.getPlayerName(),
+                        NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_PLAY_NOTE,
+                        new int[]{pitch});
+                clientThread.pushToProcessingQueue(p);
+                pressedKeys.add(pitch);
             }
         });
 
-        scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                int pitch;
-                if((pitch = Keyboard.getNotePitchFromKeyevent(event)) != Keyboard.KEY_NOT_ASSIGNED) {
-                    NetworkEventPacket p = new NetworkEventPacket(gameSettings.getPlayerName(),
-                            NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_STOP_NOTE,
-                            new int[]{pitch});
-                    clientThread.pushToProcessingQueue(p);
-                    pressedKeys.remove(pitch);
-                }
+        scene.setOnKeyReleased(event -> {
+            int pitch;
+            if((pitch = Keyboard.getNotePitchFromKeyevent(event)) != Keyboard.KEY_NOT_ASSIGNED) {
+                NetworkEventPacket p = new NetworkEventPacket(gameSettings.getPlayerName(),
+                        NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_STOP_NOTE,
+                        new int[]{pitch});
+                clientThread.pushToProcessingQueue(p);
+                pressedKeys.remove(pitch);
             }
         });
     }
