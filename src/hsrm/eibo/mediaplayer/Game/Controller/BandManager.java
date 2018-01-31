@@ -1,37 +1,37 @@
 package hsrm.eibo.mediaplayer.Game.Controller;
 
 import com.sun.javafx.collections.ObservableListWrapper;
-import hsrm.eibo.mediaplayer.Game.Model.BandmemberModel;
+import hsrm.eibo.mediaplayer.Game.Model.BandMember;
 import javafx.collections.ObservableList;
 
 import java.util.LinkedList;
 
 public class BandManager {
     private static BandManager instance = new BandManager();
-    private ObservableList<BandmemberModel> band;
+    private ObservableList<BandMember> band;
 
     private BandManager()
     {
-        band = new ObservableListWrapper<BandmemberModel>(new LinkedList<BandmemberModel>());
+        band = new ObservableListWrapper<BandMember>(new LinkedList<BandMember>());
     }
 
     public static BandManager getInstance(){return instance;}
 
-    public void addBandmember(BandmemberModel bandmember){
-        band.add(bandmember);
+    public void addBandmember(BandMember bandMember){
+        band.add(bandMember);
     }
 
-    public void removeBandmember(BandmemberModel bandmember){
-        band.remove(bandmember);
+    public void removeBandmember(BandMember bandMember){
+        band.remove(bandMember);
     }
 
-    public BandmemberModel getBandmemberByName(String name){
-        for (BandmemberModel member : band){
+    public BandMember getBandmemberByName(String name){
+        for (BandMember member : band){
             if (member.getName().equals(name))
                 return member;
         }
         return null;
     }
 
-    public ObservableList<BandmemberModel> getBand(){return band;}
+    public ObservableList<BandMember> getBand(){return band;}
 }

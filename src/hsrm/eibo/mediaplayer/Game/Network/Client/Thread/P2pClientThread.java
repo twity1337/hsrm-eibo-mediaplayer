@@ -1,7 +1,6 @@
 package hsrm.eibo.mediaplayer.Game.Network.Client.Thread;
 
 import hsrm.eibo.mediaplayer.Game.Controller.GameManager;
-import hsrm.eibo.mediaplayer.Game.Network.Client.SocketClientManager;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractClientThread;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
 import hsrm.eibo.mediaplayer.Game.Network.General.Event.NetworkEventDispatcher;
@@ -33,7 +32,6 @@ public class P2pClientThread extends AbstractClientThread {
                     byte[] data = this.pollDataToProcess();
                     DatagramPacket packet = new DatagramPacket(data, data.length, this.serverAddress, AbstractSocketManager.APPLICATION_PORT);
                     socket.send(packet);
-                    System.out.println("~~ package sent to " + this.serverAddress.toString() + " ~~");
                 } catch (IOException e) {
                     e.printStackTrace();
                     this.interrupt();

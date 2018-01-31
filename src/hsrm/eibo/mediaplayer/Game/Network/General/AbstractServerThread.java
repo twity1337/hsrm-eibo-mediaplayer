@@ -21,7 +21,6 @@ public abstract class AbstractServerThread extends Thread {
     protected void receiveAndHandleNetworkPacket(DatagramSocket socket) throws IOException {
         DatagramPacket datagramPacket = new DatagramPacket(new byte[AbstractSocketManager.PACKET_LENGTH], AbstractSocketManager.PACKET_LENGTH);
         socket.receive(datagramPacket);
-        System.out.println("~~ [" + this.getClass().getName() + "] package received from " + datagramPacket.getAddress().toString());
         Object deserializedPacket = SerializationUtils.deserialize(datagramPacket.getData());
         if (deserializedPacket instanceof NetworkEventPacket){
             ((NetworkEventPacket) deserializedPacket).setRemoteIpAdress(datagramPacket.getAddress());

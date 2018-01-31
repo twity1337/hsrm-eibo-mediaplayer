@@ -1,5 +1,6 @@
 package hsrm.eibo.mediaplayer.Game.Network.Host;
 
+import hsrm.eibo.mediaplayer.Game.Model.BandMember;
 import hsrm.eibo.mediaplayer.Game.Network.Host.Thread.P2pClientThread;
 import hsrm.eibo.mediaplayer.Game.Network.Host.Thread.P2pServerThread;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
@@ -17,7 +18,12 @@ public class SocketHostManager extends AbstractSocketManager {
     /**
      * An array list of connected clients for broadcast messages.
      */
-    private ArrayList<InetAddress> connectedClientAdresses = new ArrayList<>();
+    private ArrayList<BandMember> connectedClients = new ArrayList<>();
+
+    /**
+     * All connected client InetAddress-objects
+     */
+    private InetAddress[] connectedClientAddresses = null;
 
     /**
      * Singleton instance
@@ -29,7 +35,9 @@ public class SocketHostManager extends AbstractSocketManager {
      */
     private boolean running = false;
 
-    public static SocketHostManager getInstance() {return instance;}
+    public static SocketHostManager getInstance() {
+        return instance;
+    }
 
     private SocketHostManager() {
         try {
@@ -42,6 +50,7 @@ public class SocketHostManager extends AbstractSocketManager {
 
     /**
      * Getter for running field.
+     *
      * @return
      */
     public boolean isRunning() {
@@ -50,27 +59,48 @@ public class SocketHostManager extends AbstractSocketManager {
 
     /**
      * Adds a new connected client.
-     * @param adress The IP adress of the client stored as InetAddress object.
+     *
+     * @param client The client to add.
      */
-    public void addConnectedClient(InetAddress adress) {
-        this.connectedClientAdresses.add(adress);
+    public void addConnectedClient(BandMember client) {
+        this.connectedClientAddresses = null; // invalidate cached connectedClients on change
+        this.connectedClients.add(client);
     }
 
     /**
      * Removes / Disconnects a connected client.
      * The given client will no longer get network messages.
-     * @param address The IP adress of the client stored as InetAddress object.
+     *
+     * @param client The client to remove.
      */
-    public void removeConnectedClient(InetAddress address) {
-        this.connectedClientAdresses.remove(address);
+    public void removeConnectedClient(BandMember client) {
+        this.connectedClientAddresses = null; // invalidate cached connectedClients on change
+        this.connectedClients.remove(client);
     }
 
     /**
-     * Returns all connected clients as an array list.
+     * Getter for connected client band members
      * @return
      */
-    public ArrayList<InetAddress> getConnectedClientAdresses() {
-        return connectedClientAdresses;
+    public ArrayList<BandMember> getConnectedClients() {
+        return connectedClients;
+    }
+
+    /**
+     * Returns all connected client addresses as an array list.
+     *
+     * @return
+     */
+    public synchronized InetAddress[] getConnectedClientAddresses() {
+        // check if cached connected clients are invalidated..
+        if (this.connectedClientAddresses == null) {
+            InetAddress[] addresses = new InetAddress[this.connectedClients.size()];
+            for (int i = 0; i <= this.connectedClients.size(); i++) {
+                addresses[i] = this.connectedClients.get(i).getClientAddress();
+            }
+            this.connectedClientAddresses = addresses;
+        }
+        return this.connectedClientAddresses;
     }
 
     /**
@@ -82,16 +112,15 @@ public class SocketHostManager extends AbstractSocketManager {
         serverThread.start();
     }
 
-    public void startP2pClientThread()
-    {
+    public void startP2pClientThread() {
         running = true;
         clientThread = new P2pClientThread(localhost, APPLICATION_PORT);
     }
 
     public void close() {
-        if(serverThread != null)
+        if (serverThread != null)
             serverThread.interrupt();
-        if(clientThread != null)
+        if (clientThread != null)
             clientThread.interrupt();
     }
 }

@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class AbstractClientThread extends Thread {
 
+    public static final int IDLE_SLEEP_TIME_MS = 50;
     protected int serverPort;
     protected InetAddress serverAddress;
     /**

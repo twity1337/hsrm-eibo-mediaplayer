@@ -26,12 +26,10 @@ public class P2pClientThread extends AbstractClientThread {
                 try {
                     InetAddress[] connectedClients = SocketHostManager
                             .getInstance()
-                            .getConnectedClientAdresses()
-                            .toArray(new InetAddress[]{});
+                            .getConnectedClientAddresses();
                     for (InetAddress clientAddress : connectedClients) {
                         DatagramPacket packet = new DatagramPacket(this.pollDataToProcess(), AbstractSocketManager.PACKET_LENGTH, clientAddress, AbstractSocketManager.APPLICATION_PORT);
                         socket.send(packet);
-                        System.out.println("~~ package sent ~~");
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -41,7 +39,7 @@ public class P2pClientThread extends AbstractClientThread {
             }
 
             try {
-                Thread.sleep(50);
+                Thread.sleep(IDLE_SLEEP_TIME_MS);
             } catch (InterruptedException e) {
                 this.interrupt();
                 break;
