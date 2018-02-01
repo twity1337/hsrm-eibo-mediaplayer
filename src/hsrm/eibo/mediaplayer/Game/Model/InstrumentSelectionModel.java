@@ -1,6 +1,11 @@
 package hsrm.eibo.mediaplayer.Game.Model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class InstrumentSelectionModel {
+
+    private static Map<Integer, String> collectedInstrumentList = new HashMap<>();
 
     /**
      * The instrument title
@@ -15,6 +20,12 @@ public class InstrumentSelectionModel {
     public InstrumentSelectionModel(String title, int instrumentId) {
         this.title = title;
         this.instrumentId = instrumentId;
+        collectedInstrumentList.put(instrumentId, title);
+    }
+
+    public static String getInstrumentTitleById(int instrumentId)
+    {
+        return collectedInstrumentList.get(instrumentId);
     }
 
     public String getTitle() {

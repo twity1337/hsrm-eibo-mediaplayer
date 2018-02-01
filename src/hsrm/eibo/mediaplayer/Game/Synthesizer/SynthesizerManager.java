@@ -8,8 +8,8 @@ import java.util.Map;
  * class to generate MIDI sound
  */
 public class SynthesizerManager {
-    public final static int BASIC_C_NOTE = 60;
-    public final static int BASIC_PITCH = 600;
+    private final static int BASIC_C_NOTE = 60;
+    private final static int BASIC_PITCH = 600;
 
     private static SynthesizerManager instance = new SynthesizerManager();
     private Synthesizer synthesizer;
@@ -83,9 +83,5 @@ public class SynthesizerManager {
      */
     public void stopNote(String channelKey, int ordinalNote){
         midiChannelKeyMap.get(channelKey).noteOff(ordinalNote, BASIC_PITCH);
-    }
-
-    private int calculateNote(int index){
-        return BASIC_C_NOTE+index;
     }
 }

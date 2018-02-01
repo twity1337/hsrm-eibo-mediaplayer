@@ -46,7 +46,7 @@ public class ViewBuilder implements Observer{
     /**
      * The default stylesheet path.
      */
-    public static final String STYLESHEET_MAIN_PATH = "/hsrm/eibo/mediaplayer/Resources/Css/main.css";
+    public static final String STYLESHEET_MAIN_DIR = "/hsrm/eibo/mediaplayer/Resources/Css/";
     /**
      * The (fixed) height of the notification / error dialog box.
      */
@@ -100,8 +100,7 @@ public class ViewBuilder implements Observer{
         if(this.primaryStage != null)
             throw new RuntimeException("ViewBuilder.initPrimaryStage() can only be called once. It was already called before.");
         Scene root = new Scene(this.createMainView(), WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT);
-        root.getStylesheets().add(this.getClass().getResource(STYLESHEET_MAIN_PATH).toString());
-
+        root.getStylesheets().add(this.getClass().getResource(STYLESHEET_MAIN_DIR +"main.css").toString());
         primaryStage.setScene(root);
         primaryStage.setTitle(WINDOW_TITLE);
         primaryStage.setMinHeight(WINDOW_MIN_HEIGHT);
@@ -167,8 +166,15 @@ public class ViewBuilder implements Observer{
      */
     public void showErrorDialog(String message, String exceptionText)
     {
-        Stage dialog = createDialogStage(NOTIFICATION_DIALOG_HEIGHT, NOTIFICATION_DIALOG_WIDTH, "Fehler");
-        NotificationScene scene = new NotificationScene(dialog, NOTIFICATION_DIALOG_WIDTH, NOTIFICATION_DIALOG_HEIGHT);
+        Stage dialog;
+        NotificationScene scene;
+        if (exceptionText == null) {
+            dialog = createDialogStage(NOTIFICATION_DIALOG_HEIGHT/2, NOTIFICATION_DIALOG_WIDTH/2, "Fehler");
+            scene = new NotificationScene(dialog, NOTIFICATION_DIALOG_WIDTH/2, NOTIFICATION_DIALOG_HEIGHT/2);
+        } else {
+            dialog = createDialogStage(NOTIFICATION_DIALOG_HEIGHT, NOTIFICATION_DIALOG_WIDTH, "Fehler");
+            scene = new NotificationScene(dialog, NOTIFICATION_DIALOG_WIDTH, NOTIFICATION_DIALOG_HEIGHT);
+        }
         scene.setMessage(message);
         if(exceptionText != null)
             scene.setExceptionText(exceptionText);
@@ -218,14 +224,14 @@ public class ViewBuilder implements Observer{
                 e.printStackTrace(new PrintWriter(writer));
                 errorSummary += "\n" + writer.toString();
             }
-            ths.showErrorDialog(observable.getLastErrorSummary(), errorSummary);
+            ths.showErrorDialog(observable.getLastErrorSummary() + ":", errorSummary);
         });
     }
 
     @NotNull
     private Stage createDialogStage(int stageHeight, int stageWidth, String stageTitle) {
         Stage dialog = new Stage();
-        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.initOwner(this.primaryStage);
         dialog.setTitle(stageTitle);
         dialog.setResizable(false);

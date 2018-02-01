@@ -1,8 +1,11 @@
 package hsrm.eibo.mediaplayer.Game.View;
 
+import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
+import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Game.Model.BandMember;
 import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -13,24 +16,44 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-public class HostGamePane extends BorderPane implements Observer{
+import static hsrm.eibo.mediaplayer.Game.Model.InstrumentSelectionModel.getInstrumentTitleById;
 
-    ArrayList<BandMember> connectedClients;
+public class HostGamePane extends BorderPane implements Observer {
+
+    private static final int COLUMN_WIDTH = 100;
+    private ArrayList<BandMember> connectedClients;
     private VBox listBox;
 
-    public HostGamePane() {
+    public HostGamePane(Track backgroundPlaybackMedia) {
         SocketHostManager.getInstance().getConnectedClientList().addObserver(this);
+        this.setPadding(new Insets(5));
         this.setCenter(createPlayerListView());
+
+        if (backgroundPlaybackMedia == null)
+            return;
+        try {
+            backgroundPlaybackMedia.getTrackMediaPlayer().play();
+        } catch (Exception e) {
+            ErrorHandler err = ErrorHandler.getInstance();
+            err.addError(e);
+            err.notifyErrorObserver("Fehler bei der Initialisierung des Spiels");
+        }
     }
 
-    private Pane createPlayerListView(){
+    private Pane createPlayerListView() {
         listBox = new VBox(createListHeader());
         return listBox;
     }
 
-    private Pane createListHeader(){
+    private Pane createListHeader() {
         HBox header = new HBox();
-        header.getChildren().addAll(new Label("Name"), new Label("Instrument"));
+        Label label0 = new Label("Name");
+        Label label1 = new Label("Instrument");
+        label0.setPrefWidth(COLUMN_WIDTH);
+        label0.setStyle("-fx-font-weight: bold");
+        label1.setPrefWidth(COLUMN_WIDTH);
+        label1.setStyle("-fx-font-weight: bold");
+        header.getChildren().addAll(label0, label1);
         return header;
     }
 
@@ -38,7 +61,11 @@ public class HostGamePane extends BorderPane implements Observer{
         listBox.getChildren().clear();
         listBox.getChildren().add(createListHeader());
         for (BandMember bandMember : connectedClients) {
-            listBox.getChildren().add(new HBox(new Label(bandMember.getName()), new Label(Integer.toString(bandMember.getInstrument()))));
+            Label label0 = new Label(bandMember.getName());
+            label0.setPrefWidth(COLUMN_WIDTH);
+            Label label1 = new Label(getInstrumentTitleById(bandMember.getInstrument()));
+            label1.setPrefWidth(COLUMN_WIDTH);
+            listBox.getChildren().add(new HBox(label0, label1));
         }
         requestLayout();
     }

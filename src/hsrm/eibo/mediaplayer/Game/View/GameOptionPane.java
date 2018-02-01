@@ -1,5 +1,6 @@
 package hsrm.eibo.mediaplayer.Game.View;
 
+import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.Game.Model.GameSettings;
 import hsrm.eibo.mediaplayer.Game.Model.InstrumentSelectionModel;
 import javafx.scene.Node;
@@ -72,6 +73,17 @@ public abstract class GameOptionPane extends GridPane {
         this.setBasicGameSettingValues(settings);
         this.updateGameSettingsByAdditionalValues(settings);
         return settings;
+    }
+
+    protected boolean validateUserInput()
+    {
+        GameSettings settings = this.getPreparedGameSettings();
+        if(settings.getPlayerName().isEmpty())
+        {
+            ViewBuilder.getInstance().showErrorDialog("Bitte geben Sie einen Namen ein.");
+            return false;
+        }
+        return true;
     }
 
     /**

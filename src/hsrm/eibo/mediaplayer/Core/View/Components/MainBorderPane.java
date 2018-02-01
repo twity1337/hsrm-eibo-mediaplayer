@@ -203,7 +203,7 @@ public class MainBorderPane extends BorderPane {
         items[2].setOnAction(event -> {
             this.applyCss();
             viewBuilder.getPrimaryStage().getScene().getStylesheets().clear();
-            viewBuilder.getPrimaryStage().getScene().getStylesheets().add(this.getClass().getResource(ViewBuilder.STYLESHEET_MAIN_PATH).toString());
+            viewBuilder.getPrimaryStage().getScene().getStylesheets().add(this.getClass().getResource(ViewBuilder.STYLESHEET_MAIN_DIR+"main.css").toString());
         });
         items[3].setOnAction(event -> {
             viewBuilder.showErrorDialog("Es ist ein Test-Fehler aufgetreten!");

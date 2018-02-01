@@ -24,6 +24,12 @@ public class NewGamePane extends GameOptionPane {
     protected Button getDefaultButton() {
         Button defaultButton = new Button("Spiel erstellen");
         defaultButton.setOnAction(event -> {
+            if(!this.validateUserInput())
+            {
+                event.consume();
+                return;
+            }
+
             GameManager.setGameSettings(this.getPreparedGameSettings());
             GameManager.getInstance().initialize().hostNewGame();
             this.getParentWindow().close();

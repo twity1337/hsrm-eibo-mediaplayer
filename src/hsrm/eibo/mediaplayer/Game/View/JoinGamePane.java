@@ -22,6 +22,12 @@ public class JoinGamePane extends GameOptionPane {
     protected Button getDefaultButton() {
         Button defaultButton = new Button("Spiel beitreten");
         defaultButton.setOnAction(event -> {
+            if(!this.validateUserInput())
+            {
+                event.consume();
+                return;
+            }
+
             GameManager.setGameSettings(this.getPreparedGameSettings());
             GameManager.getInstance().initialize().joinNetworkGame(extractServerIpAdress());
             this.getParentWindow().close();

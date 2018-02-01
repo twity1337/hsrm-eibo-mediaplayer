@@ -91,7 +91,7 @@ public class NotificationScene extends Scene {
     public void setMessage(String message)
     {
         if(message != null)
-            this.messageLabel.setText(message + ":");
+            this.messageLabel.setText(message);
     }
 
     /**

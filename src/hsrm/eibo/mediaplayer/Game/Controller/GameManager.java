@@ -1,6 +1,7 @@
 package hsrm.eibo.mediaplayer.Game.Controller;
 
 import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
+import hsrm.eibo.mediaplayer.Core.Model.Track;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.Game.Model.GameSettings;
 import hsrm.eibo.mediaplayer.Game.Network.Client.SocketClientManager;
@@ -33,10 +34,30 @@ public class GameManager {
      */
     private static GameSettings gameSettings = null;
 
+    /**
+     * Singleton instance
+     */
     private static GameManager instance = new GameManager();
+
+    /**
+     * Main window stages
+     */
     private Stage mainGameWindow, hostWindow;
+
+    /**
+     * Socket client manager for client and host.
+     */
     private SocketClientManager socketClientManager;
+
+    /**
+     * ClientThread for client and host instances.
+     */
     private P2pClientThread clientThread;
+    /**
+     * Background playback Media
+     */
+    private Track playbackMedia = null;
+
     private GameManager(){}
     private Set<Integer> pressedKeys = new HashSet<>();
     public static GameManager getInstance() {
@@ -69,8 +90,23 @@ public class GameManager {
             throw new RuntimeException("No game settings were set. GameSettings has to be set for successful GameManager initialization.");
 
         this.initGameWindow();
+        this.initBackgroundSong();
 
         return this;
+    }
+
+    private void initBackgroundSong() {
+        String backgroundSongPath = gameSettings.getBackgroundSongPath();
+        if (backgroundSongPath == null)
+            return;
+
+        try {
+            playbackMedia = new Track(backgroundSongPath);
+        } catch (Exception e) {
+            ErrorHandler err = ErrorHandler.getInstance();
+            err.addError(e);
+            err.notifyErrorObserver("Fehler bei der Initialisierung des Spiels");
+        }
     }
 
 
@@ -84,8 +120,9 @@ public class GameManager {
         try {
             this.joinNetworkGame(InetAddress.getLocalHost());
         } catch (UnknownHostException e) {
-            ErrorHandler.getInstance().addError(e);
-            ErrorHandler.getInstance().notifyErrorObserver("Fehler beim Hosten des Spiels");
+            ErrorHandler err = ErrorHandler.getInstance();
+            err.addError(e);
+            err.notifyErrorObserver("Fehler beim Hosten des Spiels");
         }
 
         this.createHostWindow();
@@ -130,8 +167,8 @@ public class GameManager {
         hostWindow.initOwner(mainGameWindow);
         hostWindow.setX(0);
         hostWindow.setHeight(300);
-        hostWindow.setWidth(100);
-        Scene scene = new Scene(new HostGamePane());
+        hostWindow.setWidth(200);
+        Scene scene = new Scene(new HostGamePane(this.playbackMedia));
         hostWindow.setScene(scene);
 
         hostWindow.show();
