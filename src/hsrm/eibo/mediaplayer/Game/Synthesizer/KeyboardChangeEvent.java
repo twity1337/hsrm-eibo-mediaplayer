@@ -5,6 +5,9 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.Observable;
 
+/**
+ * Observable object to track keyboard events and notify visual keyboard for color highlighting
+ */
 public class KeyboardChangeEvent extends Observable {
 
 

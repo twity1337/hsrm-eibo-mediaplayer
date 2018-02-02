@@ -16,6 +16,9 @@ import java.util.Observer;
 import static hsrm.eibo.mediaplayer.Game.Synthesizer.KeyboardChangeEvent.PRESSED_KEY_COLOR;
 import static hsrm.eibo.mediaplayer.Game.Synthesizer.KeyboardChangeEvent.PRESSED_KEY_INDEX;
 
+/**
+ * class to generate a virtual piano keyboard with hardware keyboard keys mapped to it
+ */
 public class Keyboard {
     // Layout für Klavier: start bei Taste y= Ton c (bass 2. Zwischenraum), Halbtonschritte;
     // Taste a = Ton c (violin Schlüssel 1. Hilfslinie), Halbtonschritte
@@ -31,6 +34,10 @@ public class Keyboard {
     private final static int DEFAULT_KEY_WIDTH = 50;
     public static final int KEY_NOT_ASSIGNED = -1;
 
+    /**
+     * gather components of keyboard and put them on a stackpane
+     * @return Pane keyboard
+     */
     public static Pane createKeyboardPane(){
         StackPane sPane = new StackPane();
         HBox whiteKeyboard = createWhiteKeyboard();
@@ -51,6 +58,9 @@ public class Keyboard {
         return BASIC_C_NOTE + index;
     }
 
+    /**
+     * mapping of keyboard Layout to actual piano keys
+     */
     private static HBox createWhiteKeyboard() {
         HBox wBoard = new HBox();
         wBoard.setMinWidth(DEFAULT_KEY_WIDTH*NR_OF_WHITE_KEYS);
@@ -118,6 +128,9 @@ public class Keyboard {
         return bBoard;
     }
 
+    /**
+     * create graphics for Keyboard keys
+     */
     private static Canvas createImageWhiteKey(String name) {
         Canvas canvas = new Canvas(DEFAULT_KEY_WIDTH, DEFAULT_KEY_HIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -143,6 +156,9 @@ public class Keyboard {
     }
 
 
+    /**
+     * keyboard keys are Observers to the KeyboardChangeEvent
+     */
     private static class KeyboardKey extends HBox implements Observer{
         private int note;
 

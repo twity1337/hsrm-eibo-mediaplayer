@@ -53,6 +53,11 @@ public class SynthesizerManager {
         return map;
     }
 
+    /**
+     * each syntheziser channel is used by only one player
+     * @param channelKey player name as id
+     * @param instrumentId Integer representing index of instrument in {@link Synthesizer.getAvailableInstruments()}
+     */
     public void occupyChannel(String channelKey, int instrumentId){
         for (int i=0; i < maxMidiChannels; i++)
         {

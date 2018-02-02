@@ -5,6 +5,9 @@ import javafx.scene.paint.Color;
 
 import java.net.InetAddress;
 
+/**
+ * class to represent active players and store information
+ */
 public class BandMember {
     private short index;
     private String name;
