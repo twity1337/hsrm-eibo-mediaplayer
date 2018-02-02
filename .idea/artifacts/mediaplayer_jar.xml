@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact name="mediaplayer:jar">
+  <artifact build-on-make="true" name="mediaplayer:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/mediaplayer_jar</output-path>
     <root id="root">
-      <element id="archive" name="mediaplayer.jar">
+      <element id="archive" name="mediaplayerAndGame.jar">
         <element id="module-output" name="mediaplayer" />
       </element>
       <element id="library" level="project" name="tika-app-1.16" />
