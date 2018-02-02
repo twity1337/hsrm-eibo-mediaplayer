@@ -7,9 +7,11 @@ import java.util.Observable;
 
 public class KeyboardChangeEvent extends Observable {
 
+    public enum EventCode {KEY_PRESSED, KEY_RELEASED}
 
-    public static final int PRESSED_KEY_INDEX = 0;
-    public static final int PRESSED_KEY_COLOR = 1;
+    public static final int KEY_EVENT_TYPE = 0;
+    public static final int PRESSED_KEY_INDEX = 1;
+    public static final int PRESSED_KEY_COLOR = 2;
 
     private static KeyboardChangeEvent instance = new KeyboardChangeEvent();
     private KeyboardChangeEvent() {}
@@ -17,9 +19,9 @@ public class KeyboardChangeEvent extends Observable {
         return instance;
     }
 
-    public void change(int pressedKeyIndex, Color pressedKeyColor) {
+    public void change(EventCode eventCode, int pressedKeyIndex, Color pressedKeyColor) {
         this.setChanged();
-        this.notifyObservers(new Object[]{pressedKeyIndex, pressedKeyColor});
+        this.notifyObservers(new Object[]{eventCode, pressedKeyIndex, pressedKeyColor});
     }
 
 

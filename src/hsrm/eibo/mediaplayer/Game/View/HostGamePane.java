@@ -14,7 +14,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import org.jetbrains.annotations.NotNull;
-import org.scenicview.ScenicView;
 
 import java.util.ArrayList;
 import java.util.Observable;

@@ -16,7 +16,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-import org.scenicview.ScenicView;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -170,7 +169,6 @@ public class GameManager {
         hostWindow.setHeight(HostGamePane.WINDOW_HEIGHT);
         hostWindow.setWidth(HostGamePane.WINDOW_WIDTH);
         Scene scene = new Scene(new HostGamePane(this.playbackMedia));
-        ScenicView.show(scene);
         hostWindow.setScene(scene);
         hostWindow.setOnCloseRequest(this::handleGameCloseRequest);
 
