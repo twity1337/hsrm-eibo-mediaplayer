@@ -11,6 +11,10 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Observer;
+
+import static hsrm.eibo.mediaplayer.Game.Synthesizer.KeyboardChangeEvent.PRESSED_KEY_COLOR;
+import static hsrm.eibo.mediaplayer.Game.Synthesizer.KeyboardChangeEvent.PRESSED_KEY_INDEX;
 
 public class Keyboard {
     // Layout für Klavier: start bei Taste y= Ton c (bass 2. Zwischenraum), Halbtonschritte;
@@ -63,10 +67,12 @@ public class Keyboard {
             Canvas c = createImageWhiteKey(KEYBOARD_KEYNAMES[index]);
             int note = calculateNote(i);
             KeyboardKey whiteK = new KeyboardKey(note);
+
             whiteK.setMinWidth(DEFAULT_KEY_WIDTH);
             whiteK.setMinHeight(DEFAULT_KEY_HIGHT);
             whiteK.getChildren().add(c);
             wBoard.getChildren().add(whiteK);
+            KeyboardChangeEvent.getInstance().addObserver(whiteK);
             index++;
         }
         return wBoard;
@@ -107,6 +113,7 @@ public class Keyboard {
             blackK.setMinHeight(DEFAULT_KEY_HIGHT*BLACK_KEY_SIZE_FACTOR);
             blackK.getChildren().add(c);
             bBoard.getChildren().add(blackK);
+            KeyboardChangeEvent.getInstance().addObserver(blackK);
         }
         return bBoard;
     }
@@ -136,7 +143,7 @@ public class Keyboard {
     }
 
 
-    private static class KeyboardKey extends HBox{
+    private static class KeyboardKey extends HBox implements Observer{
         private int note;
 
         public KeyboardKey(int note){
@@ -145,6 +152,18 @@ public class Keyboard {
 
         public int getNote(){
             return this.note;
+        }
+
+        @Override
+        public void update(java.util.Observable o, Object arg) {
+            Object[] args = (Object[]) arg;
+            if((int) args[PRESSED_KEY_INDEX] == note)
+                this.repaint((Color) args[PRESSED_KEY_COLOR]);
+        }
+
+        private void repaint(Color color) {
+            System.out.println(this.note);
+            System.out.println(color.toString());
         }
     }
 

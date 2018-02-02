@@ -1,17 +1,18 @@
 package hsrm.eibo.mediaplayer.Game.Network.General;
 
 import hsrm.eibo.mediaplayer.Game.Model.BandMember;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Observable;
 
-public class ObservableConnectedClientList extends Observable {
+public class ObservableConnectedClientList<T extends BandMember> extends Observable {
 
     /**
      * An array list of connected clients for broadcast messages.
      */
-    private ArrayList<BandMember> connectedClients = new ArrayList<>();
+    private ArrayList<T> connectedClients = new ArrayList<>();
 
     /**
      * All connected client InetAddress-objects
@@ -24,7 +25,7 @@ public class ObservableConnectedClientList extends Observable {
      *
      * @param client The client to add.
      */
-    public void add(BandMember client) {
+    public void add(T client) {
         this.connectedClientAddresses = null; // invalidate cached connectedClients on change
         this.connectedClients.add(client);
         this.notifyOnChange();
@@ -36,10 +37,17 @@ public class ObservableConnectedClientList extends Observable {
      *
      * @param client The client to remove.
      */
-    public void remove(BandMember client) {
+    public void remove(T client) {
         this.connectedClientAddresses = null; // invalidate cached connectedClients on change
         this.connectedClients.remove(client);
         this.notifyOnChange();
+    }
+
+    public T get(T e){
+        int index = connectedClients.indexOf(e);
+        if(index == ArrayUtils.INDEX_NOT_FOUND)
+            return null;
+        return connectedClients.get(index);
     }
 
     /**

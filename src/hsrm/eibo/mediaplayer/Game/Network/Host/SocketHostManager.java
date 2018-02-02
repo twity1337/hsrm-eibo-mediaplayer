@@ -1,5 +1,6 @@
 package hsrm.eibo.mediaplayer.Game.Network.Host;
 
+import hsrm.eibo.mediaplayer.Game.Model.BandMember;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
 import hsrm.eibo.mediaplayer.Game.Network.General.ObservableConnectedClientList;
 import hsrm.eibo.mediaplayer.Game.Network.Host.Thread.P2pServerThread;
@@ -51,7 +52,7 @@ public class SocketHostManager extends AbstractSocketManager{
      * Getter for connected client band members
      * @return
      */
-    public ObservableConnectedClientList getConnectedClientList() {
+    public ObservableConnectedClientList<BandMember> getConnectedClientList() {
         return connectedClients;
     }
 

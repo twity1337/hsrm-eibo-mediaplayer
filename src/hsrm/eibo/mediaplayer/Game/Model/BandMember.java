@@ -1,17 +1,23 @@
 package hsrm.eibo.mediaplayer.Game.Model;
 
 
+import javafx.scene.paint.Color;
+
 import java.net.InetAddress;
 
 public class BandMember {
+    private short index;
     private String name;
     private int instrument;
     private InetAddress clientAddress;
+    private static short playerCount = 1;
 
     public BandMember(String name, int instrument, InetAddress clientAddress) {
         this.name = name;
         this.instrument = instrument;
         this.clientAddress = clientAddress;
+        this.index = playerCount;
+        playerCount++;
     }
     public BandMember(String name, InetAddress clientAddress) {
         this(name, 0, clientAddress);
@@ -40,6 +46,14 @@ public class BandMember {
     public void setClientAddress(InetAddress clientAddress) {
         this.clientAddress = clientAddress;
     }
+
+    public Color getPlayerColor()
+    {
+        float PHI = (1 + (float) Math.sqrt(5))/2.0f;
+        float n = index * PHI - (float) Math.floor(index * PHI);
+        return Color.hsb(360/n, (n/2.0), 0.5);
+    }
+
 
     @Override
     public int hashCode() {

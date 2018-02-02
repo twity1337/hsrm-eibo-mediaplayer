@@ -74,6 +74,8 @@ public class HostGamePane extends BorderPane implements Observer {
             label0.setPrefWidth(COLUMN_WIDTH);
             Label label1 = new Label(getInstrumentTitleById(bandMember.getInstrument()));
             label1.setPrefWidth(COLUMN_WIDTH);
+            label0.setTextFill(bandMember.getPlayerColor());
+            label1.setTextFill(bandMember.getPlayerColor());
             listBox.getChildren().add(new HBox(label0, label1));
         }
         requestLayout();
