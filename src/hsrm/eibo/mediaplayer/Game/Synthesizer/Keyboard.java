@@ -9,6 +9,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import org.apache.commons.lang.ArrayUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observer;
@@ -33,6 +34,8 @@ public class Keyboard {
     private final static int DEFAULT_KEY_HIGHT = 200;
     private final static int DEFAULT_KEY_WIDTH = 50;
     public static final int KEY_NOT_ASSIGNED = -1;
+    public static final int ACTIVE_KEY_BORDER_WIDTH = 10;
+    public static final int KEY_BORDER_WIDTH = 2;
 
     /**
      * gather components of keyboard and put them on a stackpane
@@ -68,19 +71,18 @@ public class Keyboard {
         int index = 0;
         for (int i = 0; i < KEYNAMES_PIANO.length ; i++)
         {
-            if (i%2 != 0)
+            if (i% KEY_BORDER_WIDTH != 0)
             {
                 if (KEYNAMES_PIANO[i].length() != 0)
                     index++;
                 continue; // überspringe Zwischenräume
             }
             Canvas c = createImageWhiteKey(KEYBOARD_KEYNAMES[index]);
-            int note = calculateNote(i);
-            KeyboardKey whiteK = new KeyboardKey(note);
+            int note = calculateNote(index);
+            KeyboardKey whiteK = new KeyboardKey(note, c, false);
 
             whiteK.setMinWidth(DEFAULT_KEY_WIDTH);
             whiteK.setMinHeight(DEFAULT_KEY_HIGHT);
-            whiteK.getChildren().add(c);
             wBoard.getChildren().add(whiteK);
             KeyboardChangeEvent.getInstance().addObserver(whiteK);
             index++;
@@ -100,7 +102,7 @@ public class Keyboard {
         int index = 0;
         for (int i = 0; i < KEYNAMES_PIANO.length ; i++)
         {
-            if (i%2 == 0)  // überspringe Ganztöne
+            if (i% KEY_BORDER_WIDTH == 0)  // überspringe Ganztöne
             {
                 if (KEYNAMES_PIANO[i].length() == 0)
                     continue;
@@ -109,19 +111,19 @@ public class Keyboard {
             }
 
             Canvas c = createImageBlackKey(KEYBOARD_KEYNAMES[index]);
-            int note = calculateNote(i);
-            KeyboardKey blackK = new KeyboardKey(note);
+            int note = calculateNote(index);
+            KeyboardKey blackK;
 
             if (KEYNAMES_PIANO[i].length()==0) // überspringe halb Tontasten die nicht da sind
             {
+                blackK = new KeyboardKey(note, new Canvas(), true);
                 blackK.setMouseTransparent(true);
-                c = new Canvas();
             } else {
+                blackK = new KeyboardKey(note, c, true);
                 index++;
             }
             blackK.setMinWidth(DEFAULT_KEY_WIDTH*BLACK_KEY_SIZE_FACTOR);
             blackK.setMinHeight(DEFAULT_KEY_HIGHT*BLACK_KEY_SIZE_FACTOR);
-            blackK.getChildren().add(c);
             bBoard.getChildren().add(blackK);
             KeyboardChangeEvent.getInstance().addObserver(blackK);
         }
@@ -136,10 +138,10 @@ public class Keyboard {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.WHITE);
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(2);
+        gc.setLineWidth(KEY_BORDER_WIDTH);
         gc.fillRoundRect(0, 0,DEFAULT_KEY_WIDTH,DEFAULT_KEY_HIGHT,10,10);
         gc.strokeRoundRect(0, 0,DEFAULT_KEY_WIDTH,DEFAULT_KEY_HIGHT,10,10);
-        gc.strokeText(name,DEFAULT_KEY_WIDTH/2-5,DEFAULT_KEY_HIGHT-20);
+        gc.strokeText(name,DEFAULT_KEY_WIDTH/ KEY_BORDER_WIDTH -5,DEFAULT_KEY_HIGHT-20);
         return canvas;
     }
 
@@ -148,10 +150,10 @@ public class Keyboard {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.WHITE);
-        gc.setLineWidth(2);
+        gc.setLineWidth(KEY_BORDER_WIDTH);
         gc.fillRoundRect(0, 0,DEFAULT_KEY_WIDTH,DEFAULT_KEY_HIGHT*BLACK_KEY_SIZE_FACTOR,10,10);
         gc.strokeRoundRect(0, 0,DEFAULT_KEY_WIDTH,DEFAULT_KEY_HIGHT*BLACK_KEY_SIZE_FACTOR,10,10);
-        gc.strokeText(name,DEFAULT_KEY_WIDTH*BLACK_KEY_SIZE_FACTOR/2-5,DEFAULT_KEY_HIGHT*BLACK_KEY_SIZE_FACTOR-20);
+        gc.strokeText(name,DEFAULT_KEY_WIDTH*BLACK_KEY_SIZE_FACTOR/ KEY_BORDER_WIDTH -5,DEFAULT_KEY_HIGHT*BLACK_KEY_SIZE_FACTOR-20);
         return canvas;
     }
 
@@ -161,9 +163,14 @@ public class Keyboard {
      */
     private static class KeyboardKey extends HBox implements Observer{
         private int note;
+        Canvas canvas;
+        boolean isBlack;
 
-        public KeyboardKey(int note){
+        public KeyboardKey(int note, Canvas canvas, boolean isBlack){
             this.note = note;
+            this.canvas = canvas;
+            this.isBlack = isBlack;
+            this.getChildren().add(canvas);
         }
 
         public int getNote(){
@@ -174,12 +181,45 @@ public class Keyboard {
         public void update(java.util.Observable o, Object arg) {
             Object[] args = (Object[]) arg;
             if((int) args[PRESSED_KEY_INDEX] == note)
-                this.repaint((Color) args[PRESSED_KEY_COLOR]);
+            {
+                if(KeyboardChangeEvent.EventCode.KEY_PRESSED == args[KeyboardChangeEvent.KEY_EVENT_TYPE]){
+                    this.paintKeyPressed((Color) args[PRESSED_KEY_COLOR]);
+                }
+                if(KeyboardChangeEvent.EventCode.KEY_RELEASED == args[KeyboardChangeEvent.KEY_EVENT_TYPE]){
+                    this.paintKeyReleased();
+                }
+            }
         }
 
-        private void repaint(Color color) {
-            System.out.println(this.note);
-            System.out.println(color.toString());
+        public void setCanvas(Canvas c){
+            this.canvas = c;
+            requestLayout();
+        }
+
+        private void paintKeyPressed(Color color) {
+            this.repaint(color, ACTIVE_KEY_BORDER_WIDTH);
+            this.requestLayout();
+        }
+
+        private void paintKeyReleased() {
+            if (isBlack)
+                this.repaint(Color.BLACK, ACTIVE_KEY_BORDER_WIDTH);
+            else
+                this.repaint(Color.WHITE, ACTIVE_KEY_BORDER_WIDTH);
+            this.repaint(Color.BLACK, KEY_BORDER_WIDTH);
+            this.requestLayout();
+        }
+
+        private void repaint(Color color, int width) {
+            GraphicsContext gc = this.canvas.getGraphicsContext2D();
+            gc.setStroke(color);
+            gc.setLineWidth(width);
+            if (isBlack){
+                gc.strokeRoundRect(0, 0, DEFAULT_KEY_WIDTH*BLACK_KEY_SIZE_FACTOR, DEFAULT_KEY_HIGHT*BLACK_KEY_SIZE_FACTOR, ACTIVE_KEY_BORDER_WIDTH, ACTIVE_KEY_BORDER_WIDTH);
+
+            }else {
+                gc.strokeRoundRect(0, 0, DEFAULT_KEY_WIDTH, DEFAULT_KEY_HIGHT, ACTIVE_KEY_BORDER_WIDTH, ACTIVE_KEY_BORDER_WIDTH);
+            }
         }
     }
 

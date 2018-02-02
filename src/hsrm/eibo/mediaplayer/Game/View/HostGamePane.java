@@ -14,7 +14,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import org.jetbrains.annotations.NotNull;
-import org.scenicview.ScenicView;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -26,6 +25,7 @@ public class HostGamePane extends BorderPane implements Observer {
 
     public static final int WINDOW_HEIGHT = 400;
     public static final int WINDOW_WIDTH = 300;
+    public static final int WINDOW_X_POSITION = 100;
     private static final int COLUMN_WIDTH = WINDOW_WIDTH/2;
 
     private MediaPlayer playbackTrackMediaPlayer = null;

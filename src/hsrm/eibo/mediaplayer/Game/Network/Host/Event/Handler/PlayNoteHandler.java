@@ -18,7 +18,7 @@ public class PlayNoteHandler implements NetworkEventHandlerInterface {
         ObservableConnectedClientList<BandMember> band = SocketHostManager.getInstance().getConnectedClientList();
         BandMember comparable = new BandMember(packet.getSenderName(), packet.getRemoteIpAdress());
 
-        KeyboardChangeEvent.getInstance().change(playedNote, band.get(comparable).getPlayerColor());
+        KeyboardChangeEvent.getInstance().change(KeyboardChangeEvent.EventCode.KEY_PRESSED, playedNote,band.get(comparable).getPlayerColor());
 
     }
 }
