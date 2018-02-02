@@ -4,6 +4,9 @@ import hsrm.eibo.mediaplayer.Game.Network.Client.Event.Handler.NewClientConnecte
 import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
 import hsrm.eibo.mediaplayer.Game.Network.Host.Event.Handler.*;
 
+/**
+ * Dispatcher for all incoming and outgoing network events.
+ */
 public class NetworkEventDispatcher  {
 
     public enum NetworkEventType {

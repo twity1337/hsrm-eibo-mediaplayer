@@ -2,7 +2,6 @@ package hsrm.eibo.mediaplayer.Game.Network.Host.Thread;
 
 import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractServerThread;
-import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -19,6 +18,7 @@ public class P2pServerThread extends AbstractServerThread {
     public void run() {
         DatagramSocket socket;
         try {
+            // open socket on the default server port...
             socket = new DatagramSocket(this.serverPort);
             socket.setSoTimeout(SO_TIMEOUT);
         } catch (SocketException e) {

@@ -21,6 +21,9 @@ import java.util.Observer;
 
 import static hsrm.eibo.mediaplayer.Game.Model.InstrumentSelectionModel.getInstrumentTitleById;
 
+/**
+ * Main pane for server view.
+ */
 public class HostGamePane extends BorderPane implements Observer {
 
     public static final int WINDOW_HEIGHT = 400;
@@ -48,6 +51,9 @@ public class HostGamePane extends BorderPane implements Observer {
         }
     }
 
+    /**
+     * Stops playback of background song
+     */
     public void stopPlayback()
     {
         if(playbackTrackMediaPlayer != null)
@@ -96,6 +102,11 @@ public class HostGamePane extends BorderPane implements Observer {
         requestLayout();
     }
 
+    /**
+     * Updates the current connected player list on Observer update.
+     * @param o
+     * @param arg
+     */
     @Override
     public void update(Observable o, Object arg) {
         connectedClients = (ArrayList<BandMember>) arg;

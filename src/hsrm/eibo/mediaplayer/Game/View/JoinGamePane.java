@@ -10,6 +10,9 @@ import javafx.stage.Stage;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+/**
+ * The window pane for form options when joining an open game.
+ */
 public class JoinGamePane extends GameOptionPane {
 
     private TextField serverIp;

@@ -25,6 +25,10 @@ public abstract class AbstractClientThread extends Thread {
         serverAddress = address;
     }
 
+    /**
+     * Pushes the given packet to the clients processing queue to send over network.
+     * @param packet The NetworkEventPacket to send.
+     */
     public synchronized void pushToProcessingQueue(NetworkEventPacket packet) {
 
         // add timecode prefix to data before checking packet length..

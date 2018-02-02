@@ -8,6 +8,9 @@ import hsrm.eibo.mediaplayer.Game.Network.Host.Thread.P2pServerThread;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+/**
+ * Manager class for Socket Api on the Game host.
+ */
 public class SocketHostManager extends AbstractSocketManager{
 
     private Thread clientThread, serverThread;

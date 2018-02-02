@@ -11,6 +11,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+/**
+ * An abstract class for instantiating Option panes with game setting options.
+ */
 public abstract class GameOptionPane extends GridPane {
 
     private Stage parentWindow;

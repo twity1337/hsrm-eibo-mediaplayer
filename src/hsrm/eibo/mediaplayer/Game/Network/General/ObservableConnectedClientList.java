@@ -7,6 +7,10 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Observable;
 
+/**
+ * A observable list class for connected clients.
+ * @param <T>
+ */
 public class ObservableConnectedClientList<T extends BandMember> extends Observable {
 
     /**

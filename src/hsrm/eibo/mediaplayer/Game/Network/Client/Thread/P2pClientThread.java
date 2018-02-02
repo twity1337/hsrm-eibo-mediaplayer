@@ -29,6 +29,7 @@ public class P2pClientThread extends AbstractClientThread {
         {
             while(!this.hasDataToProcess()) {
                 try {
+                    // poll the data if there is one and send them..
                     byte[] data = this.pollDataToProcess();
                     DatagramPacket packet = new DatagramPacket(data, data.length, this.serverAddress, AbstractSocketManager.APPLICATION_PORT);
                     socket.send(packet);
@@ -47,6 +48,8 @@ public class P2pClientThread extends AbstractClientThread {
             }
 
         }
+
+        // send an disconnect packet on socket close...
         byte[] data = SerializationUtils.serialize(new NetworkEventPacket(
                 GameManager.getGameSettings().getPlayerName(),
                 NetworkEventDispatcher.NetworkEventType.EVENT_CLIENT_GOODBYE

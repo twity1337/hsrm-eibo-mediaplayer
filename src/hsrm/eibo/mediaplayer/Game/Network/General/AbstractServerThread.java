@@ -18,6 +18,11 @@ public abstract class AbstractServerThread extends Thread {
         this.serverPort = port;
     }
 
+    /**
+     * Waits for an incoming network packet and handles dispatching of the Network event.
+     * @param socket
+     * @throws IOException if something wents wrong, while receiving the packet.
+     */
     protected void receiveAndHandleNetworkPacket(DatagramSocket socket) throws IOException {
         DatagramPacket datagramPacket = new DatagramPacket(new byte[AbstractSocketManager.PACKET_LENGTH], AbstractSocketManager.PACKET_LENGTH);
         socket.receive(datagramPacket);

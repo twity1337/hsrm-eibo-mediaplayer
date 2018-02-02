@@ -50,6 +50,10 @@ public class BandMember {
         this.clientAddress = clientAddress;
     }
 
+    /**
+     * Returns a unique player color for each created band member
+     * @return
+     */
     public Color getPlayerColor()
     {
         float PHI = (1 + (float) Math.sqrt(5))/2.0f;
@@ -63,6 +67,11 @@ public class BandMember {
         return (this.name + this.clientAddress.toString()).hashCode();
     }
 
+    /**
+     * Equals #name and #clientAddress
+     * @param obj
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof BandMember))

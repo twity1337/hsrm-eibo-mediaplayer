@@ -12,9 +12,7 @@ import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
 import hsrm.eibo.mediaplayer.Game.Synthesizer.Keyboard;
 import hsrm.eibo.mediaplayer.Game.View.HostGamePane;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -103,6 +101,9 @@ public class GameManager {
         return this;
     }
 
+    /**
+     * Initializes playback of the background song, if one is set.
+     */
     private void initBackgroundSong() {
         String backgroundSongPath = gameSettings.getBackgroundSongPath();
         if (backgroundSongPath == null)
@@ -170,6 +171,9 @@ public class GameManager {
         mainGameWindow.show();
     }
 
+    /**
+     * Create a tool window on host side, which displays all connected players with different colors.
+     */
     private void createHostWindow() {
         hostWindow = new Stage(StageStyle.UNDECORATED);
         hostWindow.initModality(Modality.NONE);
@@ -181,19 +185,15 @@ public class GameManager {
         Scene scene = new Scene(new HostGamePane(this.playbackMedia));
         hostWindow.setScene(scene);
         hostWindow.setOnCloseRequest(this::handleGameCloseRequest);
-        scene.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                xOffset = hostWindow.getX() - event.getScreenX();
-                yOffset = hostWindow.getY() - event.getScreenY();
-            }
+
+        // make window dragable/movable...
+        scene.setOnMousePressed(event -> {
+            xOffset = hostWindow.getX() - event.getScreenX();
+            yOffset = hostWindow.getY() - event.getScreenY();
         });
-        scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                hostWindow.setX(event.getScreenX() + xOffset);
-                hostWindow.setY(event.getScreenY() + yOffset);
-            }
+        scene.setOnMouseDragged(event -> {
+            hostWindow.setX(event.getScreenX() + xOffset);
+            hostWindow.setY(event.getScreenY() + yOffset);
         });
 
         hostWindow.show();

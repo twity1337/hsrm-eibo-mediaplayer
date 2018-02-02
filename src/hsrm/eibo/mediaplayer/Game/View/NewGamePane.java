@@ -11,7 +11,9 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
-
+/**
+ * The game option pane for creating a new game as host.
+ */
 public class NewGamePane extends GameOptionPane {
 
     private TextField backgroundSongPathField = null;
