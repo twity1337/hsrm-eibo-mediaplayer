@@ -2,7 +2,6 @@ package hsrm.eibo.mediaplayer.Game.Network.Host;
 
 import hsrm.eibo.mediaplayer.Game.Network.General.AbstractSocketManager;
 import hsrm.eibo.mediaplayer.Game.Network.General.ObservableConnectedClientList;
-import hsrm.eibo.mediaplayer.Game.Network.Host.Thread.P2pClientThread;
 import hsrm.eibo.mediaplayer.Game.Network.Host.Thread.P2pServerThread;
 
 import java.net.InetAddress;
@@ -63,11 +62,6 @@ public class SocketHostManager extends AbstractSocketManager{
         running = true;
         serverThread = new P2pServerThread(APPLICATION_PORT);
         serverThread.start();
-    }
-
-    public void startP2pClientThread() {
-        running = true;
-        clientThread = new P2pClientThread(localhost, APPLICATION_PORT);
     }
 
     public void close() {

@@ -170,6 +170,7 @@ public class GameManager {
         hostWindow.setWidth(200);
         Scene scene = new Scene(new HostGamePane(this.playbackMedia));
         hostWindow.setScene(scene);
+        hostWindow.setOnCloseRequest(this::handleGameCloseRequest);
 
         hostWindow.show();
     }
@@ -205,6 +206,8 @@ public class GameManager {
      */
     private void handleGameCloseRequest(WindowEvent windowEvent)
     {
+        if(hostWindow != null)
+            ((HostGamePane)hostWindow.getScene().getRoot()).stopPlayback();
         if(SocketHostManager.getInstance().isRunning())
             SocketHostManager.getInstance().close();
         socketClientManager.close();

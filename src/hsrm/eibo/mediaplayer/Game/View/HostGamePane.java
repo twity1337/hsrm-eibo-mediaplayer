@@ -11,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.MediaPlayer;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -21,6 +22,7 @@ import static hsrm.eibo.mediaplayer.Game.Model.InstrumentSelectionModel.getInstr
 public class HostGamePane extends BorderPane implements Observer {
 
     private static final int COLUMN_WIDTH = 100;
+    private MediaPlayer playbackTrackMediaPlayer = null;
     private ArrayList<BandMember> connectedClients;
     private VBox listBox;
 
@@ -32,12 +34,19 @@ public class HostGamePane extends BorderPane implements Observer {
         if (backgroundPlaybackMedia == null)
             return;
         try {
-            backgroundPlaybackMedia.getTrackMediaPlayer().play();
+            playbackTrackMediaPlayer = backgroundPlaybackMedia.getTrackMediaPlayer();
+            playbackTrackMediaPlayer.play();
         } catch (Exception e) {
             ErrorHandler err = ErrorHandler.getInstance();
             err.addError(e);
             err.notifyErrorObserver("Fehler bei der Initialisierung des Spiels");
         }
+    }
+
+    public void stopPlayback()
+    {
+        if(playbackTrackMediaPlayer != null)
+            playbackTrackMediaPlayer.dispose();
     }
 
     private Pane createPlayerListView() {
