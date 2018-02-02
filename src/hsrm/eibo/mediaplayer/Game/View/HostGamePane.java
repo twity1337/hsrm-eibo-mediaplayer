@@ -25,6 +25,7 @@ public class HostGamePane extends BorderPane implements Observer {
 
     public static final int WINDOW_HEIGHT = 400;
     public static final int WINDOW_WIDTH = 300;
+    public static final int WINDOW_X_POSITION = 100;
     private static final int COLUMN_WIDTH = WINDOW_WIDTH/2;
 
     private MediaPlayer playbackTrackMediaPlayer = null;

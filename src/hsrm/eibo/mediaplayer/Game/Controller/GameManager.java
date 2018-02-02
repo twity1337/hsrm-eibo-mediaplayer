@@ -11,7 +11,10 @@ import hsrm.eibo.mediaplayer.Game.Network.General.Model.NetworkEventPacket;
 import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
 import hsrm.eibo.mediaplayer.Game.Synthesizer.Keyboard;
 import hsrm.eibo.mediaplayer.Game.View.HostGamePane;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -57,6 +60,11 @@ public class GameManager {
      * Background playback Media
      */
     private Track playbackMedia = null;
+
+    /**
+     * Mouse offset for movable windows.
+     */
+    private static double yOffset, xOffset;
 
     private GameManager(){}
     private Set<Integer> pressedKeys = new HashSet<>();
@@ -154,6 +162,7 @@ public class GameManager {
         initKeyboardListener(scene);
 
         mainGameWindow.setTitle(GAME_WINDOW_TITLE);
+        mainGameWindow.setResizable(false);
         mainGameWindow.setScene(scene);
         mainGameWindow.setOnCloseRequest(this::handleGameCloseRequest);
 
@@ -165,14 +174,30 @@ public class GameManager {
         hostWindow = new Stage(StageStyle.UNDECORATED);
         hostWindow.initModality(Modality.NONE);
         hostWindow.initOwner(mainGameWindow);
-        hostWindow.setX(0);
+        hostWindow.centerOnScreen();
+        hostWindow.setX(HostGamePane.WINDOW_X_POSITION);
         hostWindow.setHeight(HostGamePane.WINDOW_HEIGHT);
         hostWindow.setWidth(HostGamePane.WINDOW_WIDTH);
         Scene scene = new Scene(new HostGamePane(this.playbackMedia));
         hostWindow.setScene(scene);
         hostWindow.setOnCloseRequest(this::handleGameCloseRequest);
+        scene.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                xOffset = hostWindow.getX() - event.getScreenX();
+                yOffset = hostWindow.getY() - event.getScreenY();
+            }
+        });
+        scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                hostWindow.setX(event.getScreenX() + xOffset);
+                hostWindow.setY(event.getScreenY() + yOffset);
+            }
+        });
 
         hostWindow.show();
+        Platform.runLater(mainGameWindow::requestFocus);
     }
 
     private void initKeyboardListener(Scene scene) {
