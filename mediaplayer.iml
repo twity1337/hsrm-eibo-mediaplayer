@@ -10,5 +10,6 @@
     <orderEntry type="module" module-name="mediaplayer/src" />
     <orderEntry type="library" name="tika-app-1.16" level="project" />
     <orderEntry type="library" name="scenicview" level="project" />
+    <orderEntry type="library" name="scenicView" level="project" />
   </component>
 </module>

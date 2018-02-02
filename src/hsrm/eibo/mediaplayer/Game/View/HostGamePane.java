@@ -7,11 +7,14 @@ import hsrm.eibo.mediaplayer.Game.Network.Host.SocketHostManager;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import org.jetbrains.annotations.NotNull;
+import org.scenicview.ScenicView;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -21,14 +24,16 @@ import static hsrm.eibo.mediaplayer.Game.Model.InstrumentSelectionModel.getInstr
 
 public class HostGamePane extends BorderPane implements Observer {
 
-    private static final int COLUMN_WIDTH = 100;
+    public static final int WINDOW_HEIGHT = 400;
+    public static final int WINDOW_WIDTH = 300;
+    private static final int COLUMN_WIDTH = WINDOW_WIDTH/2;
+
     private MediaPlayer playbackTrackMediaPlayer = null;
     private ArrayList<BandMember> connectedClients;
     private VBox listBox;
 
     public HostGamePane(Track backgroundPlaybackMedia) {
         SocketHostManager.getInstance().getConnectedClientList().addObserver(this);
-        this.setPadding(new Insets(5));
         this.setCenter(createPlayerListView());
 
         if (backgroundPlaybackMedia == null)
@@ -50,8 +55,18 @@ public class HostGamePane extends BorderPane implements Observer {
     }
 
     private Pane createPlayerListView() {
-        listBox = new VBox(createListHeader());
+        listBox = new VBox(createHeaderText(), createListHeader());
+        listBox.setPadding(new Insets(5));
+        listBox.setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(3), new BorderWidths(2))));
         return listBox;
+    }
+
+    @NotNull
+    private Text createHeaderText() {
+        Text header = new Text("Verbundene Spieler");
+        header.setFont(new Font(24));
+        header.setTextAlignment(TextAlignment.CENTER);
+        return header;
     }
 
     private Pane createListHeader() {
@@ -68,7 +83,7 @@ public class HostGamePane extends BorderPane implements Observer {
 
     private void updateLayout() {
         listBox.getChildren().clear();
-        listBox.getChildren().add(createListHeader());
+        listBox.getChildren().addAll(createHeaderText(), createListHeader());
         for (BandMember bandMember : connectedClients) {
             Label label0 = new Label(bandMember.getName());
             label0.setPrefWidth(COLUMN_WIDTH);
