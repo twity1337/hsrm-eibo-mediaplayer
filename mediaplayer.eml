@@ -5,5 +5,7 @@
 	<contentEntry url="file://$MODULE_DIR$"/>
 	<levels>
 		<level name="tika-app-1.16" value="project"/>
+		<level name="scenicview" value="project"/>
+		<level name="scenicView" value="project"/>
 	</levels>
 </component>

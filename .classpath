@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path="/mediaplayer/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mediaplayer/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/tika-app-1.16"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/scenicview"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/scenicView"/>
+	<classpathentry kind="output" path="out/production/mediaplayer"/>
 </classpath>
