@@ -1,5 +1,6 @@
 package hsrm.eibo.mediaplayer.Game.Synthesizer;
 
+import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
@@ -9,7 +10,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import org.apache.commons.lang.ArrayUtils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observer;
@@ -180,15 +180,17 @@ public class Keyboard {
         @Override
         public void update(java.util.Observable o, Object arg) {
             Object[] args = (Object[]) arg;
-            if((int) args[PRESSED_KEY_INDEX] == note)
-            {
-                if(KeyboardChangeEvent.EventCode.KEY_PRESSED == args[KeyboardChangeEvent.KEY_EVENT_TYPE]){
-                    this.paintKeyPressed((Color) args[PRESSED_KEY_COLOR]);
+            Platform.runLater(() -> {
+                if((int) args[PRESSED_KEY_INDEX] == note)
+                {
+                    if(KeyboardChangeEvent.EventCode.KEY_PRESSED == args[KeyboardChangeEvent.KEY_EVENT_TYPE]){
+                        paintKeyPressed((Color) args[PRESSED_KEY_COLOR]);
+                    }
+                    if(KeyboardChangeEvent.EventCode.KEY_RELEASED == args[KeyboardChangeEvent.KEY_EVENT_TYPE]){
+                        paintKeyReleased();
+                    }
                 }
-                if(KeyboardChangeEvent.EventCode.KEY_RELEASED == args[KeyboardChangeEvent.KEY_EVENT_TYPE]){
-                    this.paintKeyReleased();
-                }
-            }
+            });
         }
 
         public void setCanvas(Canvas c){
