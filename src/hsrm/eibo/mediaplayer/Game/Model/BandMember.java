@@ -58,7 +58,7 @@ public class BandMember {
     {
         float PHI = (1 + (float) Math.sqrt(5))/2.0f;
         float n = index * PHI - (float) Math.floor(index * PHI);
-        return Color.hsb(360/n, (n/2.0), 0.5);
+        return Color.hsb(360/n, 1, 0.8);
     }
 
 
