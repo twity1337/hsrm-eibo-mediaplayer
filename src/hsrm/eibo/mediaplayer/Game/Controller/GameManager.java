@@ -106,6 +106,7 @@ public class GameManager {
      */
     private void initBackgroundSong() {
         String backgroundSongPath = gameSettings.getBackgroundSongPath();
+        playbackMedia = null;
         if (backgroundSongPath == null)
             return;
 
