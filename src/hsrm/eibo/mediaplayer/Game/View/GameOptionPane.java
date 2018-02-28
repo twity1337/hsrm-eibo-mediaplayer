@@ -3,6 +3,7 @@ package hsrm.eibo.mediaplayer.Game.View;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
 import hsrm.eibo.mediaplayer.Game.Model.GameSettings;
 import hsrm.eibo.mediaplayer.Game.Model.InstrumentSelectionModel;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -26,6 +27,10 @@ public abstract class GameOptionPane extends GridPane {
         initBasicPaneComponents();
         initAdditionalComponents();
         completeBeforeRendering();
+
+        this.setVgap(10);
+        this.setHgap(50);
+        this.setPadding(new Insets(10));
     }
 
     /**
@@ -102,9 +107,13 @@ public abstract class GameOptionPane extends GridPane {
                 new InstrumentSelectionModel("Klavier", 0),
                 new InstrumentSelectionModel("Gitarre", 105),
                 new InstrumentSelectionModel("Helicopter", 125),
-                new InstrumentSelectionModel("Orgel", 17)
+                new InstrumentSelectionModel("Orgel", 17),
+                new InstrumentSelectionModel("Orchester (Staccato)", 55),
+                new InstrumentSelectionModel("Marimba", 12),
+                new InstrumentSelectionModel("Fritz®-Flöte", 76)
         );
         instrumentComboBox.getSelectionModel().select(0);
+        instrumentComboBox.setPrefWidth(200);
 
         this.appendNewRow(text0, nameField);
         this.appendNewRow(text1, instrumentComboBox);

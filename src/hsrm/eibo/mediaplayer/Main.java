@@ -2,7 +2,6 @@ package hsrm.eibo.mediaplayer;
 
 import hsrm.eibo.mediaplayer.Core.Controller.ErrorHandler;
 import hsrm.eibo.mediaplayer.Core.View.ViewBuilder;
-import hsrm.eibo.mediaplayer.Game.Synthesizer.*;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -26,9 +25,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        //TODO: entfernen
-        System.out.println(SynthesizerManager.getInstance().getInstrumentHashMap().toString());
-
         ViewBuilder.getInstance()
                 .setDebugModeEnabled(DEBUG_MODE_ENABLED)
                 .initPrimaryStage(primaryStage);

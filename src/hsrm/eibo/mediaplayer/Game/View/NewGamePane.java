@@ -6,6 +6,7 @@ import hsrm.eibo.mediaplayer.Game.Model.GameSettings;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -57,7 +58,7 @@ public class NewGamePane extends GameOptionPane {
         });
 
 
-        this.appendNewRow(text1, backgroundSongPathField, fileChooserButton);
+        this.appendNewRow(text1, new HBox(backgroundSongPathField, fileChooserButton));
     }
 
     @Override
